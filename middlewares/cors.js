@@ -1,7 +1,9 @@
 import cors from 'cors'
 
 const ACCEPTED_ORIGINS = [
-  'http://localhost:5500'
+  'http://localhost:4200',
+  'https://invites-card.vercel.app'
+
 ]
 
 export const corsMiddleware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) => cors({
