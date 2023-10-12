@@ -9,5 +9,6 @@ CREATE TABLE entries (
 	family VARCHAR(255) NOT NULL,
 	entriesNumber INT NOT NULL,
 	message TEXT,
-	confirmation BIT
+	confirmation BIT,
+  phoneNumber VARCHAR(13) NOT NULL
 );
