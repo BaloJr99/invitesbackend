@@ -4,6 +4,8 @@ CREATE DATABASE invitesdb;
 
 USE invitesdb;
 
+DROP TABLE IF EXISTS entries;
+
 CREATE TABLE entries (
 	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
 	family VARCHAR(255) NOT NULL,

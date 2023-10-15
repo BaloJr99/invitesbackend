@@ -32,6 +32,7 @@ export class EntriesModel {
         [family, entriesNumber, message, confirmation]
       )
     } catch (error) {
+      console.log(error)
       throw new Error('Error creating the party entry')
     }
 
@@ -43,6 +44,7 @@ export class EntriesModel {
     try {
       await connection.query('DELETE FROM entries WHERE id = UUID_TO_BIN(?)', [id])
     } catch (error) {
+      console.log(error)
       throw new Error('Error deleting the party entry')
     }
   }
@@ -62,6 +64,7 @@ export class EntriesModel {
 
       if (affectedRows === 0) return false
     } catch (error) {
+      console.log(error)
       throw new Error('Error updating the party entry')
     }
 
@@ -83,6 +86,7 @@ export class EntriesModel {
 
       if (affectedRows === 0) return false
     } catch (error) {
+      console.log(error)
       throw new Error('Error updating the party entry')
     }
 
