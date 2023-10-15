@@ -11,7 +11,14 @@ const entrySchema = z.object({
   }).int().min(1, 'The minimum number of entries is 1'),
   message: z.string({
     invalid_type_error: 'The message must be a string'
+  }).nullable().optional(),
+  entriesConfirmed: z.number({
+    required_error: 'The number of entries is required',
+    invalid_type_error: 'The entries confirmed must be a number'
   }).optional(),
+  phoneNumber: z.string({
+    required_error: 'The phone number is required'
+  }),
   confirmation: z.boolean().optional()
 })
 

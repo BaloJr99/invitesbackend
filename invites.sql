@@ -8,7 +8,8 @@ CREATE TABLE entries (
 	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
 	family VARCHAR(255) NOT NULL,
 	entriesNumber INT NOT NULL,
+	entriesConfirmed BOOLEAN NULL,
 	message TEXT,
-	confirmation BIT,
-  phoneNumber VARCHAR(13) NOT NULL
+	confirmation BOOLEAN NULL,
+	phoneNumber VARCHAR(13) NOT NULL
 );

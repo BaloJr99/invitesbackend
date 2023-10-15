@@ -2,7 +2,7 @@
 GET http://localhost:3000/entries
 
 ### Recuperar invitacion por id
-GET http://localhost:3000/entries/a4453f79-67e1-11ee-9673-84a938a64bb0
+GET http://localhost:3000/entries/a24266b7-6aac-11ee-bf9e-84a938a64bb0
 
 ### Crear una invitacion
 POST http://localhost:3000/entries
@@ -11,18 +11,27 @@ Content-Type: application/json
 {
   "family": "Familia Rojas",
   "entriesNumber": 4,
-  "phoneNumber": "+528781194465",
-  "message": "Jalow guapa"
+  "phoneNumber": "+528781194465"
 }
 
-### Actualizar una película
+### Actualizar una entrada
 PUT http://localhost:3000/entries/edf19ddc-6537-11ee-9673-84a938a64bb0
 Content-Type: application/json
 
 {
   "family": "Test",
-  "entriesNumber": 1
+  "entriesNumber": 5
+}
+
+### Actualizar una entrada confirmada
+PATCH http://localhost:3000/entries/e835635d-6aad-11ee-bf9e-84a938a64bb0
+Content-Type: application/json
+
+{
+  "confirmation": null,
+  "entriesConfirmed": null,
+  "message": "felicitaciones sofy"
 }
 
 ### Borrar una invitacion
-DELETE http://localhost:3000/entries/a4453f79-67e1-11ee-9673-84a938a64bb0
+DELETE http://localhost:3000/entries/ed2b7c43-6aad-11ee-bf9e-84a938a64bb0

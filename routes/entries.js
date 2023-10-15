@@ -12,6 +12,7 @@ export const createEntriesRouter = ({ entryModel }) => {
   entriesRouter.get('/:id', entrieController.getById)
   entriesRouter.delete('/:id', entrieController.delete)
   entriesRouter.put('/:id', entrieController.update)
+  entriesRouter.patch('/:id', entrieController.updateConfirmation)
 
   return entriesRouter
 }

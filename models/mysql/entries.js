@@ -65,7 +65,28 @@ export class EntriesModel {
       throw new Error('Error updating the party entry')
     }
 
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation FROM entries WHERE id = UUID_TO_BIN(?)', [id])
+    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
+    return entry
+  }
+
+  static async updateConfirmation ({ id, input }) {
+    const {
+      entriesNumber,
+      message,
+      confirmation
+    } = input
+
+    try {
+      const [{ affectedRows }] = await connection.query('UPDATE entries SET ? WHERE id = UUID_TO_BIN(?)', [
+        { entriesNumber, message, confirmation }, id
+      ])
+
+      if (affectedRows === 0) return false
+    } catch (error) {
+      throw new Error('Error updating the party entry')
+    }
+
+    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
     return entry
   }
 }

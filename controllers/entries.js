@@ -1,4 +1,4 @@
-import { validateEntry } from '../schemas/entries.js'
+import { validateEntry, validatePartialEntry } from '../schemas/entries.js'
 
 export class EntryController {
   constructor ({ entryModel }) {
@@ -57,5 +57,22 @@ export class EntryController {
     }
 
     return res.json(updatedEntry)
+  }
+
+  updateConfirmation = async (req, res) => {
+    const result = validatePartialEntry(req.body)
+
+    if (!result.success) {
+      return res.status(400).json({ error: JSON.parse(result.error.message) })
+    }
+
+    const { id } = req.params
+    const updateConfirmation = await this.entryModel.updateConfirmation({ id, input: result.data })
+
+    if (updateConfirmation === false) {
+      return res.status(400).json({ message: 'Entry not found' })
+    }
+
+    return res.json(updateConfirmation)
   }
 }
