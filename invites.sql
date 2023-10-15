@@ -13,5 +13,6 @@ CREATE TABLE entries (
 	entriesConfirmed BOOLEAN NULL,
 	message TEXT,
 	confirmation BOOLEAN NULL,
-	phoneNumber VARCHAR(13) NOT NULL
+	phoneNumber VARCHAR(13) NOT NULL,
+	groupSelected VARCHAR(20) NOT NULL
 );

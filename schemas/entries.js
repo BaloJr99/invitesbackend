@@ -19,7 +19,10 @@ const entrySchema = z.object({
   phoneNumber: z.string({
     required_error: 'The phone number is required'
   }),
-  confirmation: z.boolean().optional()
+  confirmation: z.boolean().optional(),
+  groupSelected: z.string({
+    required_error: 'The group is required'
+  })
 })
 
 export function validateEntry (input) {
