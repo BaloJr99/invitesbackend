@@ -16,8 +16,7 @@ Content-Type: application/json
 }
 
 ### Actualizar una entrada
-PUT http://localhost:3000/entries/84ee6113-6b68-11ee-bf9e-84a938a64bb0
-Content-Type: application/json
+PUT http://localhost:3000/entries/b2b125d1-6be1-11ee-bf9e-84a938a64bb0
 
 {
   "family": "Familia Rojas",
@@ -27,14 +26,14 @@ Content-Type: application/json
 }
 
 ### Actualizar una entrada confirmada
-PATCH http://localhost:3000/entries/84ee6113-6b68-11ee-bf9e-84a938a64bb0
+PATCH http://localhost:3000/entries/b5452fd0-6bde-11ee-bf9e-84a938a64bb0
 Content-Type: application/json
 
 {
-  "confirmation": true,
-  "entriesConfirmed": 4,
+  "confirmation": null,
+  "entriesConfirmed": null,
   "message": "felicitaciones sofy"
 }
 
 ### Borrar una invitacion
-DELETE http://localhost:3000/entries/84ee6113-6b68-11ee-bf9e-84a938a64bb0
+DELETE http://localhost:3000/entries/b5452fd0-6bde-11ee-bf9e-84a938a64bb0

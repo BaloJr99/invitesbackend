@@ -25,10 +25,27 @@ const entrySchema = z.object({
   })
 })
 
+const confirmationSchema = z.object({
+  message: z.string({
+    invalid_type_error: 'The message must be a string'
+  }).nullable().optional(),
+  entriesConfirmed: z.number().nullable().optional(),
+  confirmation: z.boolean().optional()
+}).superRefine(({ confirmation, entriesConfirmed }, refinementContext) => {
+  console.log(confirmation, entriesConfirmed)
+  if (confirmation === true && (entriesConfirmed === undefined || entriesConfirmed === null)) {
+    return refinementContext.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'The entries are required if you assist',
+      path: ['entriesConfirmed']
+    })
+  }
+})
+
 export function validateEntry (input) {
   return entrySchema.safeParse(input)
 }
 
-export function validatePartialEntry (input) {
-  return entrySchema.partial().safeParse(input)
+export function validateConfirmationSchema (input) {
+  return confirmationSchema.safeParse(input)
 }
