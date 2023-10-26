@@ -32,7 +32,6 @@ const confirmationSchema = z.object({
   entriesConfirmed: z.number().nullable().optional(),
   confirmation: z.boolean().optional()
 }).superRefine(({ confirmation, entriesConfirmed }, refinementContext) => {
-  console.log(confirmation, entriesConfirmed)
   if (confirmation === true && (entriesConfirmed === undefined || entriesConfirmed === null)) {
     return refinementContext.addIssue({
       code: z.ZodIssueCode.custom,
