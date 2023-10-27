@@ -13,12 +13,12 @@ const connection = await mysql.createConnection(connectionString)
 
 export class EntriesModel {
   static async getAll () {
-    const [entries] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected FROM entries')
+    const [entries] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries')
     return entries
   }
 
   static async getById ({ id }) {
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected FROM entries WHERE id = UUID_TO_BIN(?)', [id])
+    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
     return entry
   }
 
@@ -30,7 +30,8 @@ export class EntriesModel {
       confirmation,
       phoneNumber,
       entriesConfirmed,
-      groupSelected
+      groupSelected,
+      kidsAllowed
     } = input
 
     const [uuidResult] = await connection.query('SELECT UUID() uuid')
@@ -38,14 +39,14 @@ export class EntriesModel {
 
     try {
       await connection.query(
-        `INSERT INTO entries (id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, ?, ?)`,
-        [family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected]
+        `INSERT INTO entries (id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed]
       )
     } catch (error) {
       throw new Error('Error creating the party entry')
     }
 
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected FROM entries WHERE id = UUID_TO_BIN(?)', [uuid])
+    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [uuid])
     return entry.at(0)
   }
 
@@ -65,12 +66,13 @@ export class EntriesModel {
       confirmation,
       phoneNumber,
       entriesConfirmed,
-      groupSelected
+      groupSelected,
+      kidsAllowed
     } = input
 
     try {
       const [{ affectedRows }] = await connection.query('UPDATE entries SET ? WHERE id = UUID_TO_BIN(?)', [
-        { family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected }, id
+        { family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed }, id
       ])
 
       if (affectedRows === 0) return false
@@ -78,7 +80,7 @@ export class EntriesModel {
       throw new Error('Error updating the party entry')
     }
 
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected FROM entries WHERE id = UUID_TO_BIN(?)', [id])
+    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
     return entry
   }
 
@@ -99,7 +101,7 @@ export class EntriesModel {
       throw new Error('Error updating the party entry')
     }
 
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, entriesConfirmed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
+    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, entriesConfirmed, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
     return entry
   }
 }

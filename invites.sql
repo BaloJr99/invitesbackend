@@ -14,7 +14,8 @@ CREATE TABLE entries (
 	message TEXT,
 	confirmation BOOLEAN NULL,
 	phoneNumber VARCHAR(13) NOT NULL,
-	groupSelected VARCHAR(20) NOT NULL
+	groupSelected VARCHAR(20) NOT NULL,
+  kidsAllowed BOOLEAN NOT NULL
 );
 
 CREATE TABLE usersActivity (

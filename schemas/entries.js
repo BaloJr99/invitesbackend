@@ -22,6 +22,10 @@ const entrySchema = z.object({
   confirmation: z.boolean().optional(),
   groupSelected: z.string({
     required_error: 'The group is required'
+  }),
+  kidsAllowed: z.boolean({
+    required_error: 'The kids value is required',
+    invalid_type_error: 'The kids allowed must be a number'
   })
 })
 
