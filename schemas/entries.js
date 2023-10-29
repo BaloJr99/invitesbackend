@@ -25,7 +25,7 @@ const entrySchema = z.object({
   }),
   kidsAllowed: z.boolean({
     required_error: 'The kids value is required',
-    invalid_type_error: 'The kids allowed must be a number'
+    invalid_type_error: 'The kids allowed must be a boolean'
   })
 })
 
