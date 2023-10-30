@@ -5,8 +5,8 @@ const connectionString = process.env.DATABASE_URL
 const connection = await mysql.createConnection(connectionString)
 
 export class EntriesModel {
-  static async getAll () {
-    const [entries] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries')
+  static async getAll (userId) {
+    const [entries] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE userId = CAST(? AS BINARY)', [userId])
     return entries
   }
 
@@ -15,7 +15,7 @@ export class EntriesModel {
     return entry
   }
 
-  static async create ({ input }) {
+  static async create ({ input }, id) {
     const {
       family,
       entriesNumber,
@@ -32,8 +32,8 @@ export class EntriesModel {
 
     try {
       await connection.query(
-        `INSERT INTO entries (id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed]
+        `INSERT INTO entries (id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, ?, ?, ?, CAST(? AS BINARY))`,
+        [family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed, id]
       )
     } catch (error) {
       throw new Error('Error creating the party entry')

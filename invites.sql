@@ -15,14 +15,26 @@ CREATE TABLE entries (
 	confirmation BOOLEAN NULL,
 	phoneNumber VARCHAR(13) NOT NULL,
 	groupSelected VARCHAR(20) NOT NULL,
-  kidsAllowed BOOLEAN NOT NULL
+	kidsAllowed BOOLEAN NOT NULL
 );
 
 CREATE TABLE usersActivity (
   id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
   controller VARCHAR(255) NOT NULL,
   action VARCHAR(255) NOT NULL,
-  user_id BINARY(16) NOT NULL,
-  visitDate DATETIME NOT NULL,
-  CONSTRAINT FK_User_Activity FOREIGN KEY (user_id) REFERENCES users(id)
+  user_id BINARY(24) NOT NULL,
+  visitDate DATETIME NOT NULL
+);
+
+ALTER TABLE entries ADD COLUMN userId BINARY(24);
+UPDATE entries SET userId = CAST('653db741413356d785873257' AS BINARY);
+ALTER TABLE entries MODIFY COLUMN userId BINARY(24) NOT NULL;
+
+ALTER TABLE usersActivity RENAME COLUMN user_id to userId;
+
+CREATE TABLE errorLogs (
+  id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  dateOfError DATETIME NOT NULL,
+  error VARCHAR(255) NOT NULL,
+  statusCode VARCHAR(3) NOT NULL
 );

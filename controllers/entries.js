@@ -1,4 +1,5 @@
 import { validateEntry, validateConfirmationSchema } from '../schemas/entries.js'
+import jwt from 'jsonwebtoken'
 
 export class EntryController {
   constructor ({ entryModel }) {
@@ -6,7 +7,13 @@ export class EntryController {
   }
 
   getAll = async (req, res) => {
-    const entries = await this.entryModel.getAll()
+    const token = req.headers['x-access-token']
+
+    if (!token) return res.status(403).json({ error: 'No token provided' })
+
+    const decoded = jwt.verify(token, process.env.SECRET)
+
+    const entries = await this.entryModel.getAll(decoded.id)
     res.json(entries)
   }
 
@@ -26,9 +33,15 @@ export class EntryController {
       return res.status(422).json({ error: JSON.parse(result.error.message) })
     }
 
-    const newMovie = await this.entryModel.create({ input: result.data })
+    const token = req.headers['x-access-token']
 
-    res.status(201).json(newMovie)
+    if (!token) return res.status(403).json({ error: 'No token provided' })
+
+    const decoded = jwt.verify(token, process.env.SECRET)
+
+    const newEntry = await this.entryModel.create({ input: result.data }, decoded.id)
+
+    res.status(201).json(newEntry)
   }
 
   delete = async (req, res) => {
