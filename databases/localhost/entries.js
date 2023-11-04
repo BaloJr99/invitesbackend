@@ -1,13 +1,14 @@
 import mysql from 'mysql2/promise'
 
-const DEFAUL_CONFIG = {
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  database: 'invitesdb'
+const DEFAULT_CONFIG = {
+  host: process.env.MYSQL_HOST,
+  port: process.env.MYSQL_PORT,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 }
 
-const connectionString = DEFAUL_CONFIG
+const connectionString = DEFAULT_CONFIG
 
 const connection = await mysql.createConnection(connectionString)
 
@@ -18,8 +19,7 @@ export class EntriesModel {
   }
 
   static async getById ({ id }) {
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
-    return entry
+    return await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
   }
 
   static async create ({ input }, id) {
@@ -46,8 +46,7 @@ export class EntriesModel {
       throw new Error('Error creating the party entry')
     }
 
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [uuid])
-    return entry.at(0)
+    return await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [uuid])
   }
 
   static async delete ({ id }) {
@@ -80,8 +79,7 @@ export class EntriesModel {
       throw new Error('Error updating the party entry')
     }
 
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
-    return entry
+    return await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
   }
 
   static async updateConfirmation ({ id, input }) {
@@ -101,7 +99,6 @@ export class EntriesModel {
       throw new Error('Error updating the party entry')
     }
 
-    const [entry] = await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, entriesConfirmed, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
-    return entry
+    return await connection.query('SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, entriesConfirmed, kidsAllowed FROM entries WHERE id = UUID_TO_BIN(?)', [id])
   }
 }
