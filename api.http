@@ -1,17 +1,17 @@
 ### Recuperar todas las invitaciones
 GET http://localhost:3000/entries
-x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mzg5OWI2ZDczMjZiNjM4NzRkMzdjNyIsImlhdCI6MTY5ODM3Nzc2MywiZXhwIjoxNjk4NDY0MTYzfQ.Ls7LGAhuG1Y6nk_NE4oE4KFosjByTi3AHCF00iWDjcU
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mzg5OWI2ZDczMjZiNjM4NzRkMzdjNyIsInVzZXJuYW1lIjoiYnJhdWxpb2pyIiwiZW1haWwiOiJiYWxvY2hhdmV6bXR6OTlAaG90bWFpbC5jb20iLCJpYXQiOjE2OTkxMTEzODIsImV4cCI6MTY5OTE5Nzc4Mn0.11y88PjMEkT26_PxRodC9lcIDduQ--GeSfhIR9viKIQ
 
 ### Recuperar invitacion por id
-GET http://localhost:3000/entries/84ee6113-6b68-11ee-bf9e-84a938a64bb0
+GET http://localhost:3000/entries/49538452-7b28-11ee-a0b3-84a938a64bb0
 
 ### Crear una invitacion
 POST http://localhost:3000/entries
-x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mzg5OWI2ZDczMjZiNjM4NzRkMzdjNyIsImlhdCI6MTY5ODM3Nzc2MywiZXhwIjoxNjk4NDY0MTYzfQ.Ls7LGAhuG1Y6nk_NE4oE4KFosjByTi3AHCF00iWDjcU
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mzg5OWI2ZDczMjZiNjM4NzRkMzdjNyIsInVzZXJuYW1lIjoiYnJhdWxpb2pyIiwiZW1haWwiOiJiYWxvY2hhdmV6bXR6OTlAaG90bWFpbC5jb20iLCJpYXQiOjE2OTkxMTEzODIsImV4cCI6MTY5OTE5Nzc4Mn0.11y88PjMEkT26_PxRodC9lcIDduQ--GeSfhIR9viKIQ
 Content-Type: application/json
 
 {
-  "family": "Familia Rojas",
+  "family": "Familia Rojas Test 3",
   "entriesNumber": 4,
   "phoneNumber": "+528781194465",
   "groupSelected": "Mami",
@@ -19,22 +19,25 @@ Content-Type: application/json
 }
 
 ### Actualizar una entrada
-PUT http://localhost:3000/entries/b2b125d1-6be1-11ee-bf9e-84a938a64bb0
+PUT http://localhost:3000/entries/49538452-7b28-11ee-a0b3-84a938a64bb0
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mzg5OWI2ZDczMjZiNjM4NzRkMzdjNyIsInVzZXJuYW1lIjoiYnJhdWxpb2pyIiwiZW1haWwiOiJiYWxvY2hhdmV6bXR6OTlAaG90bWFpbC5jb20iLCJpYXQiOjE2OTkxMTEzODIsImV4cCI6MTY5OTE5Nzc4Mn0.11y88PjMEkT26_PxRodC9lcIDduQ--GeSfhIR9viKIQ
+Content-Type: application/json
 
 {
   "family": "Familia Rojas",
   "entriesNumber": 5,
   "phoneNumber": "+528781194465",
-  "groupSelected": "Mami"
+  "groupSelected": "Mami",
+  "kidsAllowed": false
 }
 
 ### Actualizar una entrada confirmada
-PATCH http://localhost:3000/entries/8f069f38-72f4-11ee-bf9e-84a938a64bb0
+PATCH http://localhost:3000/entries/49538452-7b28-11ee-a0b3-84a938a64bb0
 Content-Type: application/json
 
 {
   "confirmation": true,
-  "entriesConfirmed": 10,
+  "entriesConfirmed": 4,
   "message": "felicitaciones sofia"
 }
 
