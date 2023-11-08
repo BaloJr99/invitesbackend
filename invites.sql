@@ -38,3 +38,8 @@ CREATE TABLE errorLogs (
   error VARCHAR(255) NOT NULL,
   statusCode VARCHAR(3) NOT NULL
 );
+
+ALTER TABLE entries ADD COLUMN dateOfConfirmation DATETIME;
+UPDATE entries SET dateOfConfirmation = '1000-01-01 00:00:00';
+ALTER TABLE entries ADD COLUMN isMessageRead BOOLEAN;
+UPDATE entries SET isMessageRead = true;

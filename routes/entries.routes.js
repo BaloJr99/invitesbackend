@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { EntryController } from '../controllers/entries.js'
 import { isEntriesAdmin, verifyToken } from '../middlewares/authJwt.js'
+import { validateUuid } from '../middlewares/validateUuid.js'
 
 export const entriesRouter = Router()
 
@@ -10,10 +11,11 @@ export const createEntriesRouter = ({ entryModel }) => {
   entriesRouter.get('/', [verifyToken, isEntriesAdmin], entrieController.getAll)
   entriesRouter.post('/', [verifyToken, isEntriesAdmin], entrieController.create)
 
-  entriesRouter.get('/:id', entrieController.getById)
-  entriesRouter.delete('/:id', [verifyToken, isEntriesAdmin], entrieController.delete)
-  entriesRouter.put('/:id', [verifyToken, isEntriesAdmin], entrieController.update)
-  entriesRouter.patch('/:id', entrieController.updateConfirmation)
+  entriesRouter.get('/:id', [validateUuid], entrieController.getById)
+  entriesRouter.delete('/:id', [verifyToken, isEntriesAdmin, validateUuid], entrieController.delete)
+  entriesRouter.put('/:id', [verifyToken, isEntriesAdmin, validateUuid], entrieController.update)
+  entriesRouter.patch('/messages/:id', [verifyToken, isEntriesAdmin], entrieController.readMessage)
+  entriesRouter.patch('/:id', [validateUuid], entrieController.updateConfirmation)
 
   return entriesRouter
 }

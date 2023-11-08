@@ -14,16 +14,17 @@ export class EntryController {
     const decoded = jwt.verify(token, process.env.SECRET)
 
     const entries = await this.entryModel.getAll(decoded.id)
-    res.json(entries)
+    return res.json(entries)
   }
 
   getById = async (req, res) => {
     const { id } = req.params
+
     const [entry] = await this.entryModel.getById({ id })
 
     if (entry.length > 0) return res.json(entry.at(0))
 
-    res.status(404).json({ message: 'Entry not found' })
+    return res.status(404).json({ message: 'Invitación no encontrada' })
   }
 
   create = async (req, res) => {
@@ -39,9 +40,9 @@ export class EntryController {
 
     const decoded = jwt.verify(token, process.env.SECRET)
 
-    const [newEntry] = await this.entryModel.create({ input: result.data }, decoded.id)
+    await this.entryModel.create({ input: result.data }, decoded.id)
 
-    res.status(201).json(newEntry.at(0))
+    return res.status(201).json({ message: 'Invitación creada' })
   }
 
   delete = async (req, res) => {
@@ -49,10 +50,10 @@ export class EntryController {
     const result = await this.entryModel.delete({ id })
 
     if (result === false) {
-      return res.status(404).json({ message: 'Entry not found' })
+      return res.status(404).json({ message: 'Invitación no encontrada' })
     }
 
-    return res.json({ message: 'Entry deleted' })
+    return res.json({ message: 'Invitación eliminada' })
   }
 
   update = async (req, res) => {
@@ -63,13 +64,13 @@ export class EntryController {
     }
 
     const { id } = req.params
-    const [newEntries] = await this.entryModel.update({ id, input: result.data })
+    const update = await this.entryModel.update({ id, input: result.data })
 
-    if (newEntries === false) {
-      return res.status(400).json({ message: 'Entry not found' })
+    if (update === false) {
+      return res.status(400).json({ message: 'Invitación no encontrada' })
     }
 
-    return res.json(newEntries.at(0))
+    return res.status(201).json({ message: 'Invitación actualizada' })
   }
 
   updateConfirmation = async (req, res) => {
@@ -80,12 +81,23 @@ export class EntryController {
     }
 
     const { id } = req.params
-    const [updateConfirmation] = await this.entryModel.updateConfirmation({ id, input: result.data })
+    const wasUpdated = await this.entryModel.updateConfirmation({ id, input: result.data })
 
-    if (updateConfirmation === false) {
-      return res.status(400).json({ message: 'Entry not found' })
+    if (wasUpdated === false) {
+      return res.status(400).json({ message: 'Invitación no encontrada' })
     }
 
-    return res.json(updateConfirmation.at(0))
+    return res.status(201).json({ message: 'Respuesta enviada' })
+  }
+
+  readMessage = async (req, res) => {
+    const { id } = req.params
+    const wasMessageRead = await this.entryModel.readMessage({ id })
+
+    if (wasMessageRead === false) {
+      return res.status(400).json({ message: 'Mensaje no encontrado' })
+    }
+
+    return res.status(200).json({ message: 'Mensaje leído' })
   }
 }
