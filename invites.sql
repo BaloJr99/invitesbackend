@@ -43,3 +43,6 @@ ALTER TABLE entries ADD COLUMN dateOfConfirmation DATETIME;
 UPDATE entries SET dateOfConfirmation = '1000-01-01 00:00:00';
 ALTER TABLE entries ADD COLUMN isMessageRead BOOLEAN;
 UPDATE entries SET isMessageRead = true;
+
+UPDATE entries SET isMessageRead = false WHERE confirmation IS NULL;
+ALTER TABLE entries ALTER COLUMN isMessageRead SET DEFAULT false;

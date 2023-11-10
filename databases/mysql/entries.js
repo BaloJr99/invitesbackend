@@ -99,4 +99,11 @@ export class EntriesModel {
 
     return true
   }
+
+  static async getUserFromEntryId (id) {
+    return await connection.query(
+      'SELECT CAST(userId as CHAR) AS userId FROM entries WHERE id = UUID_TO_BIN(?)',
+      [id]
+    )
+  }
 }

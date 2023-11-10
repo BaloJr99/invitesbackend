@@ -71,4 +71,9 @@ export class UserModel {
 
     return token
   }
+
+  static async getUsername (userId) {
+    const userFounded = await User.findById(userId)
+    return userFounded.username
+  }
 }

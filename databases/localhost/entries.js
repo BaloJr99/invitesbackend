@@ -5,7 +5,8 @@ const DEFAULT_CONFIG = {
   port: process.env.MYSQL_PORT,
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE
+  database: process.env.MYSQL_DATABASE,
+  timezone: '+00:00'
 }
 
 const connectionString = DEFAULT_CONFIG
@@ -106,5 +107,12 @@ export class EntriesModel {
     }
 
     return true
+  }
+
+  static async getUserFromEntryId (id) {
+    return await connection.query(
+      'SELECT CAST(userId as CHAR) AS userId FROM entries WHERE id = UUID_TO_BIN(?)',
+      [id]
+    )
   }
 }
