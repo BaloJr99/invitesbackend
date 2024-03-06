@@ -16,7 +16,7 @@ export const createApp = ({ entryModel, userModel, eventModel }) => {
   const server = createServer(app)
 
   const io = new Server(server, {
-    connectionStateRecovery: { },
+    connectionStateRecovery: {},
     cors: {
       origin: ACCEPTED_ORIGINS,
       credentials: true
@@ -36,10 +36,6 @@ export const createApp = ({ entryModel, userModel, eventModel }) => {
       const username = await userModel.getUsername(userId)
 
       io.to(username).emit('newNotification')
-    })
-
-    socket.on('disconnect', () => {
-      console.log('an user has disconnected')
     })
   })
 

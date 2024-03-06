@@ -21,7 +21,7 @@ export class EntriesModel {
   }
 
   static async create ({ input }, id) {
-    const { family, entriesNumber, phoneNumber, groupSelected, kidsAllowed } =
+    const { family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, eventId } =
       input
 
     const [uuidResult] = await connection.query('SELECT UUID() uuid')
@@ -29,8 +29,8 @@ export class EntriesModel {
 
     try {
       await connection.query(
-        `INSERT INTO entries (id, family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, CAST(? AS BINARY))`,
-        [family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, id]
+        `INSERT INTO entries (id, family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, userId, eventId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, CAST(? AS BINARY))`,
+        [family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, id, eventId]
       )
     } catch (error) {
       throw new Error('Error creating the party entry')

@@ -27,6 +27,16 @@ export class EntryController {
     return res.status(404).json({ message: 'Invitación no encontrada' })
   }
 
+  getEntry = async (req, res) => {
+    const { id } = req.params
+
+    const [entry] = await this.entryModel.getEntry({ id })
+
+    if (entry.length > 0) return res.json(entry.at(0))
+
+    return res.status(404).json({ message: 'Invitación no encontrada' })
+  }
+
   create = async (req, res) => {
     const result = validateEntry(req.body)
 

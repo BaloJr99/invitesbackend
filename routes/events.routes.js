@@ -9,6 +9,7 @@ export const createEventsRouter = ({ eventModel }) => {
   const eventController = new EventsController({ eventModel })
 
   eventsRouter.get('/', [verifyToken, isEntriesAdmin], eventController.getAll)
+  eventsRouter.get('/entries/:id', [verifyToken, isEntriesAdmin], eventController.getEventEntries)
   eventsRouter.post('/', [verifyToken, isEntriesAdmin], eventController.create)
 
   eventsRouter.get('/:id', [validateUuid], eventController.getById)

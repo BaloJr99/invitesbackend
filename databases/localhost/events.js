@@ -15,9 +15,17 @@ const connection = await mysql.createConnection(connectionString)
 
 export class EventsModel {
   static async getAll (userId) {
-    const [entries] = await connection.query(
+    const [events] = await connection.query(
       'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation FROM events WHERE userId = CAST(? AS BINARY) ORDER BY dateOfEvent DESC',
       [userId]
+    )
+    return events
+  }
+
+  static async getEventEntries (userId, eventId) {
+    const [entries] = await connection.query(
+      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed, dateOfConfirmation, isMessageRead FROM entries WHERE userId = CAST(? AS BINARY) AND eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
+      [userId, eventId]
     )
     return entries
   }
@@ -38,7 +46,7 @@ export class EventsModel {
 
     try {
       await connection.query(
-        `INSERT INTO events (id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, user_id) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, CAST(? AS BINARY))`,
+        `INSERT INTO events (id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, CAST(? AS BINARY))`,
         [nameOfEvent, dateOfEvent, maxDateOfConfirmation, id]
       )
     } catch (error) {
@@ -65,7 +73,7 @@ export class EventsModel {
 
     try {
       const [{ affectedRows }] = await connection.query(
-        'UPDATE entries SET ? WHERE id = UUID_TO_BIN(?)',
+        'UPDATE events SET ? WHERE id = UUID_TO_BIN(?)',
         [{ nameOfEvent, dateOfEvent, maxDateOfConfirmation }, id]
       )
 

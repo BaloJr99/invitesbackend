@@ -17,6 +17,18 @@ export class EventsController {
     return res.json(events)
   }
 
+  getEventEntries = async (req, res) => {
+    const token = req.headers['x-access-token']
+    const { id } = req.params
+
+    if (!token) return res.status(403).json({ error: 'No token provided' })
+
+    const decoded = jwt.verify(token, process.env.SECRET)
+
+    const events = await this.eventModel.getEventEntries(decoded.id, id)
+    return res.json(events)
+  }
+
   getById = async (req, res) => {
     const { id } = req.params
 

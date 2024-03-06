@@ -21,6 +21,10 @@ const entrySchema = z.object({
   kidsAllowed: z.boolean({
     required_error: 'The kids value is required',
     invalid_type_error: 'The kids allowed must be a boolean'
+  }),
+  eventId: z.string().uuid({
+    required_error: 'The event id is required',
+    invalid_type_error: 'The event id should be a uuid type'
   })
 })
 
@@ -52,10 +56,10 @@ const confirmationSchema = z
     }
   })
 
-export function validateEntry (input) {
+export function validateEntry(input) {
   return entrySchema.safeParse(input)
 }
 
-export function validateConfirmationSchema (input) {
+export function validateConfirmationSchema(input) {
   return confirmationSchema.safeParse(input)
 }
