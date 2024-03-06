@@ -10,7 +10,7 @@ const cluster = process.env.MONGO_CLUSTER
 
 mongoose
   .connect(
-    `mongodb+srv://${username}:${password}@${cluster}/?retryWrites=true&w=majority`
+    `mongodb+srv://${username}:${password}@${cluster}/?retryWrites=true&w=majority&&appName=Cluster0`
   )
   .then((db) => {
     console.log('Db is connected')
