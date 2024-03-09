@@ -5,12 +5,13 @@ import { createServer } from 'node:http'
 
 import { createEntriesRouter } from './routes/entries.routes.js'
 import { createEventsRouter } from './routes/events.routes.js'
+import { createFamilyGroupsRouter } from './routes/familyGroup.routes.js'
 import { createUsersRouter } from './routes/user.routes.js'
 import { createAuthRouter } from './routes/auth.routes.js'
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middlewares/cors.js'
 import 'dotenv/config.js'
 
-export const createApp = ({ entryModel, userModel, eventModel }) => {
+export const createApp = ({ entryModel, userModel, eventModel, familyGroupModel }) => {
   const app = express()
 
   const server = createServer(app)
@@ -45,6 +46,7 @@ export const createApp = ({ entryModel, userModel, eventModel }) => {
 
   app.use('/entries', createEntriesRouter({ entryModel }))
   app.use('/events', createEventsRouter({ eventModel }))
+  app.use('/familyGroups', createFamilyGroupsRouter({ familyGroupModel }))
   app.use('/users', createUsersRouter({ userModel }))
   app.use('/auth', createAuthRouter({ userModel }))
 

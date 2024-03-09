@@ -15,7 +15,7 @@ export class EventsModel {
 
   static async getEventEntries (userId, eventId) {
     const [entries] = await connection.query(
-      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed, dateOfConfirmation, isMessageRead FROM entries WHERE userId = CAST(? AS BINARY) AND eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
+      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead, BIN_TO_UUID(familyGroupId) familyGroupId FROM entries WHERE userId = CAST(? AS BINARY) AND eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
       [userId, eventId]
     )
     return entries

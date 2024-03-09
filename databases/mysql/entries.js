@@ -7,7 +7,7 @@ const connection = await mysql.createConnection(connectionString)
 export class EntriesModel {
   static async getAll (userId) {
     const [entries] = await connection.query(
-      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed, dateOfConfirmation, isMessageRead FROM entries WHERE userId = CAST(? AS BINARY) ORDER BY dateOfConfirmation DESC',
+      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead FROM entries WHERE userId = CAST(? AS BINARY) ORDER BY dateOfConfirmation DESC',
       [userId]
     )
     return entries
@@ -15,7 +15,7 @@ export class EntriesModel {
 
   static async getById ({ id }) {
     return await connection.query(
-      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, groupSelected, kidsAllowed, dateOfConfirmation, isMessageRead FROM entries WHERE id = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead FROM entries WHERE id = UUID_TO_BIN(?)',
       [id]
     )
   }
@@ -32,9 +32,9 @@ export class EntriesModel {
       family,
       entriesNumber,
       phoneNumber,
-      groupSelected,
       kidsAllowed,
-      eventId
+      eventId,
+      familyGroupId
     } = input
 
     const [uuidResult] = await connection.query('SELECT UUID() uuid')
@@ -42,15 +42,15 @@ export class EntriesModel {
 
     try {
       await connection.query(
-        `INSERT INTO entries (id, family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, userId, eventId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, CAST(? AS BINARY), UUID_TO_BIN(?))`,
+        `INSERT INTO entries (id, family, entriesNumber, phoneNumber, kidsAllowed, userId, eventId, familyGroupId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, CAST(? AS BINARY), UUID_TO_BIN(?), UUID_TO_BIN(?))`,
         [
           family,
           entriesNumber,
           phoneNumber,
-          groupSelected,
           kidsAllowed,
           id,
-          eventId
+          eventId,
+          familyGroupId
         ]
       )
     } catch (error) {
@@ -71,13 +71,13 @@ export class EntriesModel {
   }
 
   static async update ({ id, input }) {
-    const { family, entriesNumber, phoneNumber, groupSelected, kidsAllowed } =
+    const { family, entriesNumber, phoneNumber, kidsAllowed } =
       input
 
     try {
       const [{ affectedRows }] = await connection.query(
         'UPDATE entries SET ? WHERE id = UUID_TO_BIN(?)',
-        [{ family, entriesNumber, phoneNumber, groupSelected, kidsAllowed }, id]
+        [{ family, entriesNumber, phoneNumber, kidsAllowed }, id]
       )
 
       if (affectedRows === 0) return false
