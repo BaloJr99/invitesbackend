@@ -52,9 +52,12 @@ export class EventsController {
 
     const decoded = jwt.verify(token, process.env.SECRET)
 
-    await this.eventModel.create({ input: result.data }, decoded.id)
+    const eventId = await this.eventModel.create(
+      { input: result.data },
+      decoded.id
+    )
 
-    return res.status(201).json({ message: 'Evento creado' })
+    return res.status(201).json({ id: eventId, message: 'Evento creado' })
   }
 
   delete = async (req, res) => {

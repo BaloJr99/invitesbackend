@@ -51,7 +51,7 @@ export class EntriesModel {
 
     try {
       await connection.query(
-        `INSERT INTO entries (id, family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, userId, eventId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, CAST(? AS BINARY))`,
+        `INSERT INTO entries (id, family, entriesNumber, phoneNumber, groupSelected, kidsAllowed, userId, eventId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, CAST(? AS BINARY), UUID_TO_BIN(?))`,
         [
           family,
           entriesNumber,
@@ -66,7 +66,7 @@ export class EntriesModel {
       throw new Error('Error creating the party entry')
     }
 
-    return true
+    return uuid
   }
 
   static async delete ({ id }) {

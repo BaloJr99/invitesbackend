@@ -7,7 +7,7 @@ const connection = await mysql.createConnection(connectionString)
 export class EventsModel {
   static async getAll (userId) {
     const [events] = await connection.query(
-      'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation FROM events WHERE userId = CAST(? AS BINARY) ORDER BY dateOfEvent DESC',
+      'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation FROM events WHERE userId = CAST(? AS BINARY) ORDER BY nameOfEvent',
       [userId]
     )
     return events
@@ -29,8 +29,7 @@ export class EventsModel {
   }
 
   static async create ({ input }, id) {
-    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation } =
-      input
+    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation } = input
 
     const [uuidResult] = await connection.query('SELECT UUID() uuid')
     const [{ uuid }] = uuidResult
@@ -41,11 +40,10 @@ export class EventsModel {
         [nameOfEvent, dateOfEvent, maxDateOfConfirmation, id]
       )
     } catch (error) {
-      console.error(error)
       throw new Error('Error creating the event')
     }
 
-    return true
+    return uuid
   }
 
   static async delete ({ id }) {
@@ -59,8 +57,7 @@ export class EventsModel {
   }
 
   static async update ({ id, input }) {
-    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation } =
-      input
+    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation } = input
 
     try {
       const [{ affectedRows }] = await connection.query(

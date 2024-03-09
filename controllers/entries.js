@@ -50,9 +50,9 @@ export class EntryController {
 
     const decoded = jwt.verify(token, process.env.SECRET)
 
-    await this.entryModel.create({ input: result.data }, decoded.id)
+    const entryId = await this.entryModel.create({ input: result.data }, decoded.id)
 
-    return res.status(201).json({ message: 'Invitación creada' })
+    return res.status(201).json({ id: entryId, message: 'Invitación creada' })
   }
 
   delete = async (req, res) => {
