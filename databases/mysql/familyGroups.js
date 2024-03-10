@@ -7,7 +7,7 @@ const connection = await mysql.createConnection(connectionString)
 export class FamilyGroupModel {
   static async getAll (userId) {
     const [familyGroups] = await connection.query(
-      'SELECT BIN_TO_UUID(id) id, familyGroup FROM familygroups WHERE userId = CAST(? AS BINARY) ORDER BY familyGroup',
+      'SELECT BIN_TO_UUID(id) id, familyGroup FROM familyGroups WHERE userId = CAST(? AS BINARY) ORDER BY familyGroup',
       [userId]
     )
     return familyGroups
@@ -15,7 +15,7 @@ export class FamilyGroupModel {
 
   static async getById ({ id }) {
     return await connection.query(
-      'SELECT BIN_TO_UUID(id) id, familyGroup FROM familygroups WHERE id = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(id) id, familyGroup FROM familyGroups WHERE id = UUID_TO_BIN(?)',
       [id]
     )
   }
@@ -28,7 +28,7 @@ export class FamilyGroupModel {
 
     try {
       await connection.query(
-        `INSERT INTO familygroups (id, familyGroup, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, CAST(? AS BINARY))`,
+        `INSERT INTO familyGroups (id, familyGroup, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, CAST(? AS BINARY))`,
         [familyGroup, id]
       )
     } catch (error) {
@@ -43,7 +43,7 @@ export class FamilyGroupModel {
 
     try {
       const [{ affectedRows }] = await connection.query(
-        'UPDATE familygroups SET ? WHERE id = UUID_TO_BIN(?)',
+        'UPDATE familyGroups SET ? WHERE id = UUID_TO_BIN(?)',
         [{ familyGroup }, id]
       )
 
