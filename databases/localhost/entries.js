@@ -15,10 +15,7 @@ const connection = await mysql.createConnection(connectionString)
 
 export class EntriesModel {
   static async getAll (userId) {
-    const [entries] = await connection.query(
-      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead FROM entries WHERE userId = CAST(? AS BINARY) ORDER BY dateOfConfirmation DESC',
-      [userId]
-    )
+    const [entries] = await connection.query('CALL getEntries(CAST(? AS BINARY))', [userId])
     return entries
   }
 
@@ -80,8 +77,7 @@ export class EntriesModel {
   }
 
   static async update ({ id, input }) {
-    const { family, entriesNumber, phoneNumber, kidsAllowed } =
-      input
+    const { family, entriesNumber, phoneNumber, kidsAllowed } = input
 
     try {
       const [{ affectedRows }] = await connection.query(

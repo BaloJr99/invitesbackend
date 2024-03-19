@@ -13,7 +13,7 @@ export class EntryController {
 
     const decoded = jwt.verify(token, process.env.SECRET)
 
-    const entries = await this.entryModel.getAll(decoded.id)
+    const [entries] = await this.entryModel.getAll(decoded.id)
     return res.json(entries)
   }
 
