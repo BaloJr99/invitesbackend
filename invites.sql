@@ -37,7 +37,9 @@ CREATE TABLE events (
   nameOfEvent VARCHAR(255) NOT NULL,
   dateOfEvent DATETIME NOT NULL,
   maxDateOfConfirmation DATETIME NOT NULL,
-  userId BINARY(24) NOT NULL
+  userId BINARY(24) NOT NULL,
+  typeOfEvent CHAR(1) NOT NULL,
+  nameOfcelebrated VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE familyGroups (
@@ -45,3 +47,19 @@ CREATE TABLE familyGroups (
   familyGroup VARCHAR(255) NOT NULL,
   userId BINARY(24) NOT NULL
 );
+
+CREATE TABLE inviteImages (
+  id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  imageUrl VARCHAR(255) NOT NULL,
+  publicId VARCHAR(255) NOT NULL,
+  imageUsage CHAR(1) NULL,
+  userId BINARY(24) NOT NULL,
+  eventId BINARY(16) NOT NULL
+);
+
+delimiter //
+CREATE PROCEDURE getEntries (IN userIdentifier BINARY(24)) 
+BEGIN
+	SELECT confirmation, entriesNumber, entriesConfirmed, dateOfConfirmation  FROM entries WHERE userId = userIdentifier order by dateOfConfirmation ASC;
+END //
+delimiter ;

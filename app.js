@@ -10,8 +10,15 @@ import { createUsersRouter } from './routes/user.routes.js'
 import { createAuthRouter } from './routes/auth.routes.js'
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middlewares/cors.js'
 import 'dotenv/config.js'
+import { createImagesRouter } from './routes/images.routes.js'
 
-export const createApp = ({ entryModel, userModel, eventModel, familyGroupModel }) => {
+export const createApp = ({
+  entryModel,
+  userModel, eventModel,
+  familyGroupModel,
+  imagesModel,
+  inviteImagesModel
+}) => {
   const app = express()
 
   const server = createServer(app)
@@ -40,12 +47,13 @@ export const createApp = ({ entryModel, userModel, eventModel, familyGroupModel 
     })
   })
 
-  app.use(json())
+  app.use(json({ limit: '2mb' }))
   app.use(corsMiddleware())
   app.disable('x-powered-by')
 
   app.use('/entries', createEntriesRouter({ entryModel }))
   app.use('/events', createEventsRouter({ eventModel }))
+  app.use('/images', createImagesRouter({ imagesModel, inviteImagesModel }))
   app.use('/familyGroups', createFamilyGroupsRouter({ familyGroupModel }))
   app.use('/users', createUsersRouter({ userModel }))
   app.use('/auth', createAuthRouter({ userModel }))

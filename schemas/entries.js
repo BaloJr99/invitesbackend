@@ -31,12 +31,11 @@ const entrySchema = z.object({
 
 const confirmationSchema = z
   .object({
-    message: z
-      .string({
-        invalid_type_error: 'The message must be a string'
-      })
+    message: z.string({
+      invalid_type_error: 'The message must be a string'
+    }).nullable(),
+    entriesConfirmed: z.number()
       .nullable(),
-    entriesConfirmed: z.number().nullable(),
     confirmation: z.boolean(),
     dateOfConfirmation: z
       .string()
