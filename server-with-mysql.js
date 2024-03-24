@@ -3,7 +3,7 @@ import { ImagesModel } from './databases/cloudinary/images.js'
 import { EntriesModel } from './databases/mysql/entries.js'
 import { EventsModel } from './databases/mysql/events.js'
 import { FamilyGroupModel } from './databases/mysql/familyGroups.js'
-import { InviteImagesModel } from './databases/localhost/inviteImages.js'
+import { InviteImagesModel } from './databases/mysql/inviteImages.js'
 import { UserModel } from './databases/mongodb/users.js'
 
 createApp({
