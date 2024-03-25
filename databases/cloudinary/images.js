@@ -11,13 +11,25 @@ export class ImagesModel {
   static async add ({ input }) {
     const { image } = input
 
-    const results = await cloudinary.uploader.upload(image)
+    let results
 
+    try {
+      results = await cloudinary.uploader.upload(image)
+    } catch (error) {
+      console.log('Error in Images Model ' + error)
+      return false
+    }
     return results
   }
 
   static async delete (id) {
-    const results = await cloudinary.uploader.destroy(id)
+    let results
+
+    try {
+      results = await cloudinary.uploader.destroy(id)
+    } catch (error) {
+      return false
+    }
 
     return results
   }

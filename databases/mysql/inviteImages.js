@@ -23,7 +23,6 @@ export class InviteImagesModel {
         [uuid, imageUrl, publicId, userId, eventId]
       )
     } catch (error) {
-      console.log(error)
       throw new Error('Error inserting the images')
     }
   }
@@ -37,7 +36,6 @@ export class InviteImagesModel {
           [imageUsage, id]
         )
       } catch (error) {
-        console.log(error)
         throw new Error('Error updating the image')
       }
     }
