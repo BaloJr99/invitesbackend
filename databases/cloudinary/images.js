@@ -14,9 +14,11 @@ export class ImagesModel {
     let results
 
     try {
-      results = await cloudinary.uploader.upload(image)
+      results = await cloudinary.uploader.upload(image).catch((error) => {
+        console.log(error)
+      })
     } catch (error) {
-      console.log('Error in Images Model ' + error)
+      console.log('Error in Images Model ' + JSON.stringify(error))
       return false
     }
     return results
