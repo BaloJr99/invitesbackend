@@ -1,4 +1,4 @@
-import express, { Application, json } from 'express'
+import express, { Application, json } from 'express';
 import { createEntriesRouter } from './routes/entries.routes.js';
 import { EntriesService } from './services/entries.js';
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js';
