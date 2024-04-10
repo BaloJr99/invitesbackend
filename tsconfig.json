@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6",  
+    "module": "ES6",                                     /* Specify the root folder within your source files. */
+    "moduleResolution": "Node10",                        /* Only output d.ts files and not JavaScript files. */
+    "sourceMap": true,                                   /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
+    "outDir": "./dist",            /* Allow 'import x from y' when a module doesn't have a default export. */
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
