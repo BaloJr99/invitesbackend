@@ -1,16 +1,21 @@
+import User from '../models/user.js';
 import { NextFunction, Request, Response } from "express";
-import { verifyToken } from "../utils/jwt.handle";
-import { AuthModel } from "../interfaces/authModel";
+import { verifyJwtToken } from "../utils/jwt.handle.js";
+import { AuthModel } from "../interfaces/authModel.js";
 
 export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const jwtByUser = req.headers.authorization ?? "";
+    const jwt = req.headers.authorization || '';
 
-    const jwt = jwtByUser.split(' ').pop();
+    const decoded = verifyJwtToken(jwt) as AuthModel;
 
-    const isOk = verifyToken(`${jwt}`) as AuthModel;
+    if (!decoded) return res.status(401).json({ error: 'INVALID_AUTH' });
 
-    if (!isOk) return res.status(401).json({ error: 'INVALID_AUTH' });
+    const user = await User.findById(decoded.id, { password: 0 });
+
+    if (!user) return res.status(404).json({ error: 'INVALID_USER' });
+
+    req.userId = decoded.id;
 
     next();
   } catch (error) {

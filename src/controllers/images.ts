@@ -1,10 +1,10 @@
 import { ImagesService } from '../config/cloudinary/cloudinary.js';
 import { validateImageUsage, validateImages } from '../schemas/images.js'
-import jwt from 'jsonwebtoken'
 import { InviteImagesService } from '../services/inviteImages.js';
 import { Request, Response } from 'express';
 import { AuthModel } from '../interfaces/authModel.js';
 import { handleHttp } from '../utils/error.handle.js';
+import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class ImagesController {
   constructor (private imagesService: ImagesService, private inviteImagesService: InviteImagesService) {
@@ -14,7 +14,7 @@ export class ImagesController {
 
   createImage = async (req: Request, res: Response) => {
     try {
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
 
       if (token === "") return res.status(403).json({ error: 'No token provided' });
 
@@ -24,7 +24,7 @@ export class ImagesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
 
-      const decoded = jwt.verify(token, process.env.SECRET) as AuthModel;
+      const decoded = verifyJwtToken(token) as AuthModel;
 
       const cloudResult = await this.imagesService.uploadImage(result.data.image);
 
@@ -59,7 +59,7 @@ export class ImagesController {
 
   deleteImage = async (req: Request, res: Response) => {
     try {
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
   
       if (token === "") return res.status(403).json({ error: 'No token provided' });
   
@@ -77,7 +77,7 @@ export class ImagesController {
 
   getAllImages = async (req: Request, res: Response) => {
     try {
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
   
       if (token === "") return res.status(403).json({ error: 'No token provided' });
   

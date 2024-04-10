@@ -3,6 +3,7 @@ import User from "../models/user.js";
 import Role from "../models/role.js";
 import { AuthUserModel, UserModel } from '../interfaces/usersModel';
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js';
+import { generateToken } from '../utils/jwt.handle.js';
 
 export class UserService {
   signup = async (user: UserModel) => {
@@ -27,11 +28,7 @@ export class UserService {
 
     const savedUser = await newUser.save();
     
-    const token = jwt.sign({ id: savedUser._id }, process.env.SECRET, {
-      expiresIn: 86400
-    });
-
-    return token;
+    return generateToken(savedUser._id);
   }
 
   signin = async (user: AuthUserModel) => {

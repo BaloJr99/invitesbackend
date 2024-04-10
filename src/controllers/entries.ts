@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 import { handleHttp } from '../utils/error.handle.js';
 import { EntriesService } from '../services/entries.js';
 import { AuthModel } from '../interfaces/authModel.js';
 import { FullEntryModel } from '../interfaces/entriesModels.js';
 import { validateConfirmationSchema, validateEntry } from '../schemas/entries.js';
+import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class EntriesController {
   constructor (private entryService: EntriesService) {
@@ -13,13 +13,13 @@ export class EntriesController {
 
   getEntries = async (req: Request, res: Response) => {
     try {
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
 
       if (token === "") {
         return res.status(403).json({ error: 'No token provided' });
       }
 
-      const decoded = jwt.verify(token, process.env.SECRET) as AuthModel;
+      const decoded = verifyJwtToken(token) as AuthModel;
 
       const [entries] = await this.entryService.getAllEntries(decoded.id) as FullEntryModel[];
 
@@ -65,11 +65,11 @@ export class EntriesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
 
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
 
       if (token === "") return res.status(403).json({ error: 'No token provided' });
 
-      const decoded = jwt.verify(token, process.env.SECRET) as AuthModel;
+      const decoded = verifyJwtToken(token) as AuthModel;
 
       const entryId = await this.entryService.createEntry(result.data, decoded.id);
 
@@ -122,7 +122,6 @@ export class EntriesController {
 
     return res.status(201).json({ message: 'Respuesta enviada' })
     } catch (error) {
-      console.log(error);
       handleHttp(res, 'ERROR_UPDATE_CONFIRMATION');
     }
   };

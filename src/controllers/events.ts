@@ -1,10 +1,10 @@
 import { validateEvent } from '../schemas/events.js'
-import jwt from 'jsonwebtoken';
 import { EventsService } from '../services/events.js';
 import { Request, Response } from 'express';
 import { AuthModel } from '../interfaces/authModel.js';
 import { FullEventModel } from '../interfaces/eventsModel.js';
 import { handleHttp } from '../utils/error.handle.js';
+import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class EventsController {
   constructor (private eventService: EventsService) {
@@ -13,11 +13,11 @@ export class EventsController {
 
   getEvents = async (req: Request, res: Response) => {
     try {
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
   
       if (token === "") return res.status(403).json({ error: 'No token provided' });
   
-      const decoded = jwt.verify(token, process.env.SECRET) as AuthModel;
+      const decoded = verifyJwtToken(token) as AuthModel;
   
       const events = await this.eventService.getEvents(decoded.id);
   
@@ -29,12 +29,12 @@ export class EventsController {
 
   getEventEntries = async (req: Request, res: Response) => {
     try {
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
       const { id } = req.params;
   
       if (token === "") return res.status(403).json({ error: 'No token provided' });
   
-      const decoded = jwt.verify(token, process.env.SECRET) as AuthModel;
+      const decoded = verifyJwtToken(token) as AuthModel;
   
       const events = await this.eventService.getEventEntries(decoded.id, id);
   
@@ -66,11 +66,11 @@ export class EventsController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
   
-      const token = req.headers['x-access-token'] as string;
+      const token = req.headers.authorization || '';
   
       if (token === "") return res.status(403).json({ error: 'No token provided' });
   
-      const decoded = jwt.verify(token, process.env.SECRET) as AuthModel;
+      const decoded = verifyJwtToken(token) as AuthModel;
   
       const eventId = await this.eventService.createEvent(
         result.data,
