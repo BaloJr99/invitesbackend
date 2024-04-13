@@ -1,11 +1,6 @@
 import express, { Application, json } from 'express';
-import { createEntriesRouter } from './routes/entries.routes.js';
 import { EntriesService } from './services/entries.js';
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js';
-import { createEventsRouter } from './routes/events.routes.js';
-import { createImagesRouter } from './routes/images.routes.js';
-import { createFamilyGroupsRouter } from './routes/familyGroup.routes.js';
-import { createAuthRouter } from './routes/auth.routes.js';
 import { EventsService } from './services/events.js';
 import { InviteImagesService } from './services/inviteImages.js';
 import { ImagesService } from './config/cloudinary/cloudinary.js';
@@ -14,6 +9,7 @@ import { UserService } from './services/users.js';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { UserFromEntry } from './interfaces/usersModel.js';
+import { createApiRouter } from './routes/api.routes.js';
 
 export class App {
   private app: Application;
@@ -69,11 +65,14 @@ export class App {
     this.app.use(json({ limit: '2mb' }));
     this.app.use(corsMiddleware())
 
-    this.app.use('/entries', createEntriesRouter(this.entriesService));
-    this.app.use('/events', createEventsRouter(this.eventsService));
-    this.app.use('/images', createImagesRouter(this.imagesService, this.inviteImagesService));
-    this.app.use('/familyGroups', createFamilyGroupsRouter(this.familyGroupService));
-    this.app.use('/auth', createAuthRouter(this.userService));
+    this.app.use('/api', createApiRouter(
+      this.entriesService,
+      this.eventsService,
+      this.imagesService,
+      this.inviteImagesService,
+      this.familyGroupService,
+      this.userService
+    ));
   }
   
   listen() {
