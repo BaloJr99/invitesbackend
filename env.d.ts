@@ -13,7 +13,8 @@ declare namespace NodeJS {
     CLOUD_NAME: string,
     API_KEY: string,
     API_SECRET: string,
-    NODE_ENV: string
+    NODE_ENV: string,
+    PORT: string
   }
 }
 

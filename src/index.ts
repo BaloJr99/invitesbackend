@@ -19,7 +19,7 @@ const main = () => {
     console.log("Mongo Connection Ready");
   });
 
-  const app = new App(
+  new App(
     new EntriesService(mysqlConnection),
     new EventsService(mysqlConnection),
     new ImagesService(),
@@ -27,8 +27,6 @@ const main = () => {
     new FamilyGroupService(mysqlConnection),
     new UserService()
   );
-  
-  app.listen();
 }
 
 main();

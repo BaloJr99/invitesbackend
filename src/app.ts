@@ -1,4 +1,4 @@
-import express, { Application, json } from 'express';
+import express, { json } from 'express';
 import { EntriesService } from './services/entries.js';
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js';
 import { EventsService } from './services/events.js';
@@ -12,7 +12,6 @@ import { UserFromEntry } from './interfaces/usersModel.js';
 import { createApiRouter } from './routes/api.routes.js';
 
 export class App {
-  private app: Application;
 
   constructor (
     private entriesService: EntriesService,
@@ -29,9 +28,9 @@ export class App {
     this.familyGroupService = familyGroupService;
     this.userService = userService;
 
-    this.app = express();
+    const app = express();
 
-    const server = createServer(this.app);
+    const server = createServer(app);
 
     const io = new Server(server, {
       connectionStateRecovery: {},
@@ -62,10 +61,10 @@ export class App {
       })
     })
 
-    this.app.use(json({ limit: '2mb' }));
-    this.app.use(corsMiddleware())
+    app.use(json({ limit: '2mb' }));
+    app.use(corsMiddleware())
 
-    this.app.use('/api', createApiRouter(
+    app.use('/api', createApiRouter(
       this.entriesService,
       this.eventsService,
       this.imagesService,
@@ -73,9 +72,9 @@ export class App {
       this.familyGroupService,
       this.userService
     ));
-  }
-  
-  listen() {
-    this.app.listen(3000, () => console.log('Server on port 3000'));
+
+    const PORT = process.env.PORT ?? 3000;
+
+    server.listen(PORT, () => console.log('Server on port 3000'));
   }
 }
