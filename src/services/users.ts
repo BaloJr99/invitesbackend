@@ -51,7 +51,12 @@ export class UserService {
       return false
     }
 
-    const token = jwt.sign({ id: userFounded._id, username: userFounded.username, email: userFounded.email }, process.env.SECRET, {
+    const token = jwt.sign({ 
+      id: userFounded._id, 
+      username: userFounded.username, 
+      email: userFounded.email,
+      roles: userFounded.roles
+    }, process.env.SECRET, {
       expiresIn: 86400
     });
 
