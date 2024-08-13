@@ -1,16 +1,5 @@
-export interface FullEntryModel {
-  id: string,
-  family: string,
-  entriesNumber: number,
-  phoneNumber: string,
-  kidsAllowed: boolean,
-  eventId: string,
-  familyGroupId: string,
-  message: string,
-  entriesConfirmed: number,
-  confirmation: boolean,
-  dateOfConfirmation: string,
-  isMessageRead: boolean
+export interface FullEntryModel extends PartialEntryModel, ConfirmationModel {
+  id: string
 }
 
 export interface PartialEntryModel {

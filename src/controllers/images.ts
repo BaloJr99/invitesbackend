@@ -77,17 +77,13 @@ export class ImagesController {
 
   getAllImages = async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization || '';
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
       const { id } = req.params;
   
       const [eventImages] = await this.inviteImagesService.getImageByEventId(id);
   
       return res.json(eventImages);
     } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_IMAGE');
+      handleHttp(res, 'ERROR_GET_ALL_IMAGES');
     }
   }
 }

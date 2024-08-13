@@ -57,6 +57,25 @@ CREATE TABLE inviteImages (
   eventId BINARY(16) NOT NULL
 );
 
+CREATE TABLE settings (
+  eventId BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  primaryColor VARCHAR(7) NOT NULL,
+  secondaryColor VARCHAR(7) NOT NULL,
+  parents VARCHAR(255) NOT NULL,
+  godParents VARCHAR(255) NOT NULL,
+  firstSectionSentences TEXT NOT NULL,
+  secondSectionSentences TEXT NOT NULL,
+  massUrl TEXT NOT NULL,
+  massTime TIME NOT NULL,
+  massAddress VARCHAR(255) NOT NULL,
+  receptionUrl TEXT NOT NULL,
+  receptionTime TIME NOT NULL,
+  receptionPlace VARCHAR(255) NOT NULL,
+  receptionAddress VARCHAR(255) NOT NULL,
+  dressCodeColor VARCHAR (255) NOT NULL,
+  userId BINARY(24) NOT NULL
+);
+
 delimiter //
 CREATE PROCEDURE getEntries (IN userIdentifier BINARY(24)) 
 BEGIN

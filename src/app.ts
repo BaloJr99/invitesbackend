@@ -10,6 +10,7 @@ import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { UserFromEntry } from './interfaces/usersModel.js';
 import { createApiRouter } from './routes/api.routes.js';
+import { EventSettingsService } from './services/settings.js';
 
 export class App {
 
@@ -20,6 +21,7 @@ export class App {
     private inviteImagesService: InviteImagesService,
     private familyGroupService: FamilyGroupService,
     private userService: UserService,
+    private eventSettingsService: EventSettingsService
   ) {
     this.entriesService = entriesService;
     this.eventsService = eventsService;
@@ -27,6 +29,7 @@ export class App {
     this.inviteImagesService = inviteImagesService;
     this.familyGroupService = familyGroupService;
     this.userService = userService;
+    this.eventSettingsService = eventSettingsService;
 
     const app = express();
 
@@ -70,11 +73,12 @@ export class App {
       this.imagesService,
       this.inviteImagesService,
       this.familyGroupService,
-      this.userService
+      this.userService,
+      this.eventSettingsService
     ));
 
     const PORT = process.env.PORT ?? 3000;
 
-    server.listen(PORT, () => console.log('Server on port 3000'));
+    server.listen(PORT, () => console.log(`Server on port ${PORT}`));
   }
 }

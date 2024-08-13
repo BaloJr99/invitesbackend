@@ -1,8 +1,5 @@
-export interface FullEventModel {
-  id: string,
-  nameOfEvent: string,
-  dateOfEvent: string,
-  maxDateOfConfirmation: string
+export interface FullEventModel  extends EventModel {
+  id: string
 }
 
 export interface EventModel {
