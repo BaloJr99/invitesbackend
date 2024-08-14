@@ -1,5 +1,6 @@
 export interface FullEventModel  extends EventModel {
-  id: string
+  id: string,
+  allowCreateEntries: boolean
 }
 
 export interface EventModel {

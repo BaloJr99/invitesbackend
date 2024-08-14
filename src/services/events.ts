@@ -8,7 +8,7 @@ export class EventsService {
 
   getEvents = async (userId: string) => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation FROM events WHERE userId = CAST(? AS BINARY) ORDER BY nameOfEvent',
+      'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, IF(count(s.eventId) > 0, true, false) AS allowCreateEntries FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id WHERE e.userId = CAST(? AS BINARY) GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent',
       [userId]
     );
 
