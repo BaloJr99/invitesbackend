@@ -82,3 +82,15 @@ BEGIN
 	SELECT confirmation, entriesNumber, entriesConfirmed, dateOfConfirmation  FROM entries WHERE userId = userIdentifier order by dateOfConfirmation ASC;
 END //
 delimiter ;
+
+DROP PROCEDURE IF EXISTS getEventInfo;
+
+delimiter //
+CREATE PROCEDURE getEventInfo (IN userIdentifier VARCHAR(24)) 
+BEGIN
+	SELECT count(ev.nameOfEvent) AS numEvents, count(en.id) AS numEntries FROM events AS ev
+LEFT JOIN entries AS en ON ev.id = en.eventId
+WHERE ev.userId IN (CAST(userIdentifier AS BINARY))
+GROUP BY ev.userId;
+END //
+delimiter ;

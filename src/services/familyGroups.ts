@@ -1,7 +1,7 @@
 import { Pool } from "mysql2/promise";
 import { FamilyGroupModel } from "../interfaces/familyGroupModel";
 
-export class FamilyGroupService {
+export class FamilyGroupsService {
   constructor (private connection: Pool) {
     this.connection = connection;
   }
@@ -10,14 +10,6 @@ export class FamilyGroupService {
     const [result] = await this.connection.query(
       'SELECT BIN_TO_UUID(id) id, familyGroup FROM familyGroups WHERE userId = CAST(? AS BINARY) ORDER BY familyGroup',
       [userId]
-    );
-    return result;
-  }
-
-  getFamilyGroupById = async (familyGroupId: string) => {
-    const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, familyGroup FROM familyGroups WHERE id = UUID_TO_BIN(?)',
-      [familyGroupId]
     );
     return result;
   }

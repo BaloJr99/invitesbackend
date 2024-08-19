@@ -1,12 +1,21 @@
-import { Pool } from "mysql2/promise";
+import { FieldPacket, Pool, RowDataPacket } from "mysql2/promise";
 import { EventModel } from "../interfaces/eventsModel";
+import { EventsInfoModel } from "../interfaces/usersModel";
 
 export class EventsService {
   constructor (private connection: Pool) {
     this.connection = connection;
   }
 
-  getEvents = async (userId: string) => {
+  getAllEvents = async () => {
+    const [result] = await this.connection.query(
+      'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, CAST(e.userId AS CHAR) as userId, IF(count(s.eventId) > 0, true, false) AS allowCreateEntries FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent',
+    );
+
+    return result;
+  }
+
+  getEventsByUser = async (userId: string) => {
     const [result] = await this.connection.query(
       'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, IF(count(s.eventId) > 0, true, false) AS allowCreateEntries FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id WHERE e.userId = CAST(? AS BINARY) GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent',
       [userId]
@@ -25,22 +34,22 @@ export class EventsService {
 
   getEventById = async (eventId: string) => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation FROM events WHERE id = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, CAST(userId AS CHAR) userId FROM events WHERE id = UUID_TO_BIN(?)',
       [eventId]
     );
 
     return result;
   }
 
-  createEvent = async (event: EventModel, id: string) => {
-    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation } = event;
+  createEvent = async (event: EventModel) => {
+    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId } = event;
 
     const [queryResult] = await this.connection.query('SELECT UUID() uuid');
     const [{ uuid }] = queryResult as { uuid: string }[];
 
     await this.connection.query(
       `INSERT INTO events (id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, CAST(? AS BINARY))`,
-      [nameOfEvent, dateOfEvent, maxDateOfConfirmation, id]
+      [nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId]
     );
 
     return uuid;
@@ -53,11 +62,19 @@ export class EventsService {
   }
 
   updateEvent = async (eventId: string, event: EventModel) => {
-    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation } = event;
+    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId } = event;
 
     await this.connection.query(
-      'UPDATE events SET ? WHERE id = UUID_TO_BIN(?)',
-      [{ nameOfEvent, dateOfEvent, maxDateOfConfirmation }, eventId]
+      'UPDATE events SET ?, userId = CAST(? AS BINARY) WHERE id = UUID_TO_BIN(?)',
+      [ { nameOfEvent, dateOfEvent, maxDateOfConfirmation }, userId, eventId]
     )
+  }
+
+  getEventsInfo = async (userId: string) => {
+    const [results] = (await this.connection.execute(
+      'CALL getEventInfo(?)', [userId]
+    )) as [RowDataPacket[], FieldPacket[]];
+
+    return results.at(0) as EventsInfoModel[];
   }
 }

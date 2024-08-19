@@ -1,36 +1,11 @@
 import jwt from 'jsonwebtoken';
 import User from "../models/user.js";
 import Role from "../models/role.js";
-import { AuthUserModel, UserModel } from '../interfaces/usersModel';
+import { AuthUserModel, FullUserModel, UserModel } from '../interfaces/usersModel';
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js';
-import { generateToken } from '../utils/jwt.handle.js';
+import { generatePass } from '../utils/passwordGenerator.hande.js';
 
-export class UserService {
-  signup = async (user: UserModel) => {
-    const { username, password, email, roles } = user;
-
-    const passHash = await encryptPassword(password);
-
-    const newUser = new User({
-      username,
-      password: passHash,
-      email
-    });
-
-    if (roles) {
-      const foundRoles = await Role.find({ name: { $in: roles } })
-      newUser.roles = foundRoles.map((role) => role._id)
-    } else {
-      const role = await Role.findOne({ name: 'entriesAdmin' });
-      if (role)
-        newUser.roles = [role._id];
-    }
-
-    const savedUser = await newUser.save();
-    
-    return generateToken(savedUser._id);
-  }
-
+export class UsersService {
   signin = async (user: AuthUserModel) => {
     const { usernameOrEmail, password } = user;
 
@@ -65,7 +40,58 @@ export class UserService {
 
   getUsername = async (userId: string) => {
     const userFounded = await User.findById(userId);
-    
     return userFounded?.username;
+  }
+
+  getUsers = async () => {
+    const usersFounded = await User.find().select({
+      username: 1,
+      email: 1,
+      isActive: 1
+    });
+    return usersFounded;
+  }
+
+  getUsersBasicInfo = async () => {
+    const usersFounded = await User.find({ isActive: true }).select({
+      username: 1,
+    });
+    return usersFounded;
+  }
+
+  getUserById = async (userId: string) => {
+    const userFounded = await User.findById(userId).populate('roles');
+    return userFounded;
+  }
+
+  createUser = async (user: FullUserModel) => {
+    const { username, email, roles } = user;
+    const passHash = await encryptPassword(generatePass());
+
+    const newUser = new User({
+      username,
+      password: passHash,
+      email
+    });
+
+    if (roles) {
+      const foundRoles = await Role.find({ _id: { $in: roles } })
+      newUser.roles = foundRoles.map((role) => role._id)
+    }
+
+    const savedUser = await newUser.save();
+    return savedUser._id;
+  }
+
+  updateUser = async (userId:string, user: UserModel) => {
+    const result = await User.updateOne({ _id: userId }, { $set: { 
+      ...user
+     }});
+    return result;
+  }
+
+  deleteUser = async (userId: string) => {
+    const result = await User.updateOne({ _id: userId }, { $set: { isActive: false }});
+    return result;
   }
 }

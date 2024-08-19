@@ -10,7 +10,8 @@ export const eventsRouter = Router()
 export const createEventsRouter = (eventsService: EventsService) => {
   const eventController = new EventsController(eventsService);
 
-  eventsRouter.get('/', [checkJwt, isEntriesAdmin], eventController.getEvents);
+  eventsRouter.get('/', [checkJwt, isEntriesAdmin], eventController.getAllEvents);
+  eventsRouter.get('/users', [checkJwt, isEntriesAdmin], eventController.getEventsByUser);
   eventsRouter.get('/entries/:id', [checkJwt, isEntriesAdmin], eventController.getEventEntries);
   eventsRouter.post('/', [checkJwt, isEntriesAdmin], eventController.createEvent);
 

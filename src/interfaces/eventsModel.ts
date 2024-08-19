@@ -6,5 +6,6 @@ export interface FullEventModel  extends EventModel {
 export interface EventModel {
   nameOfEvent: string,
   dateOfEvent: string,
-  maxDateOfConfirmation: string
+  maxDateOfConfirmation: string,
+  userId: string
 }

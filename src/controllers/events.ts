@@ -11,7 +11,21 @@ export class EventsController {
     this.eventService = eventService;
   }
 
-  getEvents = async (req: Request, res: Response) => {
+  getAllEvents = async (req: Request, res: Response) => {
+    try {
+      const token = req.headers.authorization || '';
+  
+      if (token === "") return res.status(403).json({ error: 'No token provided' });
+  
+      const events = await this.eventService.getAllEvents();
+  
+      return res.json(events);
+    } catch (error) {
+      handleHttp(res, 'ERROR_GET_ALL_EVENTS');
+    }
+  }
+
+  getEventsByUser = async (req: Request, res: Response) => {
     try {
       const token = req.headers.authorization || '';
   
@@ -19,7 +33,7 @@ export class EventsController {
   
       const decoded = verifyJwtToken(token) as AuthModel;
   
-      const events = await this.eventService.getEvents(decoded.id);
+      const events = await this.eventService.getEventsByUser(decoded.id);
   
       return res.json(events);
     } catch (error) {
@@ -66,16 +80,7 @@ export class EventsController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
   
-      const token = req.headers.authorization || '';
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
-      const decoded = verifyJwtToken(token) as AuthModel;
-  
-      const eventId = await this.eventService.createEvent(
-        result.data,
-        decoded.id
-      );
+      const eventId = await this.eventService.createEvent(result.data);
   
       return res.status(201).json({ id: eventId, message: 'Evento creado' });
     } catch (error) {
@@ -108,6 +113,7 @@ export class EventsController {
   
       return res.status(201).json({ message: 'Evento actualizado' });
     } catch (error) {
+      console.log(error);
       handleHttp(res, 'ERROR_UPDATE_EVENT');
     }
   }

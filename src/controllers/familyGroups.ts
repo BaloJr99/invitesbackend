@@ -1,13 +1,12 @@
 import { validateFamilyGroup } from '../schemas/familyGroups.js'
-import { FamilyGroupService } from '../services/familyGroups.js';
+import { FamilyGroupsService } from '../services/familyGroups.js';
 import { Request, Response } from 'express';
 import { AuthModel } from '../interfaces/authModel.js';
-import { FamilyGroupModel } from '../interfaces/familyGroupModel.js';
 import { handleHttp } from '../utils/error.handle.js';
 import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class FamilyGroupsController {
-  constructor (private familyGroupService: FamilyGroupService) {
+  constructor (private familyGroupService: FamilyGroupsService) {
     this.familyGroupService = familyGroupService;
   }
 
@@ -24,20 +23,6 @@ export class FamilyGroupsController {
       return res.json(familyGroups);
     } catch (error) {
       handleHttp(res, 'ERROR_GET_ALL_FAMILIES');
-    }
-  }
-
-  getFamilyGroupById = async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-  
-      const familyGroup = await this.familyGroupService.getFamilyGroupById(id) as FamilyGroupModel[];
-  
-      if (familyGroup.length > 0) return res.json(familyGroup.at(0));
-  
-      return res.status(404).json({ message: 'Grupo familiar no encontrado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_FAMILY');
     }
   }
 

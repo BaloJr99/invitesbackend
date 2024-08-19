@@ -7,9 +7,10 @@ import { EntriesService } from './services/entries.js';
 import { EventsService } from './services/events.js';
 import { ImagesService } from './config/cloudinary/cloudinary.js';
 import { InviteImagesService } from './services/inviteImages.js';
-import { FamilyGroupService } from './services/familyGroups.js';
-import { UserService } from './services/users.js';
+import { FamilyGroupsService } from './services/familyGroups.js';
+import { UsersService } from './services/users.js';
 import { EventSettingsService } from './services/settings.js';
+import { RolesService } from './services/roles.js';
 dotenv.config();
 
 const main = () => {
@@ -25,8 +26,9 @@ const main = () => {
     new EventsService(mysqlConnection),
     new ImagesService(),
     new InviteImagesService(mysqlConnection),
-    new FamilyGroupService(mysqlConnection),
-    new UserService(),
+    new FamilyGroupsService(mysqlConnection),
+    new UsersService(),
+    new RolesService(),
     new EventSettingsService(mysqlConnection)
   );
 }

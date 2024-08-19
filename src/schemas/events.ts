@@ -13,7 +13,10 @@ const eventSchema = z.object({
   maxDateOfConfirmation: z
     .string()
     .datetime()
-    .transform((value) => value.replace('T', ' ').replace('Z', ''))
+    .transform((value) => value.replace('T', ' ').replace('Z', '')),
+  userId: z.string({
+    required_error: 'The user is required'
+  })
 });
 
 export function validateEvent (event: EventModel) {

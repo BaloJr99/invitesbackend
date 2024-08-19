@@ -3,8 +3,14 @@ import { Schema, model } from 'mongoose'
 export const ROLES = ['admin', 'entriesAdmin']
 
 const roleSchema = new Schema({
-  name: String,
-  isActive: Boolean
+  name: {
+    type: String,
+    required: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
 }, {
   versionKey: false
 })

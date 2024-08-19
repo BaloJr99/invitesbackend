@@ -1,27 +1,10 @@
 import { Request, Response } from 'express';
-import { validateAuthUser, validateUser } from '../schemas/user.js';
-import { UserService } from '../services/users.js';
-import { handleHttp } from '../utils/error.handle.js';
+import { validateAuthUser } from '../schemas/users.js';
+import { UsersService } from '../services/users.js';
 
 export class AuthController {
-  constructor (private userService: UserService) {
+  constructor (private userService: UsersService) {
     this.userService = userService;
-  }
-
-  signUp = async (req: Request, res: Response) => {
-    try {
-      const result = validateUser(req.body)
-
-      if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
-      }
-
-      const token = await this.userService.signup(result.data);
-
-      res.status(201).json({ token })
-    } catch (error) {
-      handleHttp(res, 'ERROR_SIGN_UP');
-    }
   }
 
   signIn = async (req: Request, res: Response) => {
