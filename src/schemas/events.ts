@@ -14,6 +14,12 @@ const eventSchema = z.object({
     .string()
     .datetime()
     .transform((value) => value.replace('T', ' ').replace('Z', '')),
+  typeOfEvent: z.string({
+    required_error: 'The type of the event is required'
+  }).length(1),
+  nameOfCelebrated: z.string({
+    required_error: 'The name of the celebrated is required'
+  }),
   userId: z.string({
     required_error: 'The user is required'
   })

@@ -34,7 +34,7 @@ export class EventsService {
 
   getEventById = async (eventId: string) => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, CAST(userId AS CHAR) userId FROM events WHERE id = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, CAST(userId AS CHAR) userId FROM events WHERE id = UUID_TO_BIN(?)',
       [eventId]
     );
 
@@ -42,14 +42,14 @@ export class EventsService {
   }
 
   createEvent = async (event: EventModel) => {
-    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId } = event;
+    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId, nameOfCelebrated, typeOfEvent} = event;
 
     const [queryResult] = await this.connection.query('SELECT UUID() uuid');
     const [{ uuid }] = queryResult as { uuid: string }[];
 
     await this.connection.query(
-      `INSERT INTO events (id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, CAST(? AS BINARY))`,
-      [nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId]
+      `INSERT INTO events (id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, userId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, ?, CAST(? AS BINARY))`,
+      [nameOfEvent, dateOfEvent, maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, userId]
     );
 
     return uuid;
@@ -62,11 +62,11 @@ export class EventsService {
   }
 
   updateEvent = async (eventId: string, event: EventModel) => {
-    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation, userId } = event;
+    const { nameOfEvent, dateOfEvent, maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, userId } = event;
 
     await this.connection.query(
       'UPDATE events SET ?, userId = CAST(? AS BINARY) WHERE id = UUID_TO_BIN(?)',
-      [ { nameOfEvent, dateOfEvent, maxDateOfConfirmation }, userId, eventId]
+      [ { nameOfEvent, dateOfEvent, maxDateOfConfirmation, nameOfCelebrated, typeOfEvent }, userId, eventId]
     )
   }
 

@@ -7,5 +7,7 @@ export interface EventModel {
   nameOfEvent: string,
   dateOfEvent: string,
   maxDateOfConfirmation: string,
+  typeOfEvent: string,
+  nameOfCelebrated: string,
   userId: string
 }

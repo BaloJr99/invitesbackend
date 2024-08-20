@@ -15,7 +15,7 @@ export const createEventsRouter = (eventsService: EventsService) => {
   eventsRouter.get('/entries/:id', [checkJwt, isEntriesAdmin], eventController.getEventEntries);
   eventsRouter.post('/', [checkJwt, isEntriesAdmin], eventController.createEvent);
 
-  eventsRouter.get('/:id', [validateUuid], eventController.getById);
+  eventsRouter.get('/:id', [validateUuid], eventController.getEventById);
   eventsRouter.delete('/:id', [checkJwt, isEntriesAdmin, validateUuid], eventController.deleteEvent);
   eventsRouter.put('/:id', [checkJwt, isEntriesAdmin, validateUuid], eventController.updateEvent);
 
