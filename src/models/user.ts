@@ -17,10 +17,19 @@ const UserSchema = new Schema({
     type: Boolean,
     default: true
   },
+  needsPasswordRecovery: {
+    type: Boolean,
+    default: false
+  },
+  numberOfTries: {
+    type: Number,
+    default: 0
+  },
   roles: [{
     ref: 'Role',
     type: Schema.Types.ObjectId
-  }]
+  }
+]
 }, {
   timestamps: true,
   versionKey: false

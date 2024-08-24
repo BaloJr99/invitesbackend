@@ -9,7 +9,9 @@ export const createAuthRouter = (userService: UsersService, mailService: MailSer
   const authController = new AuthController(userService, mailService);
 
   authRouter.post('/signin', authController.signIn);
-  authRouter.post('/resetPassword', authController.resetPassword);
+  authRouter.post('/forgotPassword', authController.forgotPassword);
+  authRouter.get('/forgotPassword/:id', authController.isUserResettingPassword);
+  authRouter.post('/resetPassword/:id', authController.resetPassword);
 
   return authRouter
 }

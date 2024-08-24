@@ -6,7 +6,7 @@ import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js';
 import { generatePass } from '../utils/passwordGenerator.hande.js';
 
 export class UsersService {
-  signin = async (user: AuthUserModel) => {
+  signin = async (user: AuthUserModel): Promise<string> => {
     const { usernameOrEmail, password } = user;
 
     const userFounded = await User.findOne({
@@ -14,7 +14,7 @@ export class UsersService {
     }).populate('roles');
 
     if (!userFounded) {
-      return false;
+      return 'ERROR_USER_NOT_FOUND';
     }
 
     const matchPassword = await comparePassword(
@@ -22,9 +22,22 @@ export class UsersService {
       userFounded.password
     );
 
-    if (!matchPassword) {
-      return false
+    const newNumberOfTries = userFounded.numberOfTries + 1;
+
+    if (!matchPassword || newNumberOfTries >= 3) {
+      await User.findByIdAndUpdate(userFounded._id, { $set: { 
+        numberOfTries: newNumberOfTries
+       }})
+
+       if (newNumberOfTries >= 3) {
+         return 'BLOCKED';
+       }
+      return 'ERROR_PASSWORD_DOESNT_MATCH';
     }
+
+    await User.findByIdAndUpdate(userFounded._id, { $set: { 
+      numberOfTries: 0
+     }})
 
     const token = jwt.sign({ 
       id: userFounded._id, 
@@ -37,7 +50,6 @@ export class UsersService {
 
     return token;
   }
-
   
   findUser = async (usernameOrEmail: string) => {
     const userFounded = await User.findOne({
@@ -96,6 +108,36 @@ export class UsersService {
     const result = await User.updateOne({ _id: userId }, { $set: { 
       ...user
      }});
+    return result;
+  }
+
+  isUserResettingPassword = async (userId:string): Promise<boolean> => {
+    const userFounded = await User.findById(userId);
+
+    if (!userFounded) {
+      return false;
+    }
+
+    return userFounded.needsPasswordRecovery;
+  }
+
+  updateResetPasword = async (userId:string, password: string, userResettingPassword: boolean) => {
+    console.log(userResettingPassword)
+    if (!userResettingPassword) {
+      console.log(password)
+      const passHash = await encryptPassword(password);
+
+      const result = await User.updateOne({ _id: userId }, { $set: { 
+        password: passHash,
+        needsPasswordRecovery: userResettingPassword,
+        numberOfTries: 0
+      }});
+      return result;
+    }
+
+    const result = await User.updateOne({ _id: userId }, { $set: { 
+      needsPasswordRecovery: userResettingPassword
+    }});
     return result;
   }
 

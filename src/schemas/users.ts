@@ -57,3 +57,11 @@ export function validateUsernameOrEmail (usernameOrEmail: string) {
     })
   }).safeParse(usernameOrEmail);
 }
+
+export function validatePassword (password: string) {
+  return z.object({
+    password: z.string({
+      required_error: 'The password is required'
+    })
+  }).safeParse(password);
+}
