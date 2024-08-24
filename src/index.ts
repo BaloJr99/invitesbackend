@@ -11,15 +11,20 @@ import { FamilyGroupsService } from './services/familyGroups.js';
 import { UsersService } from './services/users.js';
 import { EventSettingsService } from './services/settings.js';
 import { RolesService } from './services/roles.js';
+import { mailConnection } from './config/nodemailer/transporter.js';
+import { MailService } from './services/mail.js';
 dotenv.config();
 
 const main = () => {
 
   const mysqlConnection = connection();
+
   dbConnect().then(() => {
     createRoles();
     console.log("Mongo Connection Ready");
   });
+
+  const nodemailerConnection = mailConnection();
 
   new App(
     new EntriesService(mysqlConnection),
@@ -29,7 +34,8 @@ const main = () => {
     new FamilyGroupsService(mysqlConnection),
     new UsersService(),
     new RolesService(),
-    new EventSettingsService(mysqlConnection)
+    new EventSettingsService(mysqlConnection),
+    new MailService(nodemailerConnection)
   );
 }
 

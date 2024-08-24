@@ -15,6 +15,7 @@ import { createSettingsRouter } from './settings.routes.js';
 import { createUsersRouter } from './users.routes.js';
 import { RolesService } from '../services/roles.js';
 import { createRolesRouter } from './roles.routes.js';
+import { MailService } from '../services/mail.js';
 
 export const apiRouter = Router();
 
@@ -26,13 +27,14 @@ export const createApiRouter = (
   familyGroupService: FamilyGroupsService, 
   userService: UsersService,
   eventSettingsService: EventSettingsService,
-  rolesService: RolesService) => {
+  rolesService: RolesService,
+  mailService: MailService) => {
 
   apiRouter.use('/entries', createEntriesRouter(entriesService));
   apiRouter.use('/events', createEventsRouter(eventsService));
   apiRouter.use('/images', createImagesRouter(imagesService, inviteImagesService));
   apiRouter.use('/familyGroups', createFamilyGroupsRouter(familyGroupService));
-  apiRouter.use('/auth', createAuthRouter(userService));
+  apiRouter.use('/auth', createAuthRouter(userService, mailService));
   apiRouter.use('/settings', createSettingsRouter(eventSettingsService));
   apiRouter.use('/users', createUsersRouter(userService, eventsService));
   apiRouter.use('/roles', createRolesRouter(rolesService));

@@ -49,3 +49,11 @@ export function validateUser (user: UserModel) {
 export function validateAuthUser (user: AuthUserModel) {
   return authUserSchema.safeParse(user);
 }
+
+export function validateUsernameOrEmail (usernameOrEmail: string) {
+  return z.object({
+    usernameOrEmail: z.string({
+      required_error: 'The username or email are required'
+    })
+  }).safeParse(usernameOrEmail);
+}

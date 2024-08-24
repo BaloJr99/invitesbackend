@@ -12,6 +12,7 @@ import { UserFromEntry } from './interfaces/usersModel.js';
 import { createApiRouter } from './routes/api.routes.js';
 import { EventSettingsService } from './services/settings.js';
 import { RolesService } from './services/roles.js';
+import { MailService } from './services/mail.js';
 
 export class App {
 
@@ -23,7 +24,8 @@ export class App {
     private familyGroupsService: FamilyGroupsService,
     private usersService: UsersService,
     private rolesService: RolesService,
-    private eventSettingsService: EventSettingsService
+    private eventSettingsService: EventSettingsService,
+    private mailService: MailService
   ) {
     this.entriesService = entriesService;
     this.eventsService = eventsService;
@@ -33,6 +35,7 @@ export class App {
     this.usersService = usersService;
     this.eventSettingsService = eventSettingsService;
     this.rolesService = rolesService;
+    this.mailService = mailService;
 
     const app = express();
 
@@ -78,7 +81,8 @@ export class App {
       this.familyGroupsService,
       this.usersService,
       this.eventSettingsService,
-      this.rolesService
+      this.rolesService,
+      this.mailService
     ));
 
     const PORT = process.env.PORT ?? 3000;

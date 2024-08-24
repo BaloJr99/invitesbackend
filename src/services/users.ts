@@ -38,6 +38,15 @@ export class UsersService {
     return token;
   }
 
+  
+  findUser = async (usernameOrEmail: string) => {
+    const userFounded = await User.findOne({
+      $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }]
+    });
+
+    return userFounded;
+  }
+
   getUsername = async (userId: string) => {
     const userFounded = await User.findById(userId);
     return userFounded?.username;
