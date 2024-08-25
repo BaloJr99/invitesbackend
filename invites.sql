@@ -2,7 +2,7 @@ CREATE DATABASE invitesdb;
 
 USE invitesdb;
 
-CREATE TABLE entries (
+CREATE TABLE invites (
 	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
 	family VARCHAR(255) NOT NULL,
 	entriesNumber INT NOT NULL,
@@ -77,9 +77,9 @@ CREATE TABLE settings (
 );
 
 delimiter //
-CREATE PROCEDURE getEntries (IN userIdentifier BINARY(24)) 
+CREATE PROCEDURE getInvites (IN userIdentifier BINARY(24)) 
 BEGIN
-	SELECT confirmation, entriesNumber, entriesConfirmed, dateOfConfirmation  FROM entries WHERE userId = userIdentifier order by dateOfConfirmation ASC;
+	SELECT confirmation, entriesNumber, entriesConfirmed, dateOfConfirmation  FROM invites WHERE userId = userIdentifier order by dateOfConfirmation ASC;
 END //
 delimiter ;
 
@@ -89,7 +89,7 @@ delimiter //
 CREATE PROCEDURE getEventInfo (IN userIdentifier VARCHAR(24)) 
 BEGIN
 	SELECT count(DISTINCT ev.nameOfEvent) AS numEvents, count(en.id) AS numEntries FROM events AS ev
-	LEFT JOIN entries AS en ON ev.id = en.eventId
+	LEFT JOIN invites AS en ON ev.id = en.eventId
 	WHERE ev.userId IN (CAST(userIdentifier AS BINARY))
 	GROUP BY ev.userId;
 END //

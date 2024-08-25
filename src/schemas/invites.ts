@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { ConfirmationModel, PartialEntryModel } from '../interfaces/entriesModels.js';
+import { ConfirmationModel, PartialInviteModel } from '../interfaces/invitesModels.js';
 
-const entrySchema = z.object({
+const inviteSchema = z.object({
   family: z.string({
     invalid_type_error: 'Family must be a string',
     required_error: 'The Family is required'
@@ -58,10 +58,14 @@ const confirmationSchema = z.object({
   }
 });
 
-export function validateEntry (entries: PartialEntryModel) {
-  return entrySchema.safeParse(entries);
+export function validateInvite (invite: PartialInviteModel) {
+  return inviteSchema.safeParse(invite);
 }
 
 export function validateConfirmationSchema (confirmation: ConfirmationModel) {
   return confirmationSchema.safeParse(confirmation);
+}
+
+export function validateBulkInvite (invites: PartialInviteModel[]) {
+  return z.array(inviteSchema).safeParse(invites);
 }

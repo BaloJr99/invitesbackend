@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import { connection } from './config/mysql/connection.js';
 import dbConnect from './config/mongo/mongo.js';
 import { createRoles } from './utils/createRoles.handle.js';
-import { EntriesService } from './services/entries.js';
 import { EventsService } from './services/events.js';
 import { ImagesService } from './config/cloudinary/cloudinary.js';
 import { InviteImagesService } from './services/inviteImages.js';
@@ -13,6 +12,7 @@ import { EventSettingsService } from './services/settings.js';
 import { RolesService } from './services/roles.js';
 import { mailConnection } from './config/nodemailer/transporter.js';
 import { MailService } from './services/mail.js';
+import { InvitesService } from './services/invites.js';
 dotenv.config();
 
 const main = () => {
@@ -27,7 +27,7 @@ const main = () => {
   const nodemailerConnection = mailConnection();
 
   new App(
-    new EntriesService(mysqlConnection),
+    new InvitesService(mysqlConnection),
     new EventsService(mysqlConnection),
     new ImagesService(),
     new InviteImagesService(mysqlConnection),

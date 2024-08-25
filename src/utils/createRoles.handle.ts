@@ -8,7 +8,7 @@ export const createRoles = async () => {
 
     await Promise.all([
       new Role({ name: 'admin', isActive: true }).save(),
-      new Role({ name: 'entriesAdmin', isActive: true }).save()
+      new Role({ name: 'invitesAdmin', isActive: true }).save()
     ]);
   } catch (error) {
     console.error(error);

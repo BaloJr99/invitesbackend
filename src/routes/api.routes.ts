@@ -8,19 +8,19 @@ import { ImagesService } from '../config/cloudinary/cloudinary.js';
 import { InviteImagesService } from '../services/inviteImages.js';
 import { FamilyGroupsService } from '../services/familyGroups.js';
 import { UsersService } from '../services/users.js';
-import { EntriesService } from '../services/entries.js';
-import { createEntriesRouter } from './entries.routes.js';
 import { EventSettingsService } from '../services/settings.js';
 import { createSettingsRouter } from './settings.routes.js';
 import { createUsersRouter } from './users.routes.js';
 import { RolesService } from '../services/roles.js';
 import { createRolesRouter } from './roles.routes.js';
 import { MailService } from '../services/mail.js';
+import { InvitesService } from '../services/invites.js';
+import { createInvitesRouter } from './invites.routes.js';
 
 export const apiRouter = Router();
 
 export const createApiRouter = (
-  entriesService: EntriesService,
+  invitesService: InvitesService,
   eventsService: EventsService, 
   imagesService: ImagesService, 
   inviteImagesService: InviteImagesService, 
@@ -30,14 +30,14 @@ export const createApiRouter = (
   rolesService: RolesService,
   mailService: MailService) => {
 
-  apiRouter.use('/entries', createEntriesRouter(entriesService));
-  apiRouter.use('/events', createEventsRouter(eventsService));
-  apiRouter.use('/images', createImagesRouter(imagesService, inviteImagesService));
-  apiRouter.use('/familyGroups', createFamilyGroupsRouter(familyGroupService));
   apiRouter.use('/auth', createAuthRouter(userService, mailService));
+  apiRouter.use('/invites', createInvitesRouter(invitesService));
+  apiRouter.use('/events', createEventsRouter(eventsService));
+  apiRouter.use('/familyGroups', createFamilyGroupsRouter(familyGroupService));
+  apiRouter.use('/images', createImagesRouter(imagesService, inviteImagesService));
+  apiRouter.use('/roles', createRolesRouter(rolesService));
   apiRouter.use('/settings', createSettingsRouter(eventSettingsService));
   apiRouter.use('/users', createUsersRouter(userService, eventsService));
-  apiRouter.use('/roles', createRolesRouter(rolesService));
 
   return apiRouter
 }

@@ -39,6 +39,6 @@ export interface AuthUserModel {
   password: string
 }
 
-export interface UserFromEntry {
+export interface UserFromInvite {
   userId: string
 }

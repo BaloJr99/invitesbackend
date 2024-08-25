@@ -1,6 +1,6 @@
 export interface FullEventModel  extends EventModel {
   id: string,
-  allowCreateEntries: boolean
+  allowCreateInvites: boolean
 }
 
 export interface EventModel {

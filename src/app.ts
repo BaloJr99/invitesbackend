@@ -1,5 +1,4 @@
 import express, { json } from 'express';
-import { EntriesService } from './services/entries.js';
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js';
 import { EventsService } from './services/events.js';
 import { InviteImagesService } from './services/inviteImages.js';
@@ -8,16 +7,17 @@ import { FamilyGroupsService } from './services/familyGroups.js';
 import { UsersService } from './services/users.js';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { UserFromEntry } from './interfaces/usersModel.js';
+import { UserFromInvite } from './interfaces/usersModel.js';
 import { createApiRouter } from './routes/api.routes.js';
 import { EventSettingsService } from './services/settings.js';
 import { RolesService } from './services/roles.js';
 import { MailService } from './services/mail.js';
+import { InvitesService } from './services/invites.js';
 
 export class App {
 
   constructor (
-    private entriesService: EntriesService,
+    private invitesService: InvitesService,
     private eventsService: EventsService,
     private imagesService: ImagesService,
     private inviteImagesService: InviteImagesService,
@@ -27,7 +27,7 @@ export class App {
     private eventSettingsService: EventSettingsService,
     private mailService: MailService
   ) {
-    this.entriesService = entriesService;
+    this.invitesService = invitesService;
     this.eventsService = eventsService;
     this.imagesService = imagesService;
     this.inviteImagesService = inviteImagesService;
@@ -56,8 +56,8 @@ export class App {
         }
       })
   
-      socket.on('sendNotification', async (entryId) => {
-        const result = await this.entriesService.getUserFromEntryId(entryId) as UserFromEntry[];
+      socket.on('sendNotification', async (inviteId) => {
+        const result = await this.invitesService.getUserFromInviteId(inviteId) as UserFromInvite[];
         if (result.length > 0) {
           const userId = result.at(0)?.userId ?? "";
 
@@ -74,7 +74,7 @@ export class App {
     app.use(corsMiddleware())
 
     app.use('/api', createApiRouter(
-      this.entriesService,
+      this.invitesService,
       this.eventsService,
       this.imagesService,
       this.inviteImagesService,

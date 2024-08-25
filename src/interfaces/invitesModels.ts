@@ -1,8 +1,8 @@
-export interface FullEntryModel extends PartialEntryModel, ConfirmationModel {
+export interface FullInviteModel extends PartialInviteModel, ConfirmationModel {
   id: string
 }
 
-export interface PartialEntryModel {
+export interface PartialInviteModel {
   family: string,
   entriesNumber: number,
   phoneNumber: string,

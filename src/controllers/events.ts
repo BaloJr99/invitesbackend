@@ -41,7 +41,7 @@ export class EventsController {
     }
   }
 
-  getEventEntries = async (req: Request, res: Response) => {
+  getEventInvites = async (req: Request, res: Response) => {
     try {
       const token = req.headers.authorization || '';
       const { id } = req.params;
@@ -50,11 +50,11 @@ export class EventsController {
   
       const decoded = verifyJwtToken(token) as AuthModel;
   
-      const events = await this.eventService.getEventEntries(decoded.id, id);
+      const events = await this.eventService.getEventInvites(decoded.id, id);
   
       return res.json(events);
     } catch (error) {
-      handleHttp(res, 'ERROR_GET_EVENT_ENTRIES');
+      handleHttp(res, 'ERROR_GET_EVENT_INVITES');
     }
   }
 
