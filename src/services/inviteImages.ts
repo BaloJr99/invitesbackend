@@ -8,7 +8,7 @@ export class InviteImagesService {
 
   getImageByEventId = async (eventId: string) => {
     return await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, imageUrl, publicId, imageUsage FROM inviteImages WHERE eventId = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(id) id, imageUrl, publicId, imageUsage FROM inviteImages WHERE eventId = UUID_TO_BIN(?) ORDER BY imageUsage',
       [eventId]
     );
   }
