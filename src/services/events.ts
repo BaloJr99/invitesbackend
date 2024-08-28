@@ -24,10 +24,10 @@ export class EventsService {
     return result;
   }
 
-  getEventInvites = async (userId: string, eventId: string) => {
+  getEventInvites = async (eventId: string) => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead, BIN_TO_UUID(familyGroupId) familyGroupId FROM invites WHERE userId = CAST(? AS BINARY) AND eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
-      [userId, eventId]
+      'SELECT BIN_TO_UUID(id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead, BIN_TO_UUID(familyGroupId) familyGroupId FROM invites WHERE eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
+      [eventId]
     );
     return result;
   }

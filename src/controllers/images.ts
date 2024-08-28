@@ -2,9 +2,7 @@ import { ImagesService } from '../config/cloudinary/cloudinary.js';
 import { validateImageUsage, validateImages } from '../schemas/images.js'
 import { InviteImagesService } from '../services/inviteImages.js';
 import { Request, Response } from 'express';
-import { AuthModel } from '../interfaces/authModel.js';
 import { handleHttp } from '../utils/error.handle.js';
-import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class ImagesController {
   constructor (private imagesService: ImagesService, private inviteImagesService: InviteImagesService) {
@@ -14,26 +12,17 @@ export class ImagesController {
 
   createImage = async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization || '';
-
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-
       const result = validateImages(req.body);
 
       if (!result.success) {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
 
-      const decoded = verifyJwtToken(token) as AuthModel;
-
       const cloudResult = await this.imagesService.uploadImage(result.data.image);
 
       const { eventId } = result.data;
 
-      await this.inviteImagesService.createImage(
-        { imageUrl: cloudResult.secure_url, publicId: cloudResult.public_id, eventId },
-        decoded.id
-      );
+      await this.inviteImagesService.createImage({ imageUrl: cloudResult.secure_url, publicId: cloudResult.public_id, eventId });
 
       return res.status(201).json({ message: 'Imagenes agregadas' });
     } catch (error) {
@@ -59,10 +48,6 @@ export class ImagesController {
 
   deleteImage = async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization || '';
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
       const image = req.body;
 
       await this.imagesService.deleteImage(image.publicId);

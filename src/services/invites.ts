@@ -29,7 +29,7 @@ export class InvitesService {
     return result;
   }
 
-  createInvite = async (invite: PartialInviteModel, id: string) => {
+  createInvite = async (invite: PartialInviteModel) => {
     const {
       family,
       entriesNumber,
@@ -43,13 +43,12 @@ export class InvitesService {
     const [{ uuid }] = queryResult as { uuid: string }[];
 
     await this.connection.query(
-      `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, userId, eventId, familyGroupId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, CAST(? AS BINARY), UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+      `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, familyGroupId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
       [
         family,
         entriesNumber,
         phoneNumber,
         kidsAllowed,
-        id,
         eventId,
         familyGroupId
       ]
@@ -58,18 +57,15 @@ export class InvitesService {
     return uuid;
   }
 
-  
-
-  createBulkInvite = async (invites: PartialInviteModel[], id: string) => {
+  createBulkInvite = async (invites: PartialInviteModel[]) => {
     invites.forEach(async invite => {
       await this.connection.query(
-        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, userId, eventId, familyGroupId) VALUES (UUID_TO_BIN('${crypto.randomUUID()}'), ?, ?, ?, ?, CAST(? AS BINARY), UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, familyGroupId) VALUES (UUID_TO_BIN('${crypto.randomUUID()}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
         [
           invite.family,
           invite.entriesNumber,
           invite.phoneNumber,
           invite.kidsAllowed,
-          id,
           invite.eventId,
           invite.familyGroupId
         ]

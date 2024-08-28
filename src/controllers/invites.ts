@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { handleHttp } from '../utils/error.handle.js';
 import { InvitesService } from '../services/invites.js';
-import { AuthModel } from '../interfaces/authModel.js';
 import { FullInviteModel } from '../interfaces/invitesModels.js';
 import { validateBulkInvite, validateConfirmationSchema, validateInvite } from '../schemas/invites.js';
 import { verifyJwtToken } from '../utils/jwt.handle.js';
+import { AuthModel } from '../interfaces/authModel.js';
 
 export class InvitesController {
   constructor (private invitesService: InvitesService) {
@@ -25,7 +25,6 @@ export class InvitesController {
 
       return res.status(200).json(invites);
     } catch (error) {
-      console.log(error)
       handleHttp(res, 'ERROR_GET_ALL_INVITES');
     }
   };
@@ -66,13 +65,7 @@ export class InvitesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
 
-      const token = req.headers.authorization || '';
-
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-
-      const decoded = verifyJwtToken(token) as AuthModel;
-
-      const inviteId = await this.invitesService.createInvite(result.data, decoded.id);
+      const inviteId = await this.invitesService.createInvite(result.data);
 
       return res.status(201).json({ id: inviteId, message: 'Invitación creada' });
     } catch (error) {
@@ -89,13 +82,7 @@ export class InvitesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
 
-      const token = req.headers.authorization || '';
-
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-
-      const decoded = verifyJwtToken(token) as AuthModel;
-
-      await this.invitesService.createBulkInvite(result.data, decoded.id);
+      await this.invitesService.createBulkInvite(result.data);
 
       return res.status(201).json({ message: 'Invitaciones creadas' });
     } catch (error) {

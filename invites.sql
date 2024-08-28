@@ -79,7 +79,10 @@ CREATE TABLE settings (
 delimiter //
 CREATE PROCEDURE getInvites (IN userIdentifier BINARY(24)) 
 BEGIN
-	SELECT confirmation, entriesNumber, entriesConfirmed, dateOfConfirmation  FROM invites WHERE userId = userIdentifier order by dateOfConfirmation ASC;
+	SELECT confirmation, entriesNumber, entriesConfirmed, dateOfConfirmation FROM invites 
+    INNER JOIN events ON invites.eventId = events.id
+    WHERE userId = userIdentifier
+    ORDER BY dateOfConfirmation ASC;
 END //
 delimiter ;
 

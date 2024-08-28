@@ -1,10 +1,8 @@
 import { validateSettings } from '../schemas/settings.js'
 import { EventSettingsService } from '../services/settings.js';
 import { Request, Response } from 'express';
-import { AuthModel } from '../interfaces/authModel.js';
 import { FullSettingsModel } from '../interfaces/settingsModel.js';
 import { handleHttp } from '../utils/error.handle.js';
-import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class SettingsController {
   constructor (private eventSettingsService: EventSettingsService) {
@@ -33,18 +31,11 @@ export class SettingsController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
   
-      const token = req.headers.authorization || '';
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
-      const decoded = verifyJwtToken(token) as AuthModel;
-  
-      const eventId = await this.eventSettingsService.createEventSettings(
-        result.data,
-        decoded.id
+      const settingId = await this.eventSettingsService.createEventSettings(
+        result.data
       );
   
-      return res.status(201).json({ id: eventId, message: 'Configuraciones del evento creadas' });
+      return res.status(201).json({ id: settingId, message: 'Configuraciones del evento creadas' });
     } catch (error) {
       console.error(error);
       handleHttp(res, 'ERROR_CREATE_EVENT_SETTINGS');

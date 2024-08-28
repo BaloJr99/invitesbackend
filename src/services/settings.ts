@@ -8,14 +8,14 @@ export class EventSettingsService {
 
   getEventSettingsById = async (eventId: string) => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(eventId) eventId, primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor, CAST(userId AS CHAR) AS userId FROM settings WHERE eventId = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(eventId) eventId, primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor FROM settings WHERE eventId = UUID_TO_BIN(?)',
       [eventId]
     );
 
     return result;
   }
 
-  createEventSettings = async (eventSettings: SettingsModel, userId: string) => {
+  createEventSettings = async (eventSettings: SettingsModel) => {
     const { 
       eventId,
       primaryColor,
@@ -35,8 +35,8 @@ export class EventSettingsService {
     } = eventSettings;
 
     await this.connection.query(
-      `INSERT INTO settings (eventId, primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor, userId) VALUES (UUID_TO_BIN('${eventId}'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CAST(? AS BINARY))`,
-      [primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor, userId]
+      `INSERT INTO settings (eventId, primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor) VALUES (UUID_TO_BIN('${eventId}'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor]
     );
 
     return eventId;

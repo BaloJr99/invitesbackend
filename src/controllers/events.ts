@@ -13,10 +13,6 @@ export class EventsController {
 
   getAllEvents = async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization || '';
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
       const events = await this.eventService.getAllEvents();
   
       return res.json(events);
@@ -43,14 +39,9 @@ export class EventsController {
 
   getEventInvites = async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization || '';
       const { id } = req.params;
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
-      const decoded = verifyJwtToken(token) as AuthModel;
-  
-      const events = await this.eventService.getEventInvites(decoded.id, id);
+      
+      const events = await this.eventService.getEventInvites(id);
   
       return res.json(events);
     } catch (error) {

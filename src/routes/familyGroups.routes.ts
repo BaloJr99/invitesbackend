@@ -10,7 +10,7 @@ export const familyGroupsRouter = Router()
 export const createFamilyGroupsRouter = (familyGroupService: FamilyGroupsService) => {
   const familyGroupController = new FamilyGroupsController(familyGroupService);
 
-  familyGroupsRouter.get('/', [checkJwt, isInvitesAdmin], familyGroupController.getFamilyGroups);
+  familyGroupsRouter.get('/:id', [checkJwt, isInvitesAdmin], familyGroupController.getFamilyGroups);
   familyGroupsRouter.post('/', [checkJwt, isInvitesAdmin], familyGroupController.createFamilyGroup);
 
   familyGroupsRouter.put('/:id', [checkJwt, isInvitesAdmin, validateUuid], familyGroupController.updateFamilyGroup);

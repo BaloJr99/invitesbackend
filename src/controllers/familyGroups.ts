@@ -1,9 +1,7 @@
-import { validateFamilyGroup } from '../schemas/familyGroups.js'
+import { validateFamilyGroup, validateUpdateFamilyGroup } from '../schemas/familyGroups.js'
 import { FamilyGroupsService } from '../services/familyGroups.js';
 import { Request, Response } from 'express';
-import { AuthModel } from '../interfaces/authModel.js';
 import { handleHttp } from '../utils/error.handle.js';
-import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class FamilyGroupsController {
   constructor (private familyGroupService: FamilyGroupsService) {
@@ -12,16 +10,13 @@ export class FamilyGroupsController {
 
   getFamilyGroups = async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization || '';
+      const { id } = req.params;
 
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-
-      const decoded = verifyJwtToken(token) as AuthModel;
-
-      const familyGroups = await this.familyGroupService.getFamilyGroups(decoded.id);
+      const familyGroups = await this.familyGroupService.getFamilyGroups(id);
 
       return res.json(familyGroups);
     } catch (error) {
+      console.log(error);
       handleHttp(res, 'ERROR_GET_ALL_FAMILIES');
     }
   }
@@ -34,15 +29,8 @@ export class FamilyGroupsController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
   
-      const token = req.headers.authorization || '';
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
-      const decoded = verifyJwtToken(token) as AuthModel;
-  
       const familyGroupId = await this.familyGroupService.createFamilyGroup(
-        result.data,
-        decoded.id
+        result.data
       );
 
       return res.status(201).json({ id: familyGroupId, message: 'Grupo familiar creado' });
@@ -53,7 +41,7 @@ export class FamilyGroupsController {
 
   updateFamilyGroup = async (req: Request, res: Response) => {
     try {
-      const result = validateFamilyGroup(req.body);
+      const result = validateUpdateFamilyGroup(req.body);
   
       if (!result.success) {
         return res.status(400).json({ error: JSON.parse(result.error.message) });

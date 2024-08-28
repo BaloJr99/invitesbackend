@@ -13,15 +13,15 @@ export class InviteImagesService {
     );
   }
 
-  createImage = async (image: ImagesModel, userId: string) => {
+  createImage = async (image: ImagesModel) => {
     const { imageUrl, publicId, eventId } = image;
 
     const [queryResult] = await this.connection.query('SELECT UUID() uuid');
     const [{ uuid }] = queryResult as { uuid: string }[];
 
     await this.connection.query(
-      'INSERT INTO inviteImages (id, imageUrl, publicId, userId, eventId) VALUES (UUID_TO_BIN(?), ?, ?, CAST(? AS BINARY), UUID_TO_BIN(?))',
-      [uuid, imageUrl, publicId, userId, eventId]
+      'INSERT INTO inviteImages (id, imageUrl, publicId, eventId) VALUES (UUID_TO_BIN(?), ?, ?, UUID_TO_BIN(?))',
+      [uuid, imageUrl, publicId, eventId]
     );
   }
 
