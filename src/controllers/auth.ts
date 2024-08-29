@@ -53,7 +53,6 @@ export class AuthController {
       await this.userService.updateResetPasword(userFounded._id.toString(), '', true);
       res.status(200).json({ info });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({ error: 'Error al enviar el correo' });
     }
   }

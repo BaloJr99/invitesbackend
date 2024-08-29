@@ -20,8 +20,9 @@ export class InvitesController {
       }
 
       const decoded = verifyJwtToken(token) as AuthModel;
+      const isAdmin = decoded.roles.some(r => r.name == "admin");
 
-      const [invites] = await this.invitesService.getAllInvites(decoded.id) as FullInviteModel[];
+      const [invites] = await this.invitesService.getAllInvites(decoded.id, isAdmin) as FullInviteModel[];
 
       return res.status(200).json(invites);
     } catch (error) {
@@ -69,7 +70,6 @@ export class InvitesController {
 
       return res.status(201).json({ id: inviteId, message: 'Invitación creada' });
     } catch (error) {
-      console.log(error)
       handleHttp(res, 'ERROR_CREATE_INVITE');
     }
   };
@@ -86,7 +86,6 @@ export class InvitesController {
 
       return res.status(201).json({ message: 'Invitaciones creadas' });
     } catch (error) {
-      console.log(error)
       handleHttp(res, 'ERROR_CREATE_INVITE');
     }
   };

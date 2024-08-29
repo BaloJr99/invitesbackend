@@ -16,7 +16,6 @@ export class FamilyGroupsController {
 
       return res.json(familyGroups);
     } catch (error) {
-      console.log(error);
       handleHttp(res, 'ERROR_GET_ALL_FAMILIES');
     }
   }

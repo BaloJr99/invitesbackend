@@ -6,8 +6,8 @@ export class InvitesService {
     this.connection = connection;
   }
 
-  getAllInvites = async (userId: string) => {
-    const [result] = await this.connection.execute('CALL getInvites(CAST(? AS BINARY))', [userId]);
+  getAllInvites = async (userId: string, isAdmin: boolean) => {
+    const [result] = await this.connection.execute('CALL getInvites(CAST(? AS BINARY), ?)', [userId, +isAdmin]);
     return result;
   }
 

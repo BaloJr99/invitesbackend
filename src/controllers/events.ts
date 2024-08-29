@@ -104,7 +104,6 @@ export class EventsController {
   
       return res.status(201).json({ message: 'Evento actualizado' });
     } catch (error) {
-      console.log(error);
       handleHttp(res, 'ERROR_UPDATE_EVENT');
     }
   }

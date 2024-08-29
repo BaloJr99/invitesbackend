@@ -122,9 +122,7 @@ export class UsersService {
   }
 
   updateResetPasword = async (userId:string, password: string, userResettingPassword: boolean) => {
-    console.log(userResettingPassword)
     if (!userResettingPassword) {
-      console.log(password)
       const passHash = await encryptPassword(password);
 
       const result = await User.updateOne({ _id: userId }, { $set: { 
