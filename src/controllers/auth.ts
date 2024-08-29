@@ -2,32 +2,43 @@ import { Request, Response } from 'express';
 import { validateAuthUser, validatePassword, validateUsernameOrEmail } from '../schemas/users.js';
 import { UsersService } from '../services/users.js';
 import { MailService } from '../services/mail.js';
+import { ErrorHandler } from '../utils/error.handle.js';
+import { LoggerService } from '../services/logger.js';
 
 export class AuthController {
+  errorHandler: ErrorHandler;
+
   constructor (
     private userService: UsersService,
-    private mailService: MailService) {
+    private mailService: MailService,
+    private loggerService: LoggerService) {
     this.userService = userService;
     this.mailService = mailService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
   signIn = async (req: Request, res: Response) => {
-    const result = validateAuthUser(req.body);
+    try {
+      const result = validateAuthUser(req.body);
 
-    if (!result.success) {
-      return res.status(422).json({ error: JSON.parse(result.error.message) });
+      if (!result.success) {
+        return res.status(422).json({ error: JSON.parse(result.error.message) });
+      }
+
+      const signInResponse = await this.userService.signin(result.data);
+      if (signInResponse.includes('ERROR')) {
+        return res.status(401).json({ error: 'Credenciales incorrectas' });
+      }
+
+      if (signInResponse.includes('BLOCKED')) {
+        return res.status(401).json({ error: 'Cuenta bloqueada, has excedido el numero de intentos' });
+      }
+
+      res.status(200).json({ token: signInResponse });
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_SIGN_IN', e.message, req.userId);
     }
-
-    const signInResponse = await this.userService.signin(result.data);
-    if (signInResponse.includes('ERROR')) {
-      return res.status(401).json({ error: 'Credenciales incorrectas' });
-    }
-
-    if (signInResponse.includes('BLOCKED')) {
-      return res.status(401).json({ error: 'Cuenta bloqueada, has excedido el numero de intentos' });
-    }
-
-    res.status(200).json({ token: signInResponse });
   }
 
   forgotPassword = async (req: Request, res: Response) => {
@@ -52,29 +63,40 @@ export class AuthController {
 
       await this.userService.updateResetPasword(userFounded._id.toString(), '', true);
       res.status(200).json({ info });
-    } catch (error) {
-      return res.status(500).json({ error: 'Error al enviar el correo' });
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_SENDING_EMAIL', e.message, req.userId);
     }
   }
 
   isUserResettingPassword = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    try {
+      const { id } = req.params;
 
-    const resetting = await this.userService.isUserResettingPassword(id);
-    return res.status(200).json(resetting);
+      const resetting = await this.userService.isUserResettingPassword(id);
+      return res.status(200).json(resetting);
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_IS_RESETTING_PASSWORD', e.message, req.userId);
+    }
   }
 
   resetPassword = async (req: Request, res: Response) => {
-    const result = validatePassword(req.body);
+    try {
+      const result = validatePassword(req.body);
 
-    if (!result.success) {
-      return res.status(422).json({ error: JSON.parse(result.error.message) });
+      if (!result.success) {
+        return res.status(422).json({ error: JSON.parse(result.error.message) });
+      }
+
+      const { id } = req.params;
+
+      await this.userService.updateResetPasword(id, result.data.password, false);
+      return res.status(200).json();
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_RESET_PASSWORD', e.message, req.userId);
     }
-
-    const { id } = req.params;
-
-    await this.userService.updateResetPasword(id, result.data.password, false);
-    return res.status(200).json();
   }
 
   getHtml = (userFound: string, userId: string, url: string): string => {

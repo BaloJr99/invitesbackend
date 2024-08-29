@@ -2,12 +2,19 @@ import { ImagesService } from '../config/cloudinary/cloudinary.js';
 import { validateImageUsage, validateImages } from '../schemas/images.js'
 import { InviteImagesService } from '../services/inviteImages.js';
 import { Request, Response } from 'express';
-import { handleHttp } from '../utils/error.handle.js';
+import { ErrorHandler } from '../utils/error.handle.js';
+import { LoggerService } from '../services/logger.js';
 
 export class ImagesController {
-  constructor (private imagesService: ImagesService, private inviteImagesService: InviteImagesService) {
+  errorHandler: ErrorHandler;
+  constructor (
+    private imagesService: ImagesService, 
+    private inviteImagesService: InviteImagesService,
+    private loggerService: LoggerService
+  ) {
     this.imagesService = imagesService;
     this.inviteImagesService = inviteImagesService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
   createImage = async (req: Request, res: Response) => {
@@ -25,8 +32,9 @@ export class ImagesController {
       await this.inviteImagesService.createImage({ imageUrl: cloudResult.secure_url, publicId: cloudResult.public_id, eventId });
 
       return res.status(201).json({ message: 'Imagenes agregadas' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_IMAGE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_CREATE_IMAGE', e.message, req.userId);
     }
   }
 
@@ -41,8 +49,9 @@ export class ImagesController {
       await this.inviteImagesService.updateImages(result.data);
   
       return res.status(201).json({ message: 'Informacion actualizada' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_IMAGE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_IMAGE', e.message, req.userId);
     }
   }
 
@@ -55,8 +64,9 @@ export class ImagesController {
       await this.inviteImagesService.deleteImage(image.id);
   
       return res.json({ message: 'Imagen eliminada' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_DELETE_IMAGE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_DELETE_IMAGE', e.message, req.userId);
     }
   }
 
@@ -67,8 +77,9 @@ export class ImagesController {
       const [eventImages] = await this.inviteImagesService.getImageByEventId(id);
   
       return res.json(eventImages);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_IMAGES');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_IMAGES', e.message, req.userId);
     }
   }
 }

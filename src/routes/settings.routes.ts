@@ -4,11 +4,12 @@ import { EventSettingsService } from '../services/settings.js'
 import { isInvitesAdmin } from '../middleware/auth.js'
 import { validateUuid } from '../middleware/validateUuid.js'
 import { checkJwt } from '../middleware/session.js'
+import { LoggerService } from '../services/logger.js'
 
 export const settingsRouter = Router()
 
-export const createSettingsRouter = (eventSettingsService: EventSettingsService) => {
-  const eventController = new SettingsController(eventSettingsService);
+export const createSettingsRouter = (eventSettingsService: EventSettingsService, loggerService: LoggerService) => {
+  const eventController = new SettingsController(eventSettingsService, loggerService);
 
   settingsRouter.get('/:id', [validateUuid], eventController.getEventSettingsById);
   settingsRouter.post('/', [checkJwt, isInvitesAdmin], eventController.createEventSettings);

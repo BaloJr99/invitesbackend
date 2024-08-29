@@ -13,6 +13,7 @@ import { RolesService } from './services/roles.js';
 import { mailConnection } from './config/nodemailer/transporter.js';
 import { MailService } from './services/mail.js';
 import { InvitesService } from './services/invites.js';
+import { LoggerService } from './services/logger.js';
 dotenv.config();
 
 const main = () => {
@@ -35,7 +36,8 @@ const main = () => {
     new UsersService(),
     new RolesService(),
     new EventSettingsService(mysqlConnection),
-    new MailService(nodemailerConnection)
+    new MailService(nodemailerConnection),
+    new LoggerService(mysqlConnection)
   );
 }
 

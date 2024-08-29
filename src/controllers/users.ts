@@ -1,16 +1,20 @@
 import { UsersService } from '../services/users.js';
 import { Request, Response } from 'express';
-import { handleHttp } from '../utils/error.handle.js';
+import { ErrorHandler } from '../utils/error.handle.js';
 import { validateFullUser, validateUser } from '../schemas/users.js';
 import { EventsService } from '../services/events.js';
 import { EventsInfoModel, UserEventInfoModel, UserInfoModel } from '../interfaces/usersModel.js';
+import { LoggerService } from '../services/logger.js';
 
 export class UsersController {
+  errorHandler: ErrorHandler;
   constructor (
     private userService: UsersService,
-    private eventsService: EventsService
+    private eventsService: EventsService,
+    private loggerService: LoggerService
   ) {
     this.userService = userService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
   getUsers = async (req: Request, res: Response) => {
@@ -48,8 +52,9 @@ export class UsersController {
       }
 
       return res.json(usersEventInfo);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_USERS');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_USERS', e.message, req.userId);
     }
   }
 
@@ -59,8 +64,9 @@ export class UsersController {
       const userFound = await this.userService.getUserById(id);
 
       return res.json(userFound);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_USERS');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_USER_BY_ID', e.message, req.userId);
     }
   }
 
@@ -68,8 +74,9 @@ export class UsersController {
     try {
       const users = await this.userService.getUsersBasicInfo();
       return res.json(users);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_USERS');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_USERS', e.message, req.userId);
     }
   }
 
@@ -84,8 +91,9 @@ export class UsersController {
       const userId = await this.userService.createUser(result.data);
 
       return res.status(201).json({ id: userId, message: 'Usuario creado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_USER');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_CREATE_USER', e.message, req.userId);
     }
   }
 
@@ -105,8 +113,9 @@ export class UsersController {
       );
   
       return res.status(201).json({ message: 'Usuario actualizado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_USER');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_USER', e.message, req.userId);
     }
   }
 
@@ -116,8 +125,9 @@ export class UsersController {
       await this.userService.deleteUser(id);
   
       return res.json({ message: 'Usuario desactivado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_DELETE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_DELETE_USER', e.message, req.userId);
     }
   }
 }

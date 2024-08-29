@@ -13,6 +13,7 @@ import { EventSettingsService } from './services/settings.js';
 import { RolesService } from './services/roles.js';
 import { MailService } from './services/mail.js';
 import { InvitesService } from './services/invites.js';
+import { LoggerService } from './services/logger.js';
 
 export class App {
 
@@ -25,7 +26,8 @@ export class App {
     private usersService: UsersService,
     private rolesService: RolesService,
     private eventSettingsService: EventSettingsService,
-    private mailService: MailService
+    private mailService: MailService,
+    private loggerService: LoggerService
   ) {
     this.invitesService = invitesService;
     this.eventsService = eventsService;
@@ -36,6 +38,7 @@ export class App {
     this.eventSettingsService = eventSettingsService;
     this.rolesService = rolesService;
     this.mailService = mailService;
+    this.loggerService = loggerService;
 
     const app = express();
 
@@ -82,7 +85,8 @@ export class App {
       this.usersService,
       this.eventSettingsService,
       this.rolesService,
-      this.mailService
+      this.mailService,
+      this.loggerService
     ));
 
     const PORT = process.env.PORT ?? 3000;

@@ -4,11 +4,12 @@ import { EventsService } from '../services/events.js'
 import { isInvitesAdmin } from '../middleware/auth.js'
 import { validateUuid } from '../middleware/validateUuid.js'
 import { checkJwt } from '../middleware/session.js'
+import { LoggerService } from '../services/logger.js'
 
 export const eventsRouter = Router()
 
-export const createEventsRouter = (eventsService: EventsService) => {
-  const eventController = new EventsController(eventsService);
+export const createEventsRouter = (eventsService: EventsService, loggerService: LoggerService) => {
+  const eventController = new EventsController(eventsService, loggerService);
 
   eventsRouter.get('/', [checkJwt, isInvitesAdmin], eventController.getAllEvents);
   eventsRouter.get('/users', [checkJwt, isInvitesAdmin], eventController.getEventsByUser);

@@ -1,11 +1,18 @@
 import { validateFamilyGroup, validateUpdateFamilyGroup } from '../schemas/familyGroups.js'
 import { FamilyGroupsService } from '../services/familyGroups.js';
 import { Request, Response } from 'express';
-import { handleHttp } from '../utils/error.handle.js';
+import { ErrorHandler } from '../utils/error.handle.js';
+import { LoggerService } from '../services/logger.js';
 
 export class FamilyGroupsController {
-  constructor (private familyGroupService: FamilyGroupsService) {
+  errorHandler: ErrorHandler;
+  constructor (
+    private familyGroupService: FamilyGroupsService,
+    private loggerService: LoggerService
+  ) {
     this.familyGroupService = familyGroupService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
+
   }
 
   getFamilyGroups = async (req: Request, res: Response) => {
@@ -15,8 +22,9 @@ export class FamilyGroupsController {
       const familyGroups = await this.familyGroupService.getFamilyGroups(id);
 
       return res.json(familyGroups);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_FAMILIES');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_FAMILIES', e.message, req.userId);
     }
   }
 
@@ -33,8 +41,9 @@ export class FamilyGroupsController {
       );
 
       return res.status(201).json({ id: familyGroupId, message: 'Grupo familiar creado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_FAMILY');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_CREATE_FAMILY', e.message, req.userId);
     }
   }
 
@@ -54,8 +63,9 @@ export class FamilyGroupsController {
       );
   
       return res.status(201).json({ message: 'Grupo familiar actualizado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_FAMILY');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_FAMILY', e.message, req.userId);
     }
   }
 }

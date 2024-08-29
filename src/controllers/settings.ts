@@ -2,11 +2,18 @@ import { validateSettings } from '../schemas/settings.js'
 import { EventSettingsService } from '../services/settings.js';
 import { Request, Response } from 'express';
 import { FullSettingsModel } from '../interfaces/settingsModel.js';
-import { handleHttp } from '../utils/error.handle.js';
+import { ErrorHandler } from '../utils/error.handle.js';
+import { LoggerService } from '../services/logger.js';
 
 export class SettingsController {
-  constructor (private eventSettingsService: EventSettingsService) {
+  errorHandler: ErrorHandler;
+
+  constructor (
+    private eventSettingsService: EventSettingsService,
+    private loggerService: LoggerService
+  ) {
     this.eventSettingsService = eventSettingsService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
   getEventSettingsById = async (req: Request, res: Response) => {
@@ -18,8 +25,9 @@ export class SettingsController {
       if (event.length > 0) return res.json(event.at(0));
   
       return res.status(404).json({ message: 'Las configuraciones del evento no se encontraron' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_EVENT_SETTINGS_BY_ID');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_EVENT_SETTINGS_BY_ID', e.message, req.userId);
     }
   }
 
@@ -36,9 +44,9 @@ export class SettingsController {
       );
   
       return res.status(201).json({ id: settingId, message: 'Configuraciones del evento creadas' });
-    } catch (error) {
-      console.error(error);
-      handleHttp(res, 'ERROR_CREATE_EVENT_SETTINGS');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_CREATE_EVENT_SETTINGS', e.message, req.userId);
     }
   }
 
@@ -55,8 +63,9 @@ export class SettingsController {
       await this.eventSettingsService.updateEventSettings(id, result.data);
   
       return res.status(201).json({ message: 'Configuraciones del evento actualizadas' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_EVENT_SETTINGS');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_EVENT_SETTINGS', e.message, req.userId);
     }
   }
 }

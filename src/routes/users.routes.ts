@@ -5,11 +5,12 @@ import { isInvitesAdmin } from '../middleware/auth.js'
 import { checkJwt } from '../middleware/session.js'
 import { checkDuplicateUsernameOrEmail, checkRolesExisted } from '../middleware/verifySignup.js'
 import { EventsService } from '../services/events.js'
+import { LoggerService } from '../services/logger.js'
 
 export const usersRouter = Router()
 
-export const createUsersRouter = (userService: UsersService, eventsService: EventsService) => {
-  const userController = new UsersController(userService, eventsService);
+export const createUsersRouter = (userService: UsersService, eventsService: EventsService, loggerService: LoggerService) => {
+  const userController = new UsersController(userService, eventsService, loggerService);
 
   usersRouter.get('/', [checkJwt, isInvitesAdmin], userController.getUsers);
   usersRouter.get('/basic', [checkJwt, isInvitesAdmin], userController.getUsersBasicInfo);

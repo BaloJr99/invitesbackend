@@ -1,39 +1,38 @@
 import { validateEvent } from '../schemas/events.js'
 import { EventsService } from '../services/events.js';
 import { Request, Response } from 'express';
-import { AuthModel } from '../interfaces/authModel.js';
 import { FullEventModel } from '../interfaces/eventsModel.js';
-import { handleHttp } from '../utils/error.handle.js';
-import { verifyJwtToken } from '../utils/jwt.handle.js';
+import { LoggerService } from '../services/logger.js';
+import { ErrorHandler } from '../utils/error.handle.js';
 
 export class EventsController {
-  constructor (private eventService: EventsService) {
+  errorHandler: ErrorHandler;
+  constructor (
+    private eventService: EventsService,
+    private loggerService: LoggerService
+  ) {
     this.eventService = eventService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
   getAllEvents = async (req: Request, res: Response) => {
     try {
       const events = await this.eventService.getAllEvents();
-  
       return res.json(events);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_EVENTS');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_RESET_PASSWORD', e.message, req.userId);
     }
   }
 
   getEventsByUser = async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization || '';
-  
-      if (token === "") return res.status(403).json({ error: 'No token provided' });
-  
-      const decoded = verifyJwtToken(token) as AuthModel;
-  
-      const events = await this.eventService.getEventsByUser(decoded.id);
+      const events = await this.eventService.getEventsByUser(req.userId);
   
       return res.json(events);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_EVENTS');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_EVENTS', e.message, req.userId);
     }
   }
 
@@ -44,8 +43,9 @@ export class EventsController {
       const events = await this.eventService.getEventInvites(id);
   
       return res.json(events);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_EVENT_INVITES');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_EVENT_INVITES', e.message, req.userId);
     }
   }
 
@@ -58,8 +58,9 @@ export class EventsController {
       if (event.length > 0) return res.json(event.at(0));
   
       return res.status(404).json({ message: 'Evento no encontrado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_EVENT_BY_ID');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_EVENT_BY_ID', e.message, req.userId);
     }
   }
 
@@ -74,8 +75,9 @@ export class EventsController {
       const eventId = await this.eventService.createEvent(result.data);
   
       return res.status(201).json({ id: eventId, message: 'Evento creado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_EVENT');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_CREATE_EVENT', e.message, req.userId);
     }
   }
 
@@ -85,8 +87,9 @@ export class EventsController {
       await this.eventService.deleteEvent(id);
   
       return res.json({ message: 'Evento eliminado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_DELETE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_DELETE', e.message, req.userId);
     }
   }
 
@@ -103,8 +106,9 @@ export class EventsController {
       await this.eventService.updateEvent(id, result.data);
   
       return res.status(201).json({ message: 'Evento actualizado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_EVENT');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_EVENT', e.message, req.userId);
     }
   }
 }

@@ -28,8 +28,9 @@ CREATE TABLE usersActivity (
 CREATE TABLE errorLogs (
   id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
   dateOfError DATETIME NOT NULL,
-  error VARCHAR(255) NOT NULL,
-  statusCode VARCHAR(3) NOT NULL
+  customError TEXT NOT NULL,
+  exceptionMessage TEXT NOT NULL,
+  userId BINARY(24)
 );
 
 CREATE TABLE events (

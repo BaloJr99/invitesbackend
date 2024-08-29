@@ -3,12 +3,13 @@ import { InvitesService } from '../services/invites.js';
 import { isInvitesAdmin } from '../middleware/auth.js';
 import { validateUuid } from '../middleware/validateUuid.js';
 import { checkJwt } from '../middleware/session.js';
-import InvitesController from '../controllers/invites.js';
+import { LoggerService } from '../services/logger.js';
+import { InvitesController } from '../controllers/invites.js';
 
 export const invitesRouter = Router();
 
-export const createInvitesRouter = (invitesService: InvitesService) => {
-  const invitesController = new InvitesController(invitesService);
+export const createInvitesRouter = (invitesService: InvitesService, loggerService: LoggerService) => {
+  const invitesController = new InvitesController(invitesService, loggerService);
 
   invitesRouter.get('/', [checkJwt, isInvitesAdmin], invitesController.getInvites);
   invitesRouter.post('/', [checkJwt, isInvitesAdmin], invitesController.createInvite);

@@ -1,14 +1,21 @@
 import { Request, Response } from 'express';
-import { handleHttp } from '../utils/error.handle.js';
 import { InvitesService } from '../services/invites.js';
 import { FullInviteModel } from '../interfaces/invitesModels.js';
 import { validateBulkInvite, validateConfirmationSchema, validateInvite } from '../schemas/invites.js';
 import { verifyJwtToken } from '../utils/jwt.handle.js';
 import { AuthModel } from '../interfaces/authModel.js';
+import { ErrorHandler } from '../utils/error.handle.js';
+import { LoggerService } from '../services/logger.js';
 
 export class InvitesController {
-  constructor (private invitesService: InvitesService) {
+  errorHandler: ErrorHandler;
+
+  constructor (
+    private invitesService: InvitesService,
+    private loggerService: LoggerService
+  ) {
     this.invitesService = invitesService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
   getInvites = async (req: Request, res: Response) => {
@@ -21,12 +28,12 @@ export class InvitesController {
 
       const decoded = verifyJwtToken(token) as AuthModel;
       const isAdmin = decoded.roles.some(r => r.name == "admin");
-
       const [invites] = await this.invitesService.getAllInvites(decoded.id, isAdmin) as FullInviteModel[];
 
       return res.status(200).json(invites);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_INVITES');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_INVITES', e.message, req.userId);
     }
   };
 
@@ -39,8 +46,9 @@ export class InvitesController {
       if (invite.length > 0) return res.json(invite.at(0));
 
       return res.status(404).json({ message: 'Invitación no encontrada' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_INVITE_BY_ID');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_INVITE_BY_ID', e.message, req.userId);
     }
   };
 
@@ -53,8 +61,9 @@ export class InvitesController {
       if (invite.length > 0) return res.json(invite.at(0));
 
       return res.status(404).json({ message: 'Invitación no encontrada' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_INVITE_FOR_EVENT');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_INVITE_FOR_EVENT', e.message, req.userId);
     }
   };
 
@@ -69,8 +78,9 @@ export class InvitesController {
       const inviteId = await this.invitesService.createInvite(result.data);
 
       return res.status(201).json({ id: inviteId, message: 'Invitación creada' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_INVITE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_CREATE_INVITE', e.message, req.userId);
     }
   };
 
@@ -85,8 +95,9 @@ export class InvitesController {
       await this.invitesService.createBulkInvite(result.data);
 
       return res.status(201).json({ message: 'Invitaciones creadas' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_INVITE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_BULK_INVITES', e.message, req.userId);
     }
   };
 
@@ -97,8 +108,9 @@ export class InvitesController {
       await this.invitesService.deleteInvite(id);
 
       return res.json({ message: 'Invitación eliminada' })
-    } catch (error) {
-      handleHttp(res, 'ERROR_DELETE_INVITE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_DELETE_INVITE', e.message, req.userId);
     }
   };
 
@@ -115,8 +127,9 @@ export class InvitesController {
       await this.invitesService.updateInvite(id, result.data);
 
       return res.status(201).json({ message: 'Invitación actualizada' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_INVITE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_INVITE', e.message, req.userId);
     }
   };
 
@@ -132,8 +145,9 @@ export class InvitesController {
     await this.invitesService.updateConfirmation(id, result.data);
 
     return res.status(201).json({ message: 'Respuesta enviada' })
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_CONFIRMATION');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_CONFIRMATION', e.message, req.userId);
     }
   };
 
@@ -141,10 +155,9 @@ export class InvitesController {
     try {
       const { id } = req.params;
       await this.invitesService.readMessage(id);
-    } catch (error) {
-      handleHttp(res, 'ERROR_READ_MESSAGE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_READ_MESSAGE', e.message, req.userId);
     }
   };
 }
-
-export default InvitesController;

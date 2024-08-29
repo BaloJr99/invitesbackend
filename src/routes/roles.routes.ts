@@ -3,11 +3,12 @@ import { RolesController } from '../controllers/roles.js'
 import { RolesService } from '../services/roles.js'
 import { isInvitesAdmin } from '../middleware/auth.js'
 import { checkJwt } from '../middleware/session.js'
+import { LoggerService } from '../services/logger.js'
 
 export const rolesRouter = Router()
 
-export const createRolesRouter = (rolesService: RolesService) => {
-  const rolesController = new RolesController(rolesService);
+export const createRolesRouter = (rolesService: RolesService, loggerService: LoggerService) => {
+  const rolesController = new RolesController(rolesService, loggerService);
 
   rolesRouter.get('/', [checkJwt, isInvitesAdmin], rolesController.getRoles);
   rolesRouter.post('/', [checkJwt, isInvitesAdmin], rolesController.createRole);

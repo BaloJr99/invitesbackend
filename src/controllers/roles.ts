@@ -1,11 +1,17 @@
 import { RolesService } from '../services/roles.js';
 import { Request, Response } from 'express';
-import { handleHttp } from '../utils/error.handle.js';
+import { ErrorHandler } from '../utils/error.handle.js';
 import { validateFullRole, validateRole } from '../schemas/roles.js';
+import { LoggerService } from '../services/logger.js';
 
 export class RolesController {
-  constructor (private rolesService: RolesService) {
+  errorHandler: ErrorHandler;
+  constructor (
+    private rolesService: RolesService,
+    private loggerService: LoggerService
+  ) {
     this.rolesService = rolesService;
+    this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
   getRoles = async (req: Request, res: Response) => {
@@ -13,8 +19,9 @@ export class RolesController {
       const roles = await this.rolesService.getRoles();
 
       return res.json(roles);
-    } catch (error) {
-      handleHttp(res, 'ERROR_GET_ALL_ROLES');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_ROLES', e.message, req.userId);
     }
   }
 
@@ -29,8 +36,9 @@ export class RolesController {
       await this.rolesService.createRole(result.data);
 
       return res.status(201).json({ message: 'Rol creado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_CREATE_ROLE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_CREATE_ROLE', e.message, req.userId);
     }
   }
 
@@ -50,8 +58,9 @@ export class RolesController {
       );
   
       return res.status(201).json({ message: 'Rol actualizado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_UPDATE_ROLE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_ROLE', e.message, req.userId);
     }
   }
 
@@ -61,8 +70,9 @@ export class RolesController {
       await this.rolesService.deleteRole(id);
   
       return res.json({ message: 'Rol desactivado' });
-    } catch (error) {
-      handleHttp(res, 'ERROR_DELETE_ROLE');
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_DELETE_ROLE', e.message, req.userId);
     }
   }
 }
