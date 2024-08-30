@@ -51,7 +51,7 @@ export class EventsService {
 
   isDeadlineMet = async (eventId: string) => {
     const [results] = await this.connection.query(
-      'SELECT IF(dateOfEvent >= NOW(), true, false) AS isDeadlineMet FROM events WHERE id = UUID_TO_BIN(?)',
+      'SELECT IF(dateOfEvent > now(), false, true) AS isDeadlineMet FROM events WHERE id = UUID_TO_BIN(?)',
       [eventId]
     ) as [RowDataPacket[], FieldPacket[]];
 
