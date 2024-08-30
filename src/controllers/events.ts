@@ -4,6 +4,8 @@ import { Request, Response } from 'express';
 import { FullEventModel } from '../interfaces/eventsModel.js';
 import { LoggerService } from '../services/logger.js';
 import { ErrorHandler } from '../utils/error.handle.js';
+import { AuthModel } from '../interfaces/authModel.js';
+import { verifyJwtToken } from '../utils/jwt.handle.js';
 
 export class EventsController {
   errorHandler: ErrorHandler;
@@ -17,18 +19,46 @@ export class EventsController {
 
   getAllEvents = async (req: Request, res: Response) => {
     try {
-      const events = await this.eventService.getAllEvents();
+      const token = req.headers.authorization || '';
+
+      if (token === "") {
+        return res.status(403).json({ error: 'No token provided' });
+      }
+
+      const decoded = verifyJwtToken(token) as AuthModel;
+      const isAdmin = decoded.roles.some(r => r.name == "admin");
+
+      let events;
+      if (isAdmin) {
+        events = await this.eventService.getAllEvents();
+      } else {
+        events = await this.eventService.getEventsByUser(req.userId);
+      }
       return res.json(events);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_RESET_PASSWORD', e.message, req.userId);
+      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_EVENTS', e.message, req.userId);
     }
   }
 
-  getEventsByUser = async (req: Request, res: Response) => {
+  getDropdownEvents = async (req: Request, res: Response) => {
     try {
-      const events = await this.eventService.getEventsByUser(req.userId);
-  
+      const token = req.headers.authorization || '';
+
+      if (token === "") {
+        return res.status(403).json({ error: 'No token provided' });
+      }
+
+      const decoded = verifyJwtToken(token) as AuthModel;
+      const isAdmin = decoded.roles.some(r => r.name == "admin");
+
+      let events;
+      if (isAdmin) {
+        events = await this.eventService.getDropdownEvents();
+      } else {
+        events = await this.eventService.getDropdownEventsByUserId(req.userId);
+      }
+
       return res.json(events);
     } catch (_e) {
       const e:Error = _e as Error;

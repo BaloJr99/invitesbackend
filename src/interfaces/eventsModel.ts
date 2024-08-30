@@ -1,6 +1,5 @@
-export interface FullEventModel  extends EventModel {
-  id: string,
-  allowCreateInvites: boolean
+export interface FullEventModel extends EventModel {
+  id: string
 }
 
 export interface EventModel {
@@ -10,4 +9,9 @@ export interface EventModel {
   typeOfEvent: string,
   nameOfCelebrated: string,
   userId: string
+}
+
+export interface IDropdownEventModel {
+  id: string,
+  nameOfEvent: string
 }

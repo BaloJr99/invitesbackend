@@ -9,7 +9,7 @@ export class EventsService {
 
   getAllEvents = async () => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, CAST(e.userId AS CHAR) as userId, IF(count(s.eventId) > 0, true, false) AS allowCreateInvites FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent',
+      'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, IF(count(s.eventId) > 0, true, false) AS allowCreateInvites FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent',
     );
 
     return result;
@@ -17,8 +17,25 @@ export class EventsService {
 
   getEventsByUser = async (userId: string) => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, maxDateOfConfirmation, IF(count(s.eventId) > 0, true, false) AS allowCreateInvites FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id WHERE e.userId = CAST(? AS BINARY) GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent',
+      'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, IF(count(s.eventId) > 0, true, false) AS allowCreateInvites FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id WHERE e.userId = CAST(? AS BINARY) GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent',
       [userId]
+    );
+
+    return result;
+  }
+
+  getDropdownEvents = async () => {
+    const [result] = await this.connection.query(
+      'SELECT BIN_TO_UUID(id) id, nameOfEvent FROM events WHERE dateOfEvent > now() ORDER BY nameOfEvent',
+    );
+
+    return result;
+  }
+
+  getDropdownEventsByUserId = async (userId: string) => {
+    const [result] = await this.connection.query(
+      'SELECT BIN_TO_UUID(id) id, nameOfEvent FROM events WHERE userId = CAST(? AS BINARY) AND dateOfEvent > now() ORDER BY nameOfEvent',
+      [ userId ]
     );
 
     return result;

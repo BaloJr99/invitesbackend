@@ -12,7 +12,7 @@ export const createEventsRouter = (eventsService: EventsService, loggerService: 
   const eventController = new EventsController(eventsService, loggerService);
 
   eventsRouter.get('/', [checkJwt, isInvitesAdmin], eventController.getAllEvents);
-  eventsRouter.get('/users', [checkJwt, isInvitesAdmin], eventController.getEventsByUser);
+  eventsRouter.get('/dropdown', [checkJwt, isInvitesAdmin], eventController.getDropdownEvents);
   eventsRouter.get('/invites/:id', [checkJwt, isInvitesAdmin], eventController.getEventInvites);
   eventsRouter.post('/', [checkJwt, isInvitesAdmin], eventController.createEvent);
 
