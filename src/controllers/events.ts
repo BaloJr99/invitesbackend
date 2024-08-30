@@ -62,7 +62,7 @@ export class EventsController {
       return res.json(events);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_EVENTS', e.message, req.userId);
+      this.errorHandler.handleHttp(res, 'ERROR_GET_DROPDOWN_EVENTS', e.message, req.userId);
     }
   }
 
@@ -76,6 +76,19 @@ export class EventsController {
     } catch (_e) {
       const e:Error = _e as Error;
       this.errorHandler.handleHttp(res, 'ERROR_GET_EVENT_INVITES', e.message, req.userId);
+    }
+  }
+
+  isDeadlineMet = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const deadlineResults = await this.eventService.isDeadlineMet(id);
+  
+      return res.json(Boolean(deadlineResults.isDeadlineMet));
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, 'ERROR_IS_DEADLINE_MET', e.message, req.userId);
     }
   }
 

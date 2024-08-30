@@ -27,6 +27,10 @@ export interface EventsInfoModel {
   numEntries: number
 }
 
+export interface IsDeadlineMet {
+  isDeadlineMet: number
+}
+
 export interface UserInfoModel {
   _id: moongose.Types.ObjectId,
   username: string,

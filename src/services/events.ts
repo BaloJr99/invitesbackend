@@ -1,6 +1,6 @@
 import { FieldPacket, Pool, RowDataPacket } from "mysql2/promise";
 import { EventModel } from "../interfaces/eventsModel";
-import { EventsInfoModel } from "../interfaces/usersModel";
+import { EventsInfoModel, IsDeadlineMet } from "../interfaces/usersModel";
 
 export class EventsService {
   constructor (private connection: Pool) {
@@ -43,10 +43,19 @@ export class EventsService {
 
   getEventInvites = async (eventId: string) => {
     const [result] = await this.connection.query(
-      'SELECT BIN_TO_UUID(inv.id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead, BIN_TO_UUID(familyGroupId) familyGroupId, IF(ev.dateOfEvent >= NOW(), true, false) AS isDeadlineMet FROM invites as inv INNER JOIN events AS ev ON inv.eventId = ev.id WHERE eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
+      'SELECT BIN_TO_UUID(inv.id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead, BIN_TO_UUID(familyGroupId) familyGroupId FROM invites as inv INNER JOIN events AS ev ON inv.eventId = ev.id WHERE eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
       [eventId]
     );
     return result;
+  }
+
+  isDeadlineMet = async (eventId: string) => {
+    const [results] = await this.connection.query(
+      'SELECT IF(dateOfEvent >= NOW(), true, false) AS isDeadlineMet FROM events WHERE id = UUID_TO_BIN(?)',
+      [eventId]
+    ) as [RowDataPacket[], FieldPacket[]];
+
+    return results.at(0) as IsDeadlineMet;
   }
 
   getEventById = async (eventId: string) => {

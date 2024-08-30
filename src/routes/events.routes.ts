@@ -14,6 +14,7 @@ export const createEventsRouter = (eventsService: EventsService, loggerService: 
   eventsRouter.get('/', [checkJwt, isInvitesAdmin], eventController.getAllEvents);
   eventsRouter.get('/dropdown', [checkJwt, isInvitesAdmin], eventController.getDropdownEvents);
   eventsRouter.get('/invites/:id', [checkJwt, isInvitesAdmin], eventController.getEventInvites);
+  eventsRouter.get('/invites/:id/deadlineMet', [checkJwt, isInvitesAdmin], eventController.isDeadlineMet);
   eventsRouter.post('/', [checkJwt, isInvitesAdmin], eventController.createEvent);
 
   eventsRouter.get('/:id', [validateUuid], eventController.getEventById);
