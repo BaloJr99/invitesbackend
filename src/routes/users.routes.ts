@@ -1,24 +1,24 @@
 import { Router } from 'express'
 import { UsersController } from '../controllers/users.js'
 import { UsersService } from '../services/users.js'
-import { isInvitesAdmin } from '../middleware/auth.js'
-import { checkJwt } from '../middleware/session.js'
 import { checkDuplicateUsernameOrEmail, checkRolesExisted } from '../middleware/verifySignup.js'
 import { EventsService } from '../services/events.js'
 import { LoggerService } from '../services/logger.js'
+import { validateUuid } from '../middleware/validateUuid.js'
+import { isAdmin, isInvitesAdmin } from '../middleware/auth.js'
 
 export const usersRouter = Router()
 
 export const createUsersRouter = (userService: UsersService, eventsService: EventsService, loggerService: LoggerService) => {
   const userController = new UsersController(userService, eventsService, loggerService);
 
-  usersRouter.get('/', [checkJwt, isInvitesAdmin], userController.getUsers);
-  usersRouter.get('/basic', [checkJwt, isInvitesAdmin], userController.getUsersBasicInfo);
-  usersRouter.get('/:id', userController.getUserById);
-  usersRouter.post('/', [checkJwt, isInvitesAdmin, checkDuplicateUsernameOrEmail, checkRolesExisted], userController.createUser);
+  usersRouter.get('/', [isAdmin], userController.getUsers);
+  usersRouter.get('/basic', [isInvitesAdmin], userController.getUsersBasicInfo);
+  usersRouter.get('/:id', [validateUuid, isAdmin], userController.getUserById);
+  usersRouter.post('/', [checkDuplicateUsernameOrEmail, checkRolesExisted, isAdmin], userController.createUser);
 
-  usersRouter.put('/:id', [checkJwt, isInvitesAdmin], userController.updateUser);
-  usersRouter.delete('/:id', [checkJwt, isInvitesAdmin], userController.deleteUser);
+  usersRouter.put('/:id', [validateUuid, isAdmin], userController.updateUser);
+  usersRouter.delete('/:id', [validateUuid, isAdmin], userController.deleteUser);
 
   return usersRouter;
 }

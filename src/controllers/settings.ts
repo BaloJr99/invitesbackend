@@ -1,5 +1,5 @@
 import { validateSettings } from '../schemas/settings.js'
-import { EventSettingsService } from '../services/settings.js';
+import { SettingsService } from '../services/settings.js';
 import { Request, Response } from 'express';
 import { FullSettingsModel } from '../interfaces/settingsModel.js';
 import { ErrorHandler } from '../utils/error.handle.js';
@@ -9,10 +9,10 @@ export class SettingsController {
   errorHandler: ErrorHandler;
 
   constructor (
-    private eventSettingsService: EventSettingsService,
+    private settingsService: SettingsService,
     private loggerService: LoggerService
   ) {
-    this.eventSettingsService = eventSettingsService;
+    this.settingsService = settingsService;
     this.errorHandler = new ErrorHandler(this.loggerService);
   }
 
@@ -20,7 +20,7 @@ export class SettingsController {
     try {
       const { id } = req.params;
   
-      const event = await this.eventSettingsService.getEventSettingsById(id) as FullSettingsModel[];
+      const event = await this.settingsService.getEventSettingsById(id) as FullSettingsModel[];
   
       if (event.length > 0) return res.json(event.at(0));
   
@@ -39,7 +39,7 @@ export class SettingsController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
   
-      const settingId = await this.eventSettingsService.createEventSettings(
+      const settingId = await this.settingsService.createEventSettings(
         result.data
       );
   
@@ -60,7 +60,7 @@ export class SettingsController {
   
       const { id } = req.params;
 
-      await this.eventSettingsService.updateEventSettings(id, result.data);
+      await this.settingsService.updateEventSettings(id, result.data);
   
       return res.status(201).json({ message: 'Configuraciones del evento actualizadas' });
     } catch (_e) {

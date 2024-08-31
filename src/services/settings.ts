@@ -1,7 +1,7 @@
 import { Pool } from "mysql2/promise";
 import { SettingsModel } from "../interfaces/settingsModel";
 
-export class EventSettingsService {
+export class SettingsService {
   constructor (private connection: Pool) {
     this.connection = connection;
   }

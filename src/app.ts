@@ -9,7 +9,7 @@ import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { UserFromInvite } from './interfaces/usersModel.js';
 import { createApiRouter } from './routes/api.routes.js';
-import { EventSettingsService } from './services/settings.js';
+import { SettingsService } from './services/settings.js';
 import { RolesService } from './services/roles.js';
 import { MailService } from './services/mail.js';
 import { InvitesService } from './services/invites.js';
@@ -18,27 +18,27 @@ import { LoggerService } from './services/logger.js';
 export class App {
 
   constructor (
-    private invitesService: InvitesService,
     private eventsService: EventsService,
+    private familyGroupsService: FamilyGroupsService,
     private imagesService: ImagesService,
     private inviteImagesService: InviteImagesService,
-    private familyGroupsService: FamilyGroupsService,
-    private usersService: UsersService,
-    private rolesService: RolesService,
-    private eventSettingsService: EventSettingsService,
+    private invitesService: InvitesService,
+    private loggerService: LoggerService,
     private mailService: MailService,
-    private loggerService: LoggerService
+    private rolesService: RolesService,
+    private settingsService: SettingsService,
+    private usersService: UsersService
   ) {
-    this.invitesService = invitesService;
     this.eventsService = eventsService;
+    this.familyGroupsService = familyGroupsService;
     this.imagesService = imagesService;
     this.inviteImagesService = inviteImagesService;
-    this.familyGroupsService = familyGroupsService;
-    this.usersService = usersService;
-    this.eventSettingsService = eventSettingsService;
-    this.rolesService = rolesService;
-    this.mailService = mailService;
+    this.invitesService = invitesService;
     this.loggerService = loggerService;
+    this.mailService = mailService;
+    this.rolesService = rolesService;
+    this.settingsService = settingsService;
+    this.usersService = usersService;
 
     const app = express();
 
@@ -77,16 +77,16 @@ export class App {
     app.use(corsMiddleware())
 
     app.use('/api', createApiRouter(
-      this.invitesService,
       this.eventsService,
+      this.familyGroupsService,
       this.imagesService,
       this.inviteImagesService,
-      this.familyGroupsService,
-      this.usersService,
-      this.eventSettingsService,
-      this.rolesService,
+      this.invitesService,
+      this.loggerService,
       this.mailService,
-      this.loggerService
+      this.rolesService,
+      this.settingsService,
+      this.usersService,
     ));
 
     const PORT = process.env.PORT ?? 3000;

@@ -85,6 +85,13 @@ export class UsersService {
     return userFounded;
   }
 
+  getUsersById = async (userId: string[]) => {
+    const usersFounded = await User.find({ _id: { $in: userId } }).select({
+      username: 1
+    });
+    return usersFounded;
+  }
+
   createUser = async (user: FullUserModel) => {
     const { username, email, roles } = user;
     const passHash = await encryptPassword(generatePass());

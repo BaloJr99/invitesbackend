@@ -8,7 +8,7 @@ import { ImagesService } from './config/cloudinary/cloudinary.js';
 import { InviteImagesService } from './services/inviteImages.js';
 import { FamilyGroupsService } from './services/familyGroups.js';
 import { UsersService } from './services/users.js';
-import { EventSettingsService } from './services/settings.js';
+import { SettingsService } from './services/settings.js';
 import { RolesService } from './services/roles.js';
 import { mailConnection } from './config/nodemailer/transporter.js';
 import { MailService } from './services/mail.js';
@@ -28,16 +28,16 @@ const main = () => {
   const nodemailerConnection = mailConnection();
 
   new App(
-    new InvitesService(mysqlConnection),
     new EventsService(mysqlConnection),
+    new FamilyGroupsService(mysqlConnection),
     new ImagesService(),
     new InviteImagesService(mysqlConnection),
-    new FamilyGroupsService(mysqlConnection),
-    new UsersService(),
-    new RolesService(),
-    new EventSettingsService(mysqlConnection),
+    new InvitesService(mysqlConnection),
+    new LoggerService(mysqlConnection),
     new MailService(nodemailerConnection),
-    new LoggerService(mysqlConnection)
+    new RolesService(),
+    new SettingsService(mysqlConnection),
+    new UsersService()
   );
 }
 
