@@ -1,18 +1,21 @@
 import { Request, Response } from 'express';
 import { InvitesService } from '../services/invites.js';
-import { FullInviteModel } from '../interfaces/invitesModels.js';
+import { FullInviteModel, PartialInviteModel } from '../interfaces/invitesModels.js';
 import { validateBulkInvite, validateConfirmationSchema, validateInvite } from '../schemas/invites.js';
 import { verifyJwtToken } from '../utils/jwt.handle.js';
 import { AuthModel } from '../interfaces/authModel.js';
 import { ErrorHandler } from '../utils/error.handle.js';
 import { LoggerService } from '../services/logger.js';
+import { FamilyGroupsService } from '../services/familyGroups.js';
+import { FamilyGroupModel, FullFamilyGroupModel } from '../interfaces/familyGroupModel.js';
 
 export class InvitesController {
   errorHandler: ErrorHandler;
 
   constructor (
     private invitesService: InvitesService,
-    private loggerService: LoggerService
+    private loggerService: LoggerService,
+    private familyGroupsService: FamilyGroupsService
   ) {
     this.invitesService = invitesService;
     this.errorHandler = new ErrorHandler(this.loggerService);
@@ -92,7 +95,31 @@ export class InvitesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
 
-      await this.invitesService.createBulkInvite(result.data);
+      const bulkFamilyGroups = result.data.filter(f => f.isNewFamilyGroup).map(x => { 
+        return {
+          familyGroup: x.familyGroupName,
+          eventId: x.eventId
+        }
+      }) as FamilyGroupModel[];
+      
+      let generatedIds: FullFamilyGroupModel[] = [];
+
+      if (bulkFamilyGroups) {
+        generatedIds = await this.familyGroupsService.bulkFamilyGroup(bulkFamilyGroups);
+      }
+
+      const bulkInvites = result.data.map((bulk) => {
+        return {
+          family: bulk.family,
+          entriesNumber: bulk.entriesNumber,
+          phoneNumber: bulk.phoneNumber,
+          kidsAllowed: bulk.kidsAllowed,
+          eventId: bulk.eventId,
+          familyGroupId: bulk.familyGroupId ?? generatedIds.find(g => g.familyGroup === bulk.familyGroupName)?.id
+        } as PartialInviteModel;
+      });
+
+      await this.invitesService.createBulkInvite(bulkInvites);
 
       return res.status(201).json({ message: 'Invitaciones creadas' });
     } catch (_e) {

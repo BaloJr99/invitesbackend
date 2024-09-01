@@ -5,11 +5,12 @@ import { validateUuid } from '../middleware/validateUuid.js';
 import { checkJwt } from '../middleware/session.js';
 import { LoggerService } from '../services/logger.js';
 import { InvitesController } from '../controllers/invites.js';
+import { FamilyGroupsService } from '../services/familyGroups.js';
 
 export const invitesRouter = Router();
 
-export const createInvitesRouter = (invitesService: InvitesService, loggerService: LoggerService) => {
-  const invitesController = new InvitesController(invitesService, loggerService);
+export const createInvitesRouter = (invitesService: InvitesService, loggerService: LoggerService, familyGroupService: FamilyGroupsService) => {
+  const invitesController = new InvitesController(invitesService, loggerService, familyGroupService);
 
   invitesRouter.get('/', [checkJwt, isInvitesAdmin], invitesController.getInvites);
   invitesRouter.post('/', [checkJwt, isInvitesAdmin], invitesController.createInvite);

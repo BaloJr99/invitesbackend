@@ -1,5 +1,5 @@
 import { Pool } from "mysql2/promise";
-import { FamilyGroupModel, PartialFamilyGroupModel } from "../interfaces/familyGroupModel";
+import { FamilyGroupModel, FullFamilyGroupModel, PartialFamilyGroupModel } from "../interfaces/familyGroupModel";
 
 export class FamilyGroupsService {
   constructor (private connection: Pool) {
@@ -12,6 +12,30 @@ export class FamilyGroupsService {
       [eventId]
     );
     return result;
+  }
+
+  bulkFamilyGroup = async (familyGroups: FamilyGroupModel[]) => {
+    const newFamilyGroups = familyGroups.reduce((result: FullFamilyGroupModel[], familyGroupModel) => {
+      result.push({
+        eventId: familyGroupModel.eventId,
+        id: crypto.randomUUID(),
+        familyGroup: familyGroupModel.familyGroup
+      } as FullFamilyGroupModel);
+      return result;
+    }, []);
+
+    newFamilyGroups.forEach(async familyGroup => {
+      await this.connection.query(
+        `INSERT INTO familyGroups (id, familyGroup, eventId) VALUES (UUID_TO_BIN(?), ?, UUID_TO_BIN(?))`,
+        [
+          familyGroup.id,
+          familyGroup.familyGroup,
+          familyGroup.eventId
+        ]
+      );
+    });
+
+    return newFamilyGroups;
   }
 
   createFamilyGroup = async (familyGroups: FamilyGroupModel) => {

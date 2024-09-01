@@ -11,6 +11,17 @@ export interface PartialInviteModel {
   familyGroupId: string
 }
 
+export interface BulkInviteModel {
+  family: string,
+  entriesNumber: number,
+  phoneNumber: string,
+  familyGroupName: string,
+  familyGroupId: string,
+  kidsAllowed: boolean,
+  eventId: string,
+  isNewFamilyGroup: boolean
+}
+
 export interface ConfirmationModel {
   message: string,
   entriesConfirmed: number,

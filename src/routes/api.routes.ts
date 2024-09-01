@@ -40,7 +40,7 @@ export const createApiRouter = (
   apiRouter.use('/events', [checkJwt, isInvitesAdmin], createEventsRouter(eventsService, loggerService));
   apiRouter.use('/familyGroups', [checkJwt, isInvitesAdmin], createFamilyGroupsRouter(familyGroupService, loggerService));
   apiRouter.use('/images', [checkJwt, isInvitesAdmin], createImagesRouter(imagesService, inviteImagesService, loggerService));
-  apiRouter.use('/invites', createInvitesRouter(invitesService, loggerService));
+  apiRouter.use('/invites', createInvitesRouter(invitesService, loggerService, familyGroupService));
   apiRouter.use('/logs', [checkJwt, isAdmin], createLoggersRouter(loggerService, userService));
   apiRouter.use('/roles', [checkJwt, isInvitesAdmin], createRolesRouter(rolesService, loggerService));
   apiRouter.use('/settings', [checkJwt, isInvitesAdmin], createSettingsRouter(settingsService, loggerService));

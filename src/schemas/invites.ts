@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ConfirmationModel, PartialInviteModel } from '../interfaces/invitesModels.js';
+import { BulkInviteModel, ConfirmationModel, PartialInviteModel } from '../interfaces/invitesModels.js';
 
 const inviteSchema = z.object({
   family: z.string({
@@ -58,6 +58,41 @@ const confirmationSchema = z.object({
   }
 });
 
+const bulkInviteSchema = z.object({
+  family: z.string({
+    invalid_type_error: 'Family must be a string',
+    required_error: 'The Family is required'
+  }),
+  entriesNumber: z
+    .number({
+      required_error: 'The number of entries is required',
+      invalid_type_error: 'The entries number must be a number'
+    })
+    .int()
+    .min(1, 'The minimum number of entries is 1'),
+  phoneNumber: z.string({
+    required_error: 'The phone number is required'
+  }),
+  kidsAllowed: z.boolean({
+    required_error: 'The kids value is required',
+    invalid_type_error: 'The kids allowed must be a boolean'
+  }),
+  eventId: z.string().uuid({
+    message: 'Invalid UUID',
+  }),
+  familyGroupId: z.string().uuid({
+    message: 'Invalid UUID',
+  }).optional(),
+  familyGroupName: z.string({
+    invalid_type_error: 'Family group must be a string',
+    required_error: 'Family group name is required'
+  }),
+  isNewFamilyGroup: z.boolean({
+    invalid_type_error: 'Is new family group flag must be boolean',
+    required_error: 'Is new family group flag is required'
+  })
+});
+
 export function validateInvite (invite: PartialInviteModel) {
   return inviteSchema.safeParse(invite);
 }
@@ -66,6 +101,6 @@ export function validateConfirmationSchema (confirmation: ConfirmationModel) {
   return confirmationSchema.safeParse(confirmation);
 }
 
-export function validateBulkInvite (invites: PartialInviteModel[]) {
-  return z.array(inviteSchema).safeParse(invites);
+export function validateBulkInvite (invites: BulkInviteModel[]) {
+  return z.array(bulkInviteSchema).safeParse(invites);
 }
