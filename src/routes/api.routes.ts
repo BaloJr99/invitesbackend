@@ -39,11 +39,11 @@ export const createApiRouter = (
   apiRouter.use('/auth', createAuthRouter(userService, mailService, loggerService));
   apiRouter.use('/events', [checkJwt, isInvitesAdmin], createEventsRouter(eventsService, loggerService));
   apiRouter.use('/familyGroups', [checkJwt, isInvitesAdmin], createFamilyGroupsRouter(familyGroupService, loggerService));
-  apiRouter.use('/images', [checkJwt, isInvitesAdmin], createImagesRouter(imagesService, inviteImagesService, loggerService));
+  apiRouter.use('/images', createImagesRouter(imagesService, inviteImagesService, loggerService));
   apiRouter.use('/invites', createInvitesRouter(invitesService, loggerService, familyGroupService));
   apiRouter.use('/logs', [checkJwt, isAdmin], createLoggersRouter(loggerService, userService));
   apiRouter.use('/roles', [checkJwt, isInvitesAdmin], createRolesRouter(rolesService, loggerService));
-  apiRouter.use('/settings', [checkJwt, isInvitesAdmin], createSettingsRouter(settingsService, loggerService));
+  apiRouter.use('/settings', createSettingsRouter(settingsService, loggerService));
   apiRouter.use('/users', [checkJwt], createUsersRouter(userService, eventsService, loggerService));
 
   return apiRouter

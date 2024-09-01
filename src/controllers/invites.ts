@@ -59,9 +59,12 @@ export class InvitesController {
     try {
       const { id } = req.params
 
-      const invite = await this.invitesService.getInvite(id) as FullInviteModel[];
+      const invite = await this.invitesService.getInvite(id) as FullInviteModel;
 
-      if (invite.length > 0) return res.json(invite.at(0));
+      if (invite) {
+        await this.invitesService.markAsViewed(id);
+        return res.json(invite);
+      }
 
       return res.status(404).json({ message: 'Invitación no encontrada' });
     } catch (_e) {

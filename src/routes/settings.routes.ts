@@ -3,6 +3,8 @@ import { SettingsController } from '../controllers/settings.js'
 import { SettingsService } from '../services/settings.js'
 import { validateUuid } from '../middleware/validateUuid.js'
 import { LoggerService } from '../services/logger.js'
+import { checkJwt } from '../middleware/session.js'
+import { isInvitesAdmin } from '../middleware/auth.js'
 
 export const settingsRouter = Router()
 
@@ -10,8 +12,8 @@ export const createSettingsRouter = (settingsService: SettingsService, loggerSer
   const eventController = new SettingsController(settingsService, loggerService);
 
   settingsRouter.get('/:id', [validateUuid], eventController.getEventSettingsById);
-  settingsRouter.post('/', eventController.createEventSettings);
-  settingsRouter.put('/:id', [validateUuid], eventController.updateEventSettings);
+  settingsRouter.post('/', [checkJwt, isInvitesAdmin], eventController.createEventSettings);
+  settingsRouter.put('/:id', [checkJwt, isInvitesAdmin, validateUuid], eventController.updateEventSettings);
 
   return settingsRouter;
 }

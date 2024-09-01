@@ -14,7 +14,8 @@ CREATE TABLE invites (
   dateOfConfirmation DATETIME,
   isMessageRead BOOLEAN DEFAULT 0,
   eventId BINARY(16) NOT NULL,
-  familyGroupId BINARY(16) NOT NULL
+  familyGroupId BINARY(16) NOT NULL,
+  inviteViewed BOOLEAN DEFAULT 0
 );
 
 CREATE TABLE usersActivity (

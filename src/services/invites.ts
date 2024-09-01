@@ -1,4 +1,4 @@
-import { Pool } from "mysql2/promise";
+import { FieldPacket, Pool, RowDataPacket } from "mysql2/promise";
 import { ConfirmationModel, PartialInviteModel } from "../interfaces/invitesModels";
 
 export class InvitesService {
@@ -24,9 +24,16 @@ export class InvitesService {
     const [result] = await this.connection.query(
       'SELECT BIN_TO_UUID(e.id) id, family, entriesNumber, confirmation, kidsAllowed, ev.dateOfEvent, ev.maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, BIN_TO_UUID(eventId) eventId FROM invites AS e INNER JOIN events as ev ON e.eventId = ev.id WHERE e.id = UUID_TO_BIN(?)',
       [id]
-    );
+    ) as [RowDataPacket[], FieldPacket[]];
 
-    return result;
+    return result.at(0);
+  }
+
+  markAsViewed = async (id: string) => {
+    await this.connection.query(
+      'UPDATE invites SET inviteViewed = ? WHERE id = UUID_TO_BIN(?)',
+      [new Date(), id]
+    )
   }
 
   createInvite = async (invite: PartialInviteModel) => {
