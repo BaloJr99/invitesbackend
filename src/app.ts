@@ -51,8 +51,9 @@ export class App {
         credentials: true
       }
     });
-  
+
     io.on('connection', async (socket) => {
+      console.log('connection')
       socket.on('joinRoom', (username) => {
         if (username) {
           socket.join(username)
