@@ -14,7 +14,9 @@ export class LoggersController {
   getLogs = async (req: Request, res: Response) => {
     const logs = await this.loggerService.getLogs() as Logger[];
 
-    const userIds = [...new Set(logs.map(l => l.userId))];
+    let userIds = [...new Set(logs.map(l => l.userId))];
+
+    userIds = userIds.filter(u => u !== '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00');
 
     const usernames = await this.usersService.getUsersById(userIds);
     

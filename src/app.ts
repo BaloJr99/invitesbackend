@@ -14,6 +14,8 @@ import { RolesService } from './services/roles.js';
 import { MailService } from './services/mail.js';
 import { InvitesService } from './services/invites.js';
 import { LoggerService } from './services/logger.js';
+import { ErrorHandler } from './utils/error.handle.js';
+import { FullInviteModel } from './interfaces/invitesModels.js';
 
 export class App {
 
@@ -44,6 +46,8 @@ export class App {
 
     const server = createServer(app);
 
+    const errorHandler = new ErrorHandler(this.loggerService);
+
     const io = new Server(server, {
       connectionStateRecovery: {},
       cors: {
@@ -53,23 +57,27 @@ export class App {
     });
 
     io.on('connection', async (socket) => {
-      console.log('connection')
       socket.on('joinRoom', (username) => {
         if (username) {
           socket.join(username)
         }
       })
   
-      socket.on('sendNotification', async (inviteId) => {
-        const result = await this.invitesService.getUserFromInviteId(inviteId) as UserFromInvite[];
-        if (result.length > 0) {
-          const userId = result.at(0)?.userId ?? "";
+      socket.on('sendNotification', async (invite: FullInviteModel) => {
+        try {
+          const result = await this.invitesService.getUserFromInviteId(invite.id) as UserFromInvite[];
+          if (result.length > 0) {
+            const userId = result.at(0)?.userId ?? "";
 
-          const username = await this.usersService.getUsername(userId);
-  
-          if(username) {
-            io.to(username).emit('newNotification');
+            const username = await this.usersService.getUsername(userId);
+    
+            if (username) {
+              io.to(username).emit('newNotification', invite);
+            }
           }
+        } catch (_e) {
+          const e:Error = _e as Error;
+          errorHandler.handleHttp(null, 'ERROR_SENDING_NOTIFICATION', e.message, '');
         }
       })
     })

@@ -113,7 +113,7 @@ export class InvitesService {
 
   getUserFromInviteId = async (inviteId: string) => {
     const [result] = await this.connection.query(
-      'SELECT CAST(userId as CHAR) AS userId FROM invites WHERE id = UUID_TO_BIN(?)',
+      'SELECT CAST(userId as CHAR) AS userId FROM invites AS i INNER JOIN events AS e ON e.id = i.eventId WHERE i.id = UUID_TO_BIN(?)',
       [inviteId]
     );
 

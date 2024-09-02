@@ -8,7 +8,7 @@ export class ErrorHandler {
     this.loggerService = loggerService;
   }
 
-  handleHttp = async (res: Response, error: string, fullError: string, userId: string) => {
+  handleHttp = async (res: Response | null = null, error: string, fullError: string, userId: string) => {
     await this.loggerService.addLog({
       dateOfError: new Date(),
       customError: error,
@@ -16,6 +16,8 @@ export class ErrorHandler {
       userId: userId
     });
 
-    res.status(500).send(error);
+    if (res) {
+      res.status(500).send(error);
+    }
   }
 }
