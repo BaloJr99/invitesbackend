@@ -22,7 +22,7 @@ export const createInvitesRouter = (invitesService: InvitesService, loggerServic
   invitesRouter.put('/:id', [checkJwt, isInvitesAdmin, validateUuid], invitesController.updateInvite);
 
   invitesRouter.patch('/messages/:id', [checkJwt, isInvitesAdmin, validateUuid], invitesController.readMessage);
-  invitesRouter.patch('/:id', [checkJwt, isInvitesAdmin, validateUuid], invitesController.updateConfirmation);
+  invitesRouter.patch('/:id', [validateUuid], invitesController.updateConfirmation);
 
   return invitesRouter
 }

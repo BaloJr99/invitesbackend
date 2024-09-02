@@ -185,6 +185,7 @@ export class InvitesController {
     try {
       const { id } = req.params;
       await this.invitesService.readMessage(id);
+      return res.status(201).json({ message: 'Mensaje Leído' })
     } catch (_e) {
       const e:Error = _e as Error;
       this.errorHandler.handleHttp(res, 'ERROR_READ_MESSAGE', e.message, req.userId);
