@@ -32,6 +32,8 @@ export class AuthController {
 
       if (signInResponse.includes('BLOCKED')) {
         return res.status(401).json({ error: 'Cuenta bloqueada, has excedido el numero de intentos' });
+      } else if (signInResponse.includes('INACTIVE')) {
+        return res.status(401).json({ error: 'Cuenta inactivada' });
       }
 
       res.status(200).json({ token: signInResponse });

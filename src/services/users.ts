@@ -17,6 +17,10 @@ export class UsersService {
       return 'ERROR_USER_NOT_FOUND';
     }
 
+    if (userFounded && !userFounded.isActive) {
+      return 'INACTIVE';
+    }
+
     const matchPassword = await comparePassword(
       password,
       userFounded.password
