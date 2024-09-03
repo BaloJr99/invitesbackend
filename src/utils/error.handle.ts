@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { LoggerService } from "../services/logger";
+import { LoggerService } from "../services/logger.js";
 
 export class ErrorHandler {
   constructor (

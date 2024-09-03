@@ -1,5 +1,5 @@
 import { Pool } from "mysql2/promise";
-import { FamilyGroupModel, FullFamilyGroupModel, PartialFamilyGroupModel } from "../interfaces/familyGroupModel";
+import { FamilyGroupModel, FullFamilyGroupModel, PartialFamilyGroupModel } from "../interfaces/familyGroupModel.js";
 
 export class FamilyGroupsService {
   constructor (private connection: Pool) {

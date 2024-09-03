@@ -1,4 +1,5 @@
 import express, { json } from 'express';
+import path from 'path';
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js';
 import { EventsService } from './services/events.js';
 import { InviteImagesService } from './services/inviteImages.js';
@@ -16,6 +17,10 @@ import { InvitesService } from './services/invites.js';
 import { LoggerService } from './services/logger.js';
 import { ErrorHandler } from './utils/error.handle.js';
 import { FullInviteModel } from './interfaces/invitesModels.js';
+import i18next from 'i18next';
+import Backend from 'i18next-fs-backend';
+import { handle, LanguageDetector } from 'i18next-http-middleware';
+import { fileURLToPath } from 'url';
 
 export class App {
 
@@ -41,6 +46,18 @@ export class App {
     this.rolesService = rolesService;
     this.settingsService = settingsService;
     this.usersService = usersService;
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    i18next
+      .use(Backend)
+      .use(LanguageDetector).init({
+        backend: {
+          loadPath: path.join(__dirname, '/locales/{{lng}}/translation.json'),
+        },
+        fallbackLng: 'en'
+      });
 
     const app = express();
 
@@ -81,9 +98,14 @@ export class App {
         }
       })
     })
-
+    
     app.use(json({ limit: '2mb' }));
-    app.use(corsMiddleware())
+    app.use(corsMiddleware());
+    app.use(handle(i18next));
+
+    app.get('/', (req, res) => {
+      return res.status(200).json(req.t('home.title'));
+    });
 
     app.use('/api', createApiRouter(
       this.eventsService,

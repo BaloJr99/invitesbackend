@@ -1,6 +1,6 @@
 import { FieldPacket, Pool, RowDataPacket } from "mysql2/promise";
-import { EventModel } from "../interfaces/eventsModel";
-import { EventsInfoModel, IsDeadlineMet } from "../interfaces/usersModel";
+import { EventModel } from "../interfaces/eventsModel.js";
+import { EventsInfoModel, IsDeadlineMet } from "../interfaces/usersModel.js";
 
 export class EventsService {
   constructor (private connection: Pool) {
