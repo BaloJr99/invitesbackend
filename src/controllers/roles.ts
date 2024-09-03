@@ -21,7 +21,7 @@ export class RolesController {
       return res.json(roles);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_ROLES', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_ALL_ROLES', e.message, req.userId);
     }
   }
 
@@ -35,10 +35,10 @@ export class RolesController {
 
       await this.rolesService.createRole(result.data);
 
-      return res.status(201).json({ message: 'Rol creado' });
+      return res.status(201).json({ message: req.t('messages.ROLE_CREATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_CREATE_ROLE', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_CREATE_ROLE', e.message, req.userId);
     }
   }
 
@@ -57,10 +57,10 @@ export class RolesController {
         result.data
       );
   
-      return res.status(201).json({ message: 'Rol actualizado' });
+      return res.status(201).json({ message: req.t('messages.ROLE_UPDATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_ROLE', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_ROLE', e.message, req.userId);
     }
   }
 
@@ -69,10 +69,10 @@ export class RolesController {
       const { id } = req.params;
       await this.rolesService.deleteRole(id);
   
-      return res.json({ message: 'Rol desactivado' });
+      return res.json({ message: req.t('messages.ROLE_DELETED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_DELETE_ROLE', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_DELETE_ROLE', e.message, req.userId);
     }
   }
 }

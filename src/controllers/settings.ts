@@ -24,10 +24,10 @@ export class SettingsController {
   
       if (event.length > 0) return res.json(event.at(0));
   
-      return res.status(404).json({ message: 'Las configuraciones del evento no se encontraron' });
+      return res.status(404).json({ message: req.t('messages.SETTINGS_NOT_FOUND') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_EVENT_SETTINGS_BY_ID', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_EVENT_SETTINGS_BY_ID', e.message, req.userId);
     }
   }
 
@@ -43,10 +43,10 @@ export class SettingsController {
         result.data
       );
   
-      return res.status(201).json({ id: settingId, message: 'Configuraciones del evento creadas' });
+      return res.status(201).json({ id: settingId, message: req.t('messages.SETTINGS_CREATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_CREATE_EVENT_SETTINGS', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_CREATE_EVENT_SETTINGS', e.message, req.userId);
     }
   }
 
@@ -62,10 +62,10 @@ export class SettingsController {
 
       await this.settingsService.updateEventSettings(id, result.data);
   
-      return res.status(201).json({ message: 'Configuraciones del evento actualizadas' });
+      return res.status(201).json({ message: req.t('messages.SETTINGS_UPDATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_EVENT_SETTINGS', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_EVENT_SETTINGS', e.message, req.userId);
     }
   }
 }

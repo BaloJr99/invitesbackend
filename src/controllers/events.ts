@@ -21,10 +21,6 @@ export class EventsController {
     try {
       const token = req.headers.authorization || '';
 
-      if (token === "") {
-        return res.status(403).json({ error: 'No token provided' });
-      }
-
       const decoded = verifyJwtToken(token) as AuthModel;
       const isAdmin = decoded.roles.some(r => r.name == "admin");
 
@@ -37,17 +33,13 @@ export class EventsController {
       return res.json(events);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_EVENTS', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_ALL_EVENTS', e.message, req.userId);
     }
   }
 
   getDropdownEvents = async (req: Request, res: Response) => {
     try {
       const token = req.headers.authorization || '';
-
-      if (token === "") {
-        return res.status(403).json({ error: 'No token provided' });
-      }
 
       const decoded = verifyJwtToken(token) as AuthModel;
       const isAdmin = decoded.roles.some(r => r.name == "admin");
@@ -62,7 +54,7 @@ export class EventsController {
       return res.json(events);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_DROPDOWN_EVENTS', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_DROPDOWN_EVENTS', e.message, req.userId);
     }
   }
 
@@ -75,7 +67,7 @@ export class EventsController {
       return res.json(events);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_EVENT_INVITES', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_EVENT_INVITES', e.message, req.userId);
     }
   }
 
@@ -88,7 +80,7 @@ export class EventsController {
       return res.json(Boolean(deadlineResults.isDeadlineMet));
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_IS_DEADLINE_MET', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_IS_DEADLINE_MET', e.message, req.userId);
     }
   }
 
@@ -100,10 +92,10 @@ export class EventsController {
   
       if (event.length > 0) return res.json(event.at(0));
   
-      return res.status(404).json({ message: 'Evento no encontrado' });
+      return res.status(404).json({ message: req.t('messages.EVENT_NOT_FOUND') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_EVENT_BY_ID', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_EVENT_BY_ID', e.message, req.userId);
     }
   }
 
@@ -117,10 +109,10 @@ export class EventsController {
   
       const eventId = await this.eventService.createEvent(result.data);
   
-      return res.status(201).json({ id: eventId, message: 'Evento creado' });
+      return res.status(201).json({ id: eventId, message: req.t('messages.EVENT_CREATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_CREATE_EVENT', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_CREATE_EVENT', e.message, req.userId);
     }
   }
 
@@ -129,10 +121,10 @@ export class EventsController {
       const { id } = req.params;
       await this.eventService.deleteEvent(id);
   
-      return res.json({ message: 'Evento eliminado' });
+      return res.json({ message: req.t('messages.EVENT_DELETED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_DELETE', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_DELETE_EVENT', e.message, req.userId);
     }
   }
 
@@ -148,10 +140,10 @@ export class EventsController {
 
       await this.eventService.updateEvent(id, result.data);
   
-      return res.status(201).json({ message: 'Evento actualizado' });
+      return res.status(201).json({ message: req.t('messages.EVENT_UPDATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_EVENT', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_EVENT', e.message, req.userId);
     }
   }
 }

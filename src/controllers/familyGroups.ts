@@ -24,7 +24,7 @@ export class FamilyGroupsController {
       return res.json(familyGroups);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_FAMILIES', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_ALL_GROUPS', e.message, req.userId);
     }
   }
 
@@ -40,10 +40,10 @@ export class FamilyGroupsController {
         result.data
       );
 
-      return res.status(201).json({ id: familyGroupId, message: 'Grupo familiar creado' });
+      return res.status(201).json({ id: familyGroupId, message: req.t('messages.GROUP_CREATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_CREATE_FAMILY', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_CREATE_GROUP', e.message, req.userId);
     }
   }
 
@@ -62,10 +62,10 @@ export class FamilyGroupsController {
         result.data
       );
   
-      return res.status(201).json({ message: 'Grupo familiar actualizado' });
+      return res.status(201).json({ message: req.t('messages.GROUP_UPDATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_FAMILY', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_GROUP', e.message, req.userId);
     }
   }
 }

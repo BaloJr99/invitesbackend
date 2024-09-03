@@ -31,10 +31,10 @@ export class ImagesController {
 
       await this.inviteImagesService.createImage({ imageUrl: cloudResult.secure_url, publicId: cloudResult.public_id, eventId });
 
-      return res.status(201).json({ message: 'Imagenes agregadas' });
+      return res.status(201).json({ message: req.t('messages.IMAGE_CREATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_CREATE_IMAGE', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_CREATE_IMAGE', e.message, req.userId);
     }
   }
 
@@ -48,10 +48,10 @@ export class ImagesController {
   
       await this.inviteImagesService.updateImages(result.data);
   
-      return res.status(201).json({ message: 'Informacion actualizada' });
+      return res.status(201).json({ message: req.t('messages.IMAGES_UPDATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_IMAGE', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_IMAGE', e.message, req.userId);
     }
   }
 
@@ -63,10 +63,10 @@ export class ImagesController {
   
       await this.inviteImagesService.deleteImage(image.id);
   
-      return res.json({ message: 'Imagen eliminada' });
+      return res.json({ message: req.t('messages.IMAGE_DELETED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_DELETE_IMAGE', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_DELETE_IMAGE', e.message, req.userId);
     }
   }
 
@@ -79,7 +79,7 @@ export class ImagesController {
       return res.json(eventImages);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_IMAGES', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_ALL_IMAGES', e.message, req.userId);
     }
   }
 }

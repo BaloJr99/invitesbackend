@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { LoggerService } from "../services/logger.js";
 
 export class ErrorHandler {
@@ -8,7 +8,7 @@ export class ErrorHandler {
     this.loggerService = loggerService;
   }
 
-  handleHttp = async (res: Response | null = null, error: string, fullError: string, userId: string) => {
+  handleHttp = async (res: Response | null = null, req: Request | null, error: string, fullError: string, userId: string) => {
     await this.loggerService.addLog({
       dateOfError: new Date(),
       customError: error,
@@ -16,8 +16,8 @@ export class ErrorHandler {
       userId: userId
     });
 
-    if (res) {
-      res.status(500).send(error);
+    if (res && req) {
+      res.status(500).send(req.t(`errors.${error}`));
     }
   }
 }

@@ -54,7 +54,7 @@ export class UsersController {
       return res.json(usersEventInfo);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_USERS', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_ALL_USERS', e.message, req.userId);
     }
   }
 
@@ -66,7 +66,7 @@ export class UsersController {
       return res.json(userFound);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_USER_BY_ID', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_USER_BY_ID', e.message, req.userId);
     }
   }
 
@@ -76,7 +76,7 @@ export class UsersController {
       return res.json(users);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_GET_ALL_USERS', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_ALL_USERS', e.message, req.userId);
     }
   }
 
@@ -90,10 +90,10 @@ export class UsersController {
 
       const userId = await this.userService.createUser(result.data);
 
-      return res.status(201).json({ id: userId, message: 'Usuario creado' });
+      return res.status(201).json({ id: userId, message: req.t('messages.USER_CREATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_CREATE_USER', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_CREATE_USER', e.message, req.userId);
     }
   }
 
@@ -112,10 +112,10 @@ export class UsersController {
         result.data
       );
   
-      return res.status(201).json({ message: 'Usuario actualizado' });
+      return res.status(201).json({ message: req.t('messages.USER_UPDATED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_UPDATE_USER', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_USER', e.message, req.userId);
     }
   }
 
@@ -124,10 +124,10 @@ export class UsersController {
       const { id } = req.params;
       await this.userService.deleteUser(id);
   
-      return res.json({ message: 'Usuario desactivado' });
+      return res.json({ message: req.t('messages.USER_DELETED') });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_DELETE_USER', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_DELETE_USER', e.message, req.userId);
     }
   }
 }

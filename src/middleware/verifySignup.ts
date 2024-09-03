@@ -6,8 +6,9 @@ export const checkRolesExisted = (req: Request, res: Response, next: NextFunctio
   if (req.body.roles) {
     for (let i = 0; i < req.body.roles.lenght; i++) {
       if (!ROLES.includes(req.body.roles[i])) {
+        const roleNotFound = req.body.roles[i];
         return res.status(400).json({
-          message: `Role ${req.body.roles[i]} doesn't exists`
+          message: req.t('messages.ROLE_NOT_FOUND', { roleNotFound })
         })
       }
     }
@@ -19,10 +20,10 @@ export const checkRolesExisted = (req: Request, res: Response, next: NextFunctio
 export const checkDuplicateUsernameOrEmail = async (req: Request, res: Response, next: NextFunction) => {
   const user = await User.findOne({ username: req.body.username })
 
-  if (user) return res.status(409).json({ message: 'El usuario ya existe' })
+  if (user) return res.status(409).json({ message: req.t('messages.USER_EXISTS') })
 
   const email = await User.findOne({ email: req.body.email })
-  if (email) return res.status(409).json({ message: 'El correo ya existe' })
+  if (email) return res.status(409).json({ message: req.t('messages.EMAIL_EXISTS') })
 
   next()
 }
