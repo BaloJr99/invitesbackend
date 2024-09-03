@@ -9,16 +9,16 @@ export const checkJwt = async (req: Request, res: Response, next: NextFunction) 
 
     const decoded = verifyJwtToken(jwt) as AuthModel;
 
-    if (!decoded) return res.status(401).json({ error: 'INVALID_AUTH' });
+    if (!decoded) return res.status(401).json({ error: req.t('messages.INVALID_AUTH') });
 
     const user = await User.findById(decoded.id, { password: 0 });
 
-    if (!user) return res.status(404).json({ error: 'INVALID_USER' });
+    if (!user) return res.status(404).json({ error: req.t('messages.INVALID_USER') });
 
     req.userId = decoded.id;
 
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'INVALID_AUTH' });
+    return res.status(401).json({ error: req.t('messages.INVALID_AUTH') });
   }
 }

@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "start:dev": "node --watch dist/index.js",
-    "copystatic": "copyfiles -u 1 src/locales/**/* dist/",
+    "copy-static": "copyfiles -u 1 src/locales/**/* dist/",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],

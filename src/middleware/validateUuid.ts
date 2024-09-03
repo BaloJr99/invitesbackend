@@ -10,7 +10,7 @@ export const validateUuid = (req: Request, res: Response, next: NextFunction) =>
     }).safeParse(id);
 
     if (!result.success) {
-      return res.status(400).json({ error: 'Wrong uuid format' })
+      return res.status(400).json({ error: req.t('messages.WRONG_UUID') });
     }
   }
 

@@ -94,7 +94,7 @@ export class App {
           }
         } catch (_e) {
           const e:Error = _e as Error;
-          errorHandler.handleHttp(null, 'ERROR_SENDING_NOTIFICATION', e.message, '');
+          errorHandler.handleHttp(null, null, 'ERROR_SENDING_NOTIFICATION', e.message, '');
         }
       })
     })
@@ -102,10 +102,6 @@ export class App {
     app.use(json({ limit: '2mb' }));
     app.use(corsMiddleware());
     app.use(handle(i18next));
-
-    app.get('/', (req, res) => {
-      return res.status(200).json(req.t('home.title'));
-    });
 
     app.use('/api', createApiRouter(
       this.eventsService,

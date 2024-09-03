@@ -27,19 +27,19 @@ export class AuthController {
 
       const signInResponse = await this.userService.signin(result.data);
       if (signInResponse.includes('ERROR')) {
-        return res.status(401).json({ error: 'Credenciales incorrectas' });
+        return res.status(401).json({ error: req.t('messages.WRONG_CREDENTIALS') });
       }
 
       if (signInResponse.includes('BLOCKED')) {
-        return res.status(401).json({ error: 'Cuenta bloqueada, has excedido el numero de intentos' });
+        return res.status(401).json({ error: req.t('messages.BLOCKED_USER') });
       } else if (signInResponse.includes('INACTIVE')) {
-        return res.status(401).json({ error: 'Cuenta inactivada' });
+        return res.status(401).json({ error: req.t('messages.INACTIVE_ACCOUNT') });
       }
 
       res.status(200).json({ token: signInResponse });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_SIGN_IN', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_SIGN_IN', e.message, req.userId);
     }
   }
 
@@ -52,7 +52,7 @@ export class AuthController {
 
     const userFounded = await this.userService.findUser(result.data.usernameOrEmail);
     if (!userFounded) {
-      return res.status(401).json({ error: 'No se encontro el usuario' });
+      return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') });
     }
 
     try {
@@ -67,7 +67,7 @@ export class AuthController {
       res.status(200).json({ info });
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_SENDING_EMAIL', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_SENDING_EMAIL', e.message, req.userId);
     }
   }
 
@@ -79,7 +79,7 @@ export class AuthController {
       return res.status(200).json(resetting);
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_IS_RESETTING_PASSWORD', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_IS_RESETTING_PASSWORD', e.message, req.userId);
     }
   }
 
@@ -97,7 +97,7 @@ export class AuthController {
       return res.status(200).json();
     } catch (_e) {
       const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, 'ERROR_RESET_PASSWORD', e.message, req.userId);
+      this.errorHandler.handleHttp(res, req, 'ERROR_RESET_PASSWORD', e.message, req.userId);
     }
   }
 
