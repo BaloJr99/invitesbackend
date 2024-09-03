@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from "../models/user.js";
 import Role from "../models/role.js";
-import { AuthUserModel, FullUserModel, UserModel } from '../interfaces/usersModel';
+import { AuthUserModel, FullUserModel, UserModel } from '../interfaces/usersModel.js';
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js';
 import { generatePass } from '../utils/passwordGenerator.hande.js';
 

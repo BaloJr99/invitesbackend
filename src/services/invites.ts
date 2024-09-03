@@ -1,5 +1,5 @@
 import { FieldPacket, Pool, RowDataPacket } from "mysql2/promise";
-import { ConfirmationModel, PartialInviteModel } from "../interfaces/invitesModels";
+import { ConfirmationModel, PartialInviteModel } from "../interfaces/invitesModels.js";
 
 export class InvitesService {
   constructor (private connection: Pool) {

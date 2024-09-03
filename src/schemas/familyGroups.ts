@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FamilyGroupModel } from '../interfaces/familyGroupModel';
+import { FamilyGroupModel } from '../interfaces/familyGroupModel.js';
 
 const familyGroupSchema = z.object({
   familyGroup: z.string({

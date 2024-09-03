@@ -1,4 +1,4 @@
-import { RoleModel } from "./rolesModel";
+import { RoleModel } from "./rolesModel.js";
 
 export interface AuthModel {
   id: string,

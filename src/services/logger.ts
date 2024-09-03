@@ -1,5 +1,5 @@
 import { FieldPacket, Pool, RowDataPacket } from "mysql2/promise";
-import { Logger } from "../interfaces/loggerModel";
+import { Logger } from "../interfaces/loggerModel.js";
 
 export class LoggerService {
   constructor (private connection: Pool) {

@@ -1,5 +1,5 @@
 import { Pool } from "mysql2/promise";
-import { ImageUsageModel, ImagesModel } from "../interfaces/imagesModel";
+import { ImageUsageModel, ImagesModel } from "../interfaces/imagesModel.js";
 
 export class InviteImagesService {
   constructor (private connection: Pool) {
