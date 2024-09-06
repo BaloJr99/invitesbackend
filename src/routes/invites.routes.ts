@@ -15,6 +15,7 @@ export const createInvitesRouter = (invitesService: InvitesService, loggerServic
   invitesRouter.get('/', [checkJwt, isInvitesAdmin], invitesController.getInvites);
   invitesRouter.post('/', [checkJwt, isInvitesAdmin], invitesController.createInvite);
   invitesRouter.post('/bulkInvites', [checkJwt, isInvitesAdmin], invitesController.bulkInvites);
+  invitesRouter.delete('/bulkInvites', [checkJwt, isInvitesAdmin], invitesController.bulkDeleteInvites);
 
   invitesRouter.get('/:id', [checkJwt, isInvitesAdmin, validateUuid], invitesController.getInviteById);
   invitesRouter.get('/invite/:id', [validateUuid], invitesController.getInviteForEvent);

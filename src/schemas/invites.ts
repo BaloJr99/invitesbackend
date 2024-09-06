@@ -104,3 +104,11 @@ export function validateConfirmationSchema (confirmation: ConfirmationModel) {
 export function validateBulkInvite (invites: BulkInviteModel[]) {
   return z.array(bulkInviteSchema).safeParse(invites);
 }
+
+export function validateBulkDeleteInvites (invitesIds: string[]) {
+  return z.array(z.string().uuid({
+    message: 'Invalid UUID',
+  })).min(1, {
+    message: 'The invites ids are required'
+  }).safeParse(invitesIds);
+}

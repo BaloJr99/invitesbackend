@@ -79,6 +79,14 @@ export class InvitesService {
       );
     })
   }
+  
+  bulkDeleteInvite = async (invites: string[]) => {
+    const placeholders = invites.map(() => 'UUID_TO_BIN(?)').join(', ');
+    await this.connection.query(
+      `DELETE FROM invites WHERE id IN (${placeholders})`,
+      invites
+    );
+  }
 
   deleteInvite = async (inviteId: string) => {
     await this.connection.query('DELETE FROM invites WHERE id = UUID_TO_BIN(?)', [

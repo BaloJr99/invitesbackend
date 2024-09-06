@@ -22,6 +22,7 @@
     "IMAGE_DELETED": "Image deleted",
     "INVITE_NOT_FOUND": "Invite not found",
     "INVITE_CREATED": "Invite created",
+    "INVITES_BULK_DELETED": "Invites deleted",
     "INVITES_CREATED": "Invites created",
     "INVITE_DELETED": "Invite deleted",
     "INVITE_UPDATED": "Invite updated",

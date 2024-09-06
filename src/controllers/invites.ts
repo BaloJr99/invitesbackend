@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { InvitesService } from '../services/invites.js';
 import { FullInviteModel, PartialInviteModel } from '../interfaces/invitesModels.js';
-import { validateBulkInvite, validateConfirmationSchema, validateInvite } from '../schemas/invites.js';
+import { validateBulkDeleteInvites, validateBulkInvite, validateConfirmationSchema, validateInvite } from '../schemas/invites.js';
 import { verifyJwtToken } from '../utils/jwt.handle.js';
 import { AuthModel } from '../interfaces/authModel.js';
 import { ErrorHandler } from '../utils/error.handle.js';
@@ -121,6 +121,23 @@ export class InvitesController {
       await this.invitesService.createBulkInvite(bulkInvites);
 
       return res.status(201).json({ message: req.t('messages.INVITES_CREATED') });
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, req, 'ERROR_BULK_INVITES', e.message, req.userId);
+    }
+  };
+
+  bulkDeleteInvites = async (req: Request, res: Response) => {
+    try {
+      const result = validateBulkDeleteInvites(req.body);
+
+      if (!result.success) {
+        return res.status(422).json({ error: JSON.parse(result.error.message) });
+      }
+
+      await this.invitesService.bulkDeleteInvite(result.data);
+
+      return res.status(201).json({ message: req.t('messages.INVITES_BULK_DELETED') });
     } catch (_e) {
       const e:Error = _e as Error;
       this.errorHandler.handleHttp(res, req, 'ERROR_BULK_INVITES', e.message, req.userId);
