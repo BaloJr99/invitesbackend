@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from "../models/user.js";
 import Role from "../models/role.js";
-import { AuthUserModel, FullUserModel, UserModel } from '../interfaces/usersModel.js';
+import { AuthUserModel, FullUserModel, UserModel, UserProfileModel } from '../interfaces/usersModel.js';
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js';
 import { generatePass } from '../utils/passwordGenerator.hande.js';
 
@@ -153,5 +153,35 @@ export class UsersService {
   deleteUser = async (userId: string) => {
     const result = await User.updateOne({ _id: userId }, { $set: { isActive: false }});
     return result;
+  }
+
+  getUserProfile = async (userId: string) => {
+    const userFounded = await User.findById(userId).select({
+      _id: 0,
+      id: "$_id",
+      username: 1,
+      email: 1,
+      firstName: 1,
+      lastName: 1,
+      phoneNumber: 1,
+      gender: 1,
+      profilePhoto: 1
+    });
+    return userFounded;
+  }
+
+  updateUserProfile = async (user: UserProfileModel) => {
+    const result = await User.updateOne({ _id: user._id }, { $set: { 
+      ...user
+     }});
+    return result;
+  }
+
+  checkUsername = async (username: string) => {
+    const userFounded = await User.findOne({
+      username
+    });
+
+    return userFounded ? true : false;
   }
 }

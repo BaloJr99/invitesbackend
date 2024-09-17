@@ -16,8 +16,13 @@ export const createUsersRouter = (userService: UsersService, eventsService: Even
   usersRouter.get('/:id', [isAdmin], userController.getUserById);
   usersRouter.post('/', [checkDuplicateUsernameOrEmail, checkRolesExisted, isAdmin], userController.createUser);
 
+  usersRouter.put('/profile', [isInvitesAdmin], userController.updateUserProfile);
+  usersRouter.get('/profile/check-username/:username', [isInvitesAdmin], userController.checkUsername);
+  usersRouter.get('/profile/:id', [isInvitesAdmin], userController.getUserProfile);
+  
   usersRouter.put('/:id', [isAdmin], userController.updateUser);
   usersRouter.delete('/:id', [isAdmin], userController.deleteUser);
+
 
   return usersRouter;
 }

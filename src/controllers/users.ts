@@ -1,7 +1,7 @@
 import { UsersService } from '../services/users.js';
 import { Request, Response } from 'express';
 import { ErrorHandler } from '../utils/error.handle.js';
-import { validateFullUser, validateUser } from '../schemas/users.js';
+import { validateFullUser, validateUser, validateUserProfile } from '../schemas/users.js';
 import { EventsService } from '../services/events.js';
 import { EventsInfoModel, UserEventInfoModel, UserInfoModel } from '../interfaces/usersModel.js';
 import { LoggerService } from '../services/logger.js';
@@ -128,6 +128,49 @@ export class UsersController {
     } catch (_e) {
       const e:Error = _e as Error;
       this.errorHandler.handleHttp(res, req, 'ERROR_DELETE_USER', e.message, req.userId);
+    }
+  }
+
+  getUserProfile = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const userFound = await this.userService.getUserProfile(id);
+
+      return res.json(userFound);
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, req, 'ERROR_GET_USER_PROFILE', e.message, req.userId);
+    }
+  }
+
+  updateUserProfile = async (req: Request, res: Response) => {
+    try {
+      const result = validateUserProfile(req.body);
+  
+      if (!result.success) {
+        return res.status(400).json({ error: JSON.parse(result.error.message) });
+      }
+  
+      await this.userService.updateUserProfile(
+        result.data
+      );
+  
+      return res.status(201).json({ message: req.t('messages.PROFILE_UPDATED') });
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_USER_PROFILE', e.message, req.userId);
+    }
+  }
+
+  checkUsername = async (req: Request, res: Response) => {
+    try {
+      const { username } = req.params;
+      const isDuplicated = await this.userService.checkUsername(username);
+
+      return res.json(isDuplicated);
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, req, 'ERROR_CHECK_USERNAME', e.message, req.userId);
     }
   }
 }

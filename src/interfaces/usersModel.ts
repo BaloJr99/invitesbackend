@@ -43,6 +43,17 @@ export interface AuthUserModel {
   password: string
 }
 
+export interface UserProfileModel {
+  _id: string,
+  username: string,
+  firstName: string,
+  lastName: string,
+  phoneNumber: string,
+  email: string,
+  gender: string,
+  profilePhoto?: string
+}
+
 export interface UserFromInvite {
   userId: string
 }

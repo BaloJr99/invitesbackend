@@ -13,6 +13,21 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  firstName: {
+    type: String
+  },
+  lastName: {
+    type: String
+  },
+  phoneNumber: {
+    type: String
+  },
+  gender: {
+    type: String
+  },
+  profilePhoto: {
+    type: String
+  },
   isActive: {
     type: Boolean,
     default: true

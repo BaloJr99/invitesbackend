@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AuthUserModel, FullUserModel, UserModel } from '../interfaces/usersModel.js';
+import { AuthUserModel, FullUserModel, UserModel, UserProfileModel } from '../interfaces/usersModel.js';
 import moongose from 'mongoose';
 
 const fullUserSchema = z.object({
@@ -29,6 +29,31 @@ const userSchema = z.object({
   })).nonempty().transform(objectIds => objectIds.map(x => new moongose.Types.ObjectId(x)))
 });
 
+const userProfileSchema = z.object({
+  _id: z.string({
+    required_error: 'The id is required'
+  }),
+  username: z.string({
+    required_error: 'The username is required'
+  }),
+  firstName: z.string({
+    required_error: 'The first name is required'
+  }),
+  lastName: z.string({
+    required_error: 'The last name is required'
+  }),
+  phoneNumber: z.string({
+    required_error: 'The phone number is required'
+  }),
+  email: z.string({
+    required_error: 'The email is required'
+  }),
+  gender: z.string({
+    required_error: 'The gender is required'
+  }),
+  profilePhoto: z.string().url().optional().or(z.literal(''))
+});
+
 const authUserSchema = z.object({
   usernameOrEmail: z.string({
     required_error: 'The username is required'
@@ -48,6 +73,10 @@ export function validateUser (user: UserModel) {
 
 export function validateAuthUser (user: AuthUserModel) {
   return authUserSchema.safeParse(user);
+}
+
+export function validateUserProfile (user: UserProfileModel) {
+  return userProfileSchema.safeParse(user);
 }
 
 export function validateUsernameOrEmail (usernameOrEmail: string) {

@@ -36,7 +36,8 @@
     "SETTINGS_UPDATED": "Event settings updated",
     "USER_CREATED": "User created",
     "USER_UPDATED": "User updated",
-    "USER_DELETED": "User deactivated"
+    "USER_DELETED": "User deactivated",
+    "PROFILE_UPDATED": "Profile updated"
   },
   "errors": {
     "ERROR_SIGN_IN": "Error signing in",
@@ -78,6 +79,8 @@
     "ERROR_GET_USER_BY_ID": "Error getting user by id",
     "ERROR_CREATE_USER": "Error creating user",
     "ERROR_UPDATE_USER": "Error updating user",
-    "ERROR_DELETE_USER": "Error deleting user"
+    "ERROR_DELETE_USER": "Error deleting user",
+    "ERROR_UPDATE_USER_PROFILE": "Error updating user profile",
+    "ERROR_CHECK_USERNAME": "Error checking username"
   }
 }

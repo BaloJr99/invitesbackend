@@ -36,7 +36,8 @@
     "SETTINGS_UPDATED": "Configuración de evento actualizada",
     "USER_CREATED": "Usuario creado",
     "USER_UPDATED": "Usuario actualizado",
-    "USER_DELETED": "Usuario desactivado" 
+    "USER_DELETED": "Usuario desactivado",
+    "PROFILE_UPDATED": "Perfil actualizado"
   },
   "errors": {
     "ERROR_SIGN_IN": "Error al iniciar sesión",
@@ -78,6 +79,9 @@
     "ERROR_GET_USER_BY_ID": "Error al obtener usuario por id",
     "ERROR_CREATE_USER": "Error al crear usuario",
     "ERROR_UPDATE_USER": "Error al actualizar usuario",
-    "ERROR_DELETE_USER": "Error al desactivar usuario"
+    "ERROR_DELETE_USER": "Error al desactivar usuario",
+    "ERROR_GET_USER_PROFILE": "Error al obtener perfil de usuario",
+    "ERROR_UPDATE_USER_PROFILE": "Error al actualizar perfil de usuario",
+    "ERROR_CHECK_USERNAME": "Error al verificar nombre de usuario"
   }
 }
