@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AuthUserModel, FullUserModel, UserModel, UserProfileModel } from '../interfaces/usersModel.js';
+import { AuthUserModel, FullUserModel, UploadUserProfileModel, UserModel, UserProfileModel } from '../interfaces/usersModel.js';
 import moongose from 'mongoose';
 
 const fullUserSchema = z.object({
@@ -63,6 +63,17 @@ const authUserSchema = z.object({
   })
 });
 
+const userProfilePhotoSchema = z.object({
+  userId: z.string({
+    required_error: 'The user id is required',
+    invalid_type_error: 'The user id must be a string'
+  }),
+  profilePhotoSource: z.string({
+    required_error: 'The profile photo is required',
+    invalid_type_error: 'The profile photo must be a string'
+  })
+});
+
 export function validateFullUser (user: FullUserModel) {
   return fullUserSchema.safeParse(user);
 }
@@ -93,4 +104,8 @@ export function validatePassword (password: string) {
       required_error: 'The password is required'
     })
   }).safeParse(password);
+}
+
+export function validateUserProfilePhoto (photo: UploadUserProfileModel) {
+  return userProfilePhotoSchema.safeParse(photo);
 }

@@ -44,7 +44,7 @@ export const createApiRouter = (
   apiRouter.use('/logs', [checkJwt, isAdmin], createLoggersRouter(loggerService, userService));
   apiRouter.use('/roles', [checkJwt, isInvitesAdmin], createRolesRouter(rolesService, loggerService));
   apiRouter.use('/settings', createSettingsRouter(settingsService, loggerService));
-  apiRouter.use('/users', [checkJwt], createUsersRouter(userService, eventsService, loggerService));
+  apiRouter.use('/users', [checkJwt], createUsersRouter(userService, eventsService, loggerService, imagesService));
 
   return apiRouter
 }

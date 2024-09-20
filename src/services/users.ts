@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from "../models/user.js";
 import Role from "../models/role.js";
-import { AuthUserModel, FullUserModel, UserModel, UserProfileModel } from '../interfaces/usersModel.js';
+import { AuthUserModel, FullUserModel, UserModel, UserProfileModel, UserProfilePhotoModel } from '../interfaces/usersModel.js';
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js';
 import { generatePass } from '../utils/passwordGenerator.hande.js';
 
@@ -47,6 +47,7 @@ export class UsersService {
       id: userFounded._id, 
       username: userFounded.username, 
       email: userFounded.email,
+      profilePhoto: userFounded.profilePhoto,
       roles: userFounded.roles
     }, process.env.SECRET, {
       expiresIn: 86400
@@ -165,7 +166,8 @@ export class UsersService {
       lastName: 1,
       phoneNumber: 1,
       gender: 1,
-      profilePhoto: 1
+      profilePhoto: 1,
+      profilePhotoPublicId: 1
     });
     return userFounded;
   }
@@ -173,6 +175,14 @@ export class UsersService {
   updateUserProfile = async (user: UserProfileModel) => {
     const result = await User.updateOne({ _id: user._id }, { $set: { 
       ...user
+     }});
+    return result;
+  }
+
+  updateUserProfilePhoto = async (userId: string, user: UserProfilePhotoModel) => {
+    const result = await User.updateOne({ _id: userId }, { $set: { 
+      profilePhoto: user.profilePhoto,
+      profilePhotoPublicId: user.profilePhotoPublicId
      }});
     return result;
   }

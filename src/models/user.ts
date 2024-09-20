@@ -28,6 +28,9 @@ const UserSchema = new Schema({
   profilePhoto: {
     type: String
   },
+  profilePhotoPublicId: {
+    type: String
+  },
   isActive: {
     type: Boolean,
     default: true

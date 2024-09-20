@@ -54,6 +54,16 @@ export interface UserProfileModel {
   profilePhoto?: string
 }
 
+export interface UploadUserProfileModel {
+  userId: string,
+  profilePhotoSource: string,
+}
+
+export interface UserProfilePhotoModel {
+  profilePhoto: string,
+  profilePhotoPublicId: string
+}
+
 export interface UserFromInvite {
   userId: string
 }

@@ -1,17 +1,19 @@
 import { UsersService } from '../services/users.js';
 import { Request, Response } from 'express';
 import { ErrorHandler } from '../utils/error.handle.js';
-import { validateFullUser, validateUser, validateUserProfile } from '../schemas/users.js';
+import { validateFullUser, validateUser, validateUserProfile, validateUserProfilePhoto } from '../schemas/users.js';
 import { EventsService } from '../services/events.js';
 import { EventsInfoModel, UserEventInfoModel, UserInfoModel } from '../interfaces/usersModel.js';
 import { LoggerService } from '../services/logger.js';
+import { ImagesService } from '../config/cloudinary/cloudinary.js';
 
 export class UsersController {
   errorHandler: ErrorHandler;
   constructor (
     private userService: UsersService,
     private eventsService: EventsService,
-    private loggerService: LoggerService
+    private loggerService: LoggerService,
+    private imagesService: ImagesService
   ) {
     this.userService = userService;
     this.errorHandler = new ErrorHandler(this.loggerService);
@@ -171,6 +173,31 @@ export class UsersController {
     } catch (_e) {
       const e:Error = _e as Error;
       this.errorHandler.handleHttp(res, req, 'ERROR_CHECK_USERNAME', e.message, req.userId);
+    }
+  }
+
+  uploadProfilePhoto = async (req: Request, res: Response) => {
+    try {
+      const result = validateUserProfilePhoto(req.body);
+
+      if (!result.success) {
+        return res.status(422).json({ error: JSON.parse(result.error.message) });
+      }
+
+      const searchLastPhoto = await this.userService.getUserProfile(result.data.userId);
+
+      if (searchLastPhoto && searchLastPhoto.profilePhotoPublicId) {
+        await this.imagesService.deleteImage(searchLastPhoto.profilePhotoPublicId);
+      }
+
+      const cloudResult = await this.imagesService.uploadImage(result.data.profilePhotoSource);
+
+      await this.userService.updateUserProfilePhoto(result.data.userId, { profilePhoto: cloudResult.secure_url, profilePhotoPublicId: cloudResult.public_id });
+
+      return res.status(201).json({ id: cloudResult.secure_url, message: req.t('messages.PROFILE_PHOTO_UPDATED') });
+    } catch (_e) {
+      const e:Error = _e as Error;
+      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_PROFILE_PHOTO', e.message, req.userId);
     }
   }
 }
