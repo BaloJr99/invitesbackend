@@ -1,10 +1,9 @@
 import { Pool, createPool } from 'mysql2/promise'
 
 export const connection = () => {
+  let connection: Pool
 
-  let connection: Pool;
-  
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     connection = createPool({
       host: process.env.MYSQL_HOST,
       port: parseInt(process.env.MYSQL_PORT),
@@ -13,10 +12,10 @@ export const connection = () => {
       database: process.env.MYSQL_DATABASE,
       timezone: '+00:00',
       connectionLimit: 10
-    });
+    })
   } else {
-    connection = createPool(process.env.DATABASE_URL);
+    connection = createPool(process.env.DATABASE_URL)
   }
-  
-  return connection;
+
+  return connection
 }

@@ -6,14 +6,17 @@ import { validateUuid } from '../middleware/validateUuid.js'
 
 export const rolesRouter = Router()
 
-export const createRolesRouter = (rolesService: RolesService, loggerService: LoggerService) => {
-  const rolesController = new RolesController(rolesService, loggerService);
+export const createRolesRouter = (
+  rolesService: RolesService,
+  loggerService: LoggerService
+) => {
+  const rolesController = new RolesController(rolesService, loggerService)
 
-  rolesRouter.get('/', rolesController.getRoles);
-  rolesRouter.post('/', rolesController.createRole);
+  rolesRouter.get('/', rolesController.getRoles)
+  rolesRouter.post('/', rolesController.createRole)
 
-  rolesRouter.put('/:id', [validateUuid], rolesController.updateRole);
-  rolesRouter.delete('/:id', [validateUuid], rolesController.deleteRole);
+  rolesRouter.put('/:id', [validateUuid], rolesController.updateRole)
+  rolesRouter.delete('/:id', [validateUuid], rolesController.deleteRole)
 
-  return rolesRouter;
+  return rolesRouter
 }

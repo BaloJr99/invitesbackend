@@ -6,18 +6,29 @@ import { LoggerService } from '../services/logger.js'
 
 export const eventsRouter = Router()
 
-export const createEventsRouter = (eventsService: EventsService, loggerService: LoggerService) => {
-  const eventController = new EventsController(eventsService, loggerService);
+export const createEventsRouter = (
+  eventsService: EventsService,
+  loggerService: LoggerService
+) => {
+  const eventController = new EventsController(eventsService, loggerService)
 
-  eventsRouter.get('/', eventController.getAllEvents);
-  eventsRouter.get('/dropdown', eventController.getDropdownEvents);
-  eventsRouter.get('/invites/:id', [validateUuid], eventController.getEventInvites);
-  eventsRouter.get('/invites/:id/deadlineMet', [validateUuid], eventController.isDeadlineMet);
-  eventsRouter.post('/', eventController.createEvent);
+  eventsRouter.get('/', eventController.getAllEvents)
+  eventsRouter.get('/dropdown', eventController.getDropdownEvents)
+  eventsRouter.get(
+    '/invites/:id',
+    [validateUuid],
+    eventController.getEventInvites
+  )
+  eventsRouter.get(
+    '/invites/:id/deadlineMet',
+    [validateUuid],
+    eventController.isDeadlineMet
+  )
+  eventsRouter.post('/', eventController.createEvent)
 
-  eventsRouter.get('/:id', [validateUuid], eventController.getEventById);
-  eventsRouter.delete('/:id', [validateUuid], eventController.deleteEvent);
-  eventsRouter.put('/:id', [validateUuid], eventController.updateEvent);
+  eventsRouter.get('/:id', [validateUuid], eventController.getEventById)
+  eventsRouter.delete('/:id', [validateUuid], eventController.deleteEvent)
+  eventsRouter.put('/:id', [validateUuid], eventController.updateEvent)
 
-  return eventsRouter;
+  return eventsRouter
 }

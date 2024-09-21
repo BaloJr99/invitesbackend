@@ -1,4 +1,4 @@
-import cors from 'cors';
+import cors from 'cors'
 
 // Localhost
 // Production
@@ -10,12 +10,13 @@ export const ACCEPTED_ORIGINS = [
   'https://invites-card-fkvf-git-playing-with-i18n-balojr99s-projects.vercel.app'
 ]
 
-export const corsMiddleware = () => cors({
-  origin: (origin, callback) => {
-    if (!origin || ACCEPTED_ORIGINS.includes(origin)) {
-      return callback(null, true);
-    }
+export const corsMiddleware = () =>
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || ACCEPTED_ORIGINS.includes(origin)) {
+        return callback(null, true)
+      }
 
-    return callback(new Error(`Not allowed by CORS ${origin}`), false);
-  }
-})
+      return callback(new Error(`Not allowed by CORS ${origin}`), false)
+    }
+  })

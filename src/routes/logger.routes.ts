@@ -6,10 +6,13 @@ import { UsersService } from '../services/users.js'
 
 export const logsRouter = Router()
 
-export const createLoggersRouter = (loggerService: LoggerService, usersService: UsersService) => {
-  const loggerController = new LoggersController(loggerService, usersService);
+export const createLoggersRouter = (
+  loggerService: LoggerService,
+  usersService: UsersService
+) => {
+  const loggerController = new LoggersController(loggerService, usersService)
 
-  logsRouter.get('/', [validateUuid], loggerController.getLogs);
+  logsRouter.get('/', [validateUuid], loggerController.getLogs)
 
-  return logsRouter;
+  return logsRouter
 }

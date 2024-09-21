@@ -1,103 +1,146 @@
-import { Request, Response } from 'express';
-import { validateAuthUser, validatePassword, validateUsernameOrEmail } from '../schemas/users.js';
-import { UsersService } from '../services/users.js';
-import { MailService } from '../services/mail.js';
-import { ErrorHandler } from '../utils/error.handle.js';
-import { LoggerService } from '../services/logger.js';
+import { Request, Response } from 'express'
+import {
+  validateAuthUser,
+  validatePassword,
+  validateUsernameOrEmail
+} from '../schemas/users.js'
+import { UsersService } from '../services/users.js'
+import { MailService } from '../services/mail.js'
+import { ErrorHandler } from '../utils/error.handle.js'
+import { LoggerService } from '../services/logger.js'
 
 export class AuthController {
-  errorHandler: ErrorHandler;
+  errorHandler: ErrorHandler
 
-  constructor (
+  constructor(
     private userService: UsersService,
     private mailService: MailService,
-    private loggerService: LoggerService) {
-    this.userService = userService;
-    this.mailService = mailService;
-    this.errorHandler = new ErrorHandler(this.loggerService);
+    private loggerService: LoggerService
+  ) {
+    this.userService = userService
+    this.mailService = mailService
+    this.errorHandler = new ErrorHandler(this.loggerService)
   }
 
   signIn = async (req: Request, res: Response) => {
     try {
-      const result = validateAuthUser(req.body);
+      const result = validateAuthUser(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) });
+        return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
 
-      const signInResponse = await this.userService.signin(result.data);
+      const signInResponse = await this.userService.signin(result.data)
       if (signInResponse.includes('ERROR')) {
-        return res.status(401).json({ error: req.t('messages.WRONG_CREDENTIALS') });
+        return res
+          .status(401)
+          .json({ error: req.t('messages.WRONG_CREDENTIALS') })
       }
 
       if (signInResponse.includes('BLOCKED')) {
-        return res.status(401).json({ error: req.t('messages.BLOCKED_USER') });
+        return res.status(401).json({ error: req.t('messages.BLOCKED_USER') })
       } else if (signInResponse.includes('INACTIVE')) {
-        return res.status(401).json({ error: req.t('messages.INACTIVE_ACCOUNT') });
+        return res
+          .status(401)
+          .json({ error: req.t('messages.INACTIVE_ACCOUNT') })
       }
 
-      res.status(200).json({ token: signInResponse });
+      res.status(200).json({ token: signInResponse })
     } catch (_e) {
-      const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, req, 'ERROR_SIGN_IN', e.message, req.userId);
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_SIGN_IN',
+        e.message,
+        req.userId
+      )
     }
   }
 
   forgotPassword = async (req: Request, res: Response) => {
-    const result = validateUsernameOrEmail(req.body);
+    const result = validateUsernameOrEmail(req.body)
 
     if (!result.success) {
-      return res.status(422).json({ error: JSON.parse(result.error.message) });
+      return res.status(422).json({ error: JSON.parse(result.error.message) })
     }
 
-    const userFounded = await this.userService.findUser(result.data.usernameOrEmail);
+    const userFounded = await this.userService.findUser(
+      result.data.usernameOrEmail
+    )
     if (!userFounded) {
-      return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') });
+      return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
     }
 
     try {
       const info = await this.mailService.sendMail({
         from: 'InvitesMX',
         to: userFounded.email ?? '',
-        html: this.getHtml(userFounded.username ?? '', userFounded._id.toString(), req.get('origin') ?? ''),
-        subject: 'Password Reset',
-      });
+        html: this.getHtml(
+          userFounded.username ?? '',
+          userFounded._id.toString(),
+          req.get('origin') ?? ''
+        ),
+        subject: 'Password Reset'
+      })
 
-      await this.userService.updateResetPasword(userFounded._id.toString(), '', true);
-      res.status(200).json({ info });
+      await this.userService.updateResetPasword(
+        userFounded._id.toString(),
+        '',
+        true
+      )
+      res.status(200).json({ info })
     } catch (_e) {
-      const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, req, 'ERROR_SENDING_EMAIL', e.message, req.userId);
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_SENDING_EMAIL',
+        e.message,
+        req.userId
+      )
     }
   }
 
   isUserResettingPassword = async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { id } = req.params
 
-      const resetting = await this.userService.isUserResettingPassword(id);
-      return res.status(200).json(resetting);
+      const resetting = await this.userService.isUserResettingPassword(id)
+      return res.status(200).json(resetting)
     } catch (_e) {
-      const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, req, 'ERROR_IS_RESETTING_PASSWORD', e.message, req.userId);
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_IS_RESETTING_PASSWORD',
+        e.message,
+        req.userId
+      )
     }
   }
 
   resetPassword = async (req: Request, res: Response) => {
     try {
-      const result = validatePassword(req.body);
+      const result = validatePassword(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) });
+        return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
 
-      const { id } = req.params;
+      const { id } = req.params
 
-      await this.userService.updateResetPasword(id, result.data.password, false);
-      return res.status(200).json();
+      await this.userService.updateResetPasword(id, result.data.password, false)
+      return res.status(200).json()
     } catch (_e) {
-      const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, req, 'ERROR_RESET_PASSWORD', e.message, req.userId);
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_RESET_PASSWORD',
+        e.message,
+        req.userId
+      )
     }
   }
 

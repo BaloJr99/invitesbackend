@@ -3,6 +3,6 @@ export interface FullRoleModel {
 }
 
 export interface RoleModel {
-  name: string,
+  name: string
   isActive: boolean
 }

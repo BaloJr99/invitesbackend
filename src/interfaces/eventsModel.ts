@@ -3,15 +3,15 @@ export interface FullEventModel extends EventModel {
 }
 
 export interface EventModel {
-  nameOfEvent: string,
-  dateOfEvent: string,
-  maxDateOfConfirmation: string,
-  typeOfEvent: string,
-  nameOfCelebrated: string,
+  nameOfEvent: string
+  dateOfEvent: string
+  maxDateOfConfirmation: string
+  typeOfEvent: string
+  nameOfCelebrated: string
   userId: string
 }
 
 export interface IDropdownEventModel {
-  id: string,
+  id: string
   nameOfEvent: string
 }

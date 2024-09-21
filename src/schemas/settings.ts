@@ -1,9 +1,9 @@
-import { z } from 'zod';
-import { SettingsModel } from '../interfaces/settingsModel.js';
+import { z } from 'zod'
+import { SettingsModel } from '../interfaces/settingsModel.js'
 
 const settingsSchema = z.object({
   eventId: z.string().uuid({
-    message: 'Invalid UUID',
+    message: 'Invalid UUID'
   }),
   primaryColor: z.string({
     invalid_type_error: 'The primary color must be a string',
@@ -55,8 +55,8 @@ const settingsSchema = z.object({
     invalid_type_error: 'The dress code must be a string',
     required_error: 'The dress code is required'
   })
-});
+})
 
-export function validateSettings (settings: SettingsModel) {
-  return settingsSchema.safeParse(settings);
+export function validateSettings(settings: SettingsModel) {
+  return settingsSchema.safeParse(settings)
 }

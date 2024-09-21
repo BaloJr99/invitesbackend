@@ -1,71 +1,97 @@
 import { validateSettings } from '../schemas/settings.js'
-import { SettingsService } from '../services/settings.js';
-import { Request, Response } from 'express';
-import { FullSettingsModel } from '../interfaces/settingsModel.js';
-import { ErrorHandler } from '../utils/error.handle.js';
-import { LoggerService } from '../services/logger.js';
+import { SettingsService } from '../services/settings.js'
+import { Request, Response } from 'express'
+import { FullSettingsModel } from '../interfaces/settingsModel.js'
+import { ErrorHandler } from '../utils/error.handle.js'
+import { LoggerService } from '../services/logger.js'
 
 export class SettingsController {
-  errorHandler: ErrorHandler;
+  errorHandler: ErrorHandler
 
-  constructor (
+  constructor(
     private settingsService: SettingsService,
     private loggerService: LoggerService
   ) {
-    this.settingsService = settingsService;
-    this.errorHandler = new ErrorHandler(this.loggerService);
+    this.settingsService = settingsService
+    this.errorHandler = new ErrorHandler(this.loggerService)
   }
 
   getEventSettingsById = async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
-  
-      const event = await this.settingsService.getEventSettingsById(id) as FullSettingsModel[];
-  
-      if (event.length > 0) return res.json(event.at(0));
-  
-      return res.status(404).json({ message: req.t('messages.SETTINGS_NOT_FOUND') });
+      const { id } = req.params
+
+      const event = (await this.settingsService.getEventSettingsById(
+        id
+      )) as FullSettingsModel[]
+
+      if (event.length > 0) return res.json(event.at(0))
+
+      return res
+        .status(404)
+        .json({ message: req.t('messages.SETTINGS_NOT_FOUND') })
     } catch (_e) {
-      const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, req, 'ERROR_GET_EVENT_SETTINGS_BY_ID', e.message, req.userId);
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_GET_EVENT_SETTINGS_BY_ID',
+        e.message,
+        req.userId
+      )
     }
   }
 
   createEventSettings = async (req: Request, res: Response) => {
     try {
-      const result = validateSettings(req.body);
-  
+      const result = validateSettings(req.body)
+
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) });
+        return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
-  
+
       const settingId = await this.settingsService.createEventSettings(
         result.data
-      );
-  
-      return res.status(201).json({ id: settingId, message: req.t('messages.SETTINGS_CREATED') });
+      )
+
+      return res
+        .status(201)
+        .json({ id: settingId, message: req.t('messages.SETTINGS_CREATED') })
     } catch (_e) {
-      const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, req, 'ERROR_CREATE_EVENT_SETTINGS', e.message, req.userId);
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_CREATE_EVENT_SETTINGS',
+        e.message,
+        req.userId
+      )
     }
   }
 
   updateEventSettings = async (req: Request, res: Response) => {
     try {
-      const result = validateSettings(req.body);
-  
-      if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) });
-      }
-  
-      const { id } = req.params;
+      const result = validateSettings(req.body)
 
-      await this.settingsService.updateEventSettings(id, result.data);
-  
-      return res.status(201).json({ message: req.t('messages.SETTINGS_UPDATED') });
+      if (!result.success) {
+        return res.status(400).json({ error: JSON.parse(result.error.message) })
+      }
+
+      const { id } = req.params
+
+      await this.settingsService.updateEventSettings(id, result.data)
+
+      return res
+        .status(201)
+        .json({ message: req.t('messages.SETTINGS_UPDATED') })
     } catch (_e) {
-      const e:Error = _e as Error;
-      this.errorHandler.handleHttp(res, req, 'ERROR_UPDATE_EVENT_SETTINGS', e.message, req.userId);
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_UPDATE_EVENT_SETTINGS',
+        e.message,
+        req.userId
+      )
     }
   }
 }

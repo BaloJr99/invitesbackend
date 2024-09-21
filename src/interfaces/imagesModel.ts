@@ -1,15 +1,15 @@
 export interface ImageUpload {
-  image: string,
+  image: string
   eventId: string
 }
 
 export interface ImagesModel {
-  eventId: string,
-  imageUrl: string, 
+  eventId: string
+  imageUrl: string
   publicId: string
 }
 
 export interface ImageUsageModel {
-  id: string,
+  id: string
   imageUsage: string
 }

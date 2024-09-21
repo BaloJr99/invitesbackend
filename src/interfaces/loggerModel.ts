@@ -1,6 +1,6 @@
 export interface Logger {
-  dateOfError: Date,
-  customError: string,
-  exceptionMessage: string,
+  dateOfError: Date
+  customError: string
+  exceptionMessage: string
   userId: string
 }

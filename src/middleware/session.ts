@@ -1,24 +1,30 @@
-import User from '../models/user.js';
-import { NextFunction, Request, Response } from "express";
-import { verifyJwtToken } from "../utils/jwt.handle.js";
-import { AuthModel } from "../interfaces/authModel.js";
+import User from '../models/user.js'
+import { NextFunction, Request, Response } from 'express'
+import { verifyJwtToken } from '../utils/jwt.handle.js'
+import { AuthModel } from '../interfaces/authModel.js'
 
-export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
+export const checkJwt = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const jwt = req.headers.authorization || '';
+    const jwt = req.headers.authorization || ''
 
-    const decoded = verifyJwtToken(jwt) as AuthModel;
+    const decoded = verifyJwtToken(jwt) as AuthModel
 
-    if (!decoded) return res.status(401).json({ error: req.t('messages.INVALID_AUTH') });
+    if (!decoded)
+      return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
 
-    const user = await User.findById(decoded.id, { password: 0 });
+    const user = await User.findById(decoded.id, { password: 0 })
 
-    if (!user) return res.status(404).json({ error: req.t('messages.INVALID_USER') });
+    if (!user)
+      return res.status(404).json({ error: req.t('messages.INVALID_USER') })
 
-    req.userId = decoded.id;
+    req.userId = decoded.id
 
-    next();
+    next()
   } catch (error) {
-    return res.status(401).json({ error: req.t('messages.INVALID_AUTH') });
+    return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
   }
 }

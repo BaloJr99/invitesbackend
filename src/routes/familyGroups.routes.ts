@@ -6,13 +6,27 @@ import { LoggerService } from '../services/logger.js'
 
 export const familyGroupsRouter = Router()
 
-export const createFamilyGroupsRouter = (familyGroupService: FamilyGroupsService, loggerService: LoggerService) => {
-  const familyGroupController = new FamilyGroupsController(familyGroupService, loggerService);
+export const createFamilyGroupsRouter = (
+  familyGroupService: FamilyGroupsService,
+  loggerService: LoggerService
+) => {
+  const familyGroupController = new FamilyGroupsController(
+    familyGroupService,
+    loggerService
+  )
 
-  familyGroupsRouter.get('/:id', [validateUuid], familyGroupController.getFamilyGroups);
-  familyGroupsRouter.post('/', familyGroupController.createFamilyGroup);
+  familyGroupsRouter.get(
+    '/:id',
+    [validateUuid],
+    familyGroupController.getFamilyGroups
+  )
+  familyGroupsRouter.post('/', familyGroupController.createFamilyGroup)
 
-  familyGroupsRouter.put('/:id', [validateUuid], familyGroupController.updateFamilyGroup);
+  familyGroupsRouter.put(
+    '/:id',
+    [validateUuid],
+    familyGroupController.updateFamilyGroup
+  )
 
-  return familyGroupsRouter;
+  return familyGroupsRouter
 }

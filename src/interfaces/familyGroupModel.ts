@@ -1,9 +1,9 @@
-export interface FullFamilyGroupModel extends FamilyGroupModel { 
+export interface FullFamilyGroupModel extends FamilyGroupModel {
   id: string
 }
 
 export interface FamilyGroupModel {
-  familyGroup: string,
+  familyGroup: string
   eventId: string
 }
 

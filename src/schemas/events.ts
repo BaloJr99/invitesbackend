@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { EventModel } from '../interfaces/eventsModel.js';
+import { z } from 'zod'
+import { EventModel } from '../interfaces/eventsModel.js'
 
 const eventSchema = z.object({
   nameOfEvent: z.string({
@@ -14,17 +14,19 @@ const eventSchema = z.object({
     .string()
     .datetime()
     .transform((value) => value.replace('T', ' ').replace('Z', '')),
-  typeOfEvent: z.string({
-    required_error: 'The type of the event is required'
-  }).length(1),
+  typeOfEvent: z
+    .string({
+      required_error: 'The type of the event is required'
+    })
+    .length(1),
   nameOfCelebrated: z.string({
     required_error: 'The name of the celebrated is required'
   }),
   userId: z.string({
     required_error: 'The user is required'
   })
-});
+})
 
-export function validateEvent (event: EventModel) {
-  return eventSchema.safeParse(event);
+export function validateEvent(event: EventModel) {
+  return eventSchema.safeParse(event)
 }

@@ -1,9 +1,9 @@
 import { Transporter } from 'nodemailer'
-import { MailModel } from '../interfaces/mail.js';
+import { MailModel } from '../interfaces/mail.js'
 
 export class MailService {
-  constructor (private connection: Transporter) {
-    this.connection = connection;
+  constructor(private connection: Transporter) {
+    this.connection = connection
   }
 
   sendMail = async (emailInformation: MailModel) => {
@@ -12,8 +12,8 @@ export class MailService {
       to: emailInformation.to,
       subject: emailInformation.subject,
       html: emailInformation.html
-    });
+    })
 
-    return info;
+    return info
   }
 }

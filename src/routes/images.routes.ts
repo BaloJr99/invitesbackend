@@ -9,14 +9,34 @@ import { checkJwt } from '../middleware/session.js'
 
 export const imagesRouter = Router()
 
-export const createImagesRouter = (imagesService: ImagesService, inviteImagesService: InviteImagesService, loggerService: LoggerService) => {
-  const imagesController = new ImagesController(imagesService, inviteImagesService, loggerService);
+export const createImagesRouter = (
+  imagesService: ImagesService,
+  inviteImagesService: InviteImagesService,
+  loggerService: LoggerService
+) => {
+  const imagesController = new ImagesController(
+    imagesService,
+    inviteImagesService,
+    loggerService
+  )
 
-  imagesRouter.post('/', [checkJwt, isInvitesAdmin], imagesController.createImage);
+  imagesRouter.post(
+    '/',
+    [checkJwt, isInvitesAdmin],
+    imagesController.createImage
+  )
 
-  imagesRouter.get('/:id', [validateUuid], imagesController.getAllImages);
-  imagesRouter.delete('/', [checkJwt, isInvitesAdmin], imagesController.deleteImage);
-  imagesRouter.put('/', [checkJwt, isInvitesAdmin], imagesController.updateImage);
+  imagesRouter.get('/:id', [validateUuid], imagesController.getAllImages)
+  imagesRouter.delete(
+    '/',
+    [checkJwt, isInvitesAdmin],
+    imagesController.deleteImage
+  )
+  imagesRouter.put(
+    '/',
+    [checkJwt, isInvitesAdmin],
+    imagesController.updateImage
+  )
 
   return imagesRouter
 }

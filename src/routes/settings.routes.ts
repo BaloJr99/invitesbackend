@@ -8,12 +8,27 @@ import { isInvitesAdmin } from '../middleware/auth.js'
 
 export const settingsRouter = Router()
 
-export const createSettingsRouter = (settingsService: SettingsService, loggerService: LoggerService) => {
-  const eventController = new SettingsController(settingsService, loggerService);
+export const createSettingsRouter = (
+  settingsService: SettingsService,
+  loggerService: LoggerService
+) => {
+  const eventController = new SettingsController(settingsService, loggerService)
 
-  settingsRouter.get('/:id', [validateUuid], eventController.getEventSettingsById);
-  settingsRouter.post('/', [checkJwt, isInvitesAdmin], eventController.createEventSettings);
-  settingsRouter.put('/:id', [checkJwt, isInvitesAdmin, validateUuid], eventController.updateEventSettings);
+  settingsRouter.get(
+    '/:id',
+    [validateUuid],
+    eventController.getEventSettingsById
+  )
+  settingsRouter.post(
+    '/',
+    [checkJwt, isInvitesAdmin],
+    eventController.createEventSettings
+  )
+  settingsRouter.put(
+    '/:id',
+    [checkJwt, isInvitesAdmin, validateUuid],
+    eventController.updateEventSettings
+  )
 
-  return settingsRouter;
+  return settingsRouter
 }

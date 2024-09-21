@@ -1,16 +1,16 @@
-import Role from '../models/role.js';
+import Role from '../models/role.js'
 
 export const createRoles = async () => {
   try {
-    const count = await Role.estimatedDocumentCount();
+    const count = await Role.estimatedDocumentCount()
 
-    if (count > 0) return;
+    if (count > 0) return
 
     await Promise.all([
       new Role({ name: 'admin', isActive: true }).save(),
       new Role({ name: 'invitesAdmin', isActive: true }).save()
-    ]);
+    ])
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 }
