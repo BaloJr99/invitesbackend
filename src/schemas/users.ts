@@ -96,6 +96,17 @@ export function validateUsernameOrEmail(usernameOrEmail: string) {
     .safeParse(usernameOrEmail)
 }
 
+export function validateUserId(userId: string) {
+  return z
+    .object({
+      id: z.string({
+        required_error: 'The user id is required',
+        invalid_type_error: 'The user id must be a string'
+      })
+    })
+    .safeParse(userId)
+}
+
 export function validatePassword(password: string) {
   return z
     .object({

@@ -20,6 +20,7 @@ export const createAuthRouter = (
 
   authRouter.post('/signin', authController.signIn)
   authRouter.post('/forgotPassword', authController.forgotPassword)
+  authRouter.post('/forgotPasswordToUser', authController.forgotPasswordToUser)
   authRouter.get(
     '/forgotPassword/:id',
     [validateUuid],

@@ -38,7 +38,9 @@
     "USER_UPDATED": "User updated",
     "USER_DELETED": "User deactivated",
     "PROFILE_UPDATED": "Profile updated",
-    "PROFILE_PHOTO_UPDATED": "Profile photo updated"
+    "PROFILE_PHOTO_UPDATED": "Profile photo updated",
+    "USER_PASSWORD_RESET": "An email has been sent to the user associated with the account",
+    "PASSWORD_RESET": "Password has been updated"
   },
   "errors": {
     "ERROR_SIGN_IN": "Error signing in",

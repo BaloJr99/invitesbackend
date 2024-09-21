@@ -38,7 +38,9 @@
     "USER_UPDATED": "Usuario actualizado",
     "USER_DELETED": "Usuario desactivado",
     "PROFILE_UPDATED": "Perfil actualizado",
-    "PROFILE_PHOTO_UPDATED": "Foto de perfil actualizada"
+    "PROFILE_PHOTO_UPDATED": "Foto de perfil actualizada",
+    "USER_PASSWORD_RESET": "Se ha enviado un correo electrónico al usuario asociado a la cuenta",
+    "PASSWORD_RESET": "Se ha actualizado la contraseña"
   },
   "errors": {
     "ERROR_SIGN_IN": "Error al iniciar sesión",

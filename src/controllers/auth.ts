@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import {
   validateAuthUser,
   validatePassword,
+  validateUserId,
   validateUsernameOrEmail
 } from '../schemas/users.js'
 import { UsersService } from '../services/users.js'
@@ -68,6 +69,7 @@ export class AuthController {
     const userFounded = await this.userService.findUser(
       result.data.usernameOrEmail
     )
+
     if (!userFounded) {
       return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
     }
@@ -90,6 +92,49 @@ export class AuthController {
         true
       )
       res.status(200).json({ info })
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_SENDING_EMAIL',
+        e.message,
+        req.userId
+      )
+    }
+  }
+
+  forgotPasswordToUser = async (req: Request, res: Response) => {
+    const result = validateUserId(req.body)
+
+    if (!result.success) {
+      return res.status(422).json({ error: JSON.parse(result.error.message) })
+    }
+
+    const userFounded = await this.userService.findUserById(result.data.id)
+
+    if (!userFounded) {
+      return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
+    }
+
+    try {
+      await this.mailService.sendMail({
+        from: 'InvitesMX',
+        to: userFounded.email ?? '',
+        html: this.getHtml(
+          userFounded.username ?? '',
+          userFounded._id.toString(),
+          req.get('origin') ?? ''
+        ),
+        subject: 'Password Reset'
+      })
+
+      await this.userService.updateResetPasword(
+        userFounded._id.toString(),
+        '',
+        true
+      )
+      res.status(200).json({ message: req.t('messages.USER_PASSWORD_RESET') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -131,7 +176,7 @@ export class AuthController {
       const { id } = req.params
 
       await this.userService.updateResetPasword(id, result.data.password, false)
-      return res.status(200).json()
+      return res.status(200).json({ message: req.t('messages.PASSWORD_RESET') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -372,7 +417,7 @@ export class AuthController {
                                           <span style="font-size: 18px; line-height: 25.2px; color: #666666;">
                                             We have sent you this email in response
                                             to your request to reset your password on
-                                            company name.
+                                            invitesMX.
                                           </span>
                                         </p>
                                         <p style="font-size: 14px; line-height: 140%">

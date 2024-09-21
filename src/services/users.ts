@@ -2,7 +2,12 @@ import jwt from 'jsonwebtoken'
 import User from '../models/user.js'
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js'
 import { generatePass } from '../utils/passwordGenerator.hande.js'
-import { IAuthUser, IUpsertUser, IUserProfile, IUserProfilePhoto } from '../interfaces/usersModel.js'
+import {
+  IAuthUser,
+  IUpsertUser,
+  IUserProfile,
+  IUserProfilePhoto
+} from '../interfaces/usersModel.js'
 
 export class UsersService {
   signin = async (user: IAuthUser): Promise<string> => {
@@ -68,6 +73,14 @@ export class UsersService {
     return userFounded
   }
 
+  findUserById = async (id: string) => {
+    const userFounded = await User.findById(id).select({
+      username: 1,
+      email: 1
+    })
+    return userFounded
+  }
+
   getUsername = async (userId: string) => {
     const userFounded = await User.findById(userId)
     return userFounded?.username
@@ -77,7 +90,7 @@ export class UsersService {
     const usersFounded = await User.find().select({
       username: 1,
       email: 1,
-      isActive: 1,
+      isActive: 1
     })
     return usersFounded
   }
@@ -92,20 +105,22 @@ export class UsersService {
   }
 
   getUserById = async (userId: string) => {
-    const userFounded = await User.findById(userId).select({
-      _id: 0,
-      id: '$_id',
-      username: 1,
-      email: 1,
-      isActive: 1,
-    }).populate({
-      path: 'roles',
-      select: { 
+    const userFounded = await User.findById(userId)
+      .select({
         _id: 0,
-        name: 1,
         id: '$_id',
-      }
-    })
+        username: 1,
+        email: 1,
+        isActive: 1
+      })
+      .populate({
+        path: 'roles',
+        select: {
+          _id: 0,
+          name: 1,
+          id: '$_id'
+        }
+      })
     return userFounded
   }
 
@@ -221,9 +236,7 @@ export class UsersService {
     return result
   }
 
-  updateUserProfilePhoto = async (
-    userProfilePhoto: IUserProfilePhoto
-  ) => {
+  updateUserProfilePhoto = async (userProfilePhoto: IUserProfilePhoto) => {
     const result = await User.updateOne(
       { _id: userProfilePhoto.id },
       {
