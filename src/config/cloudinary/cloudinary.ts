@@ -9,8 +9,10 @@ cloudinary.config({
 });
 
 export class ImagesService {
-  uploadImage = async (image: string) => {
-    return await cloudinary.uploader.upload(image);
+  uploadImage = async (image: string, folder: string) => {
+    return await cloudinary.uploader.upload(image, {
+      folder
+    });
   }
 
   deleteImage = async (imageId: string) => {

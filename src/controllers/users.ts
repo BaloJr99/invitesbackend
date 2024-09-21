@@ -190,7 +190,7 @@ export class UsersController {
         await this.imagesService.deleteImage(searchLastPhoto.profilePhotoPublicId);
       }
 
-      const cloudResult = await this.imagesService.uploadImage(result.data.profilePhotoSource);
+      const cloudResult = await this.imagesService.uploadImage(result.data.profilePhotoSource, 'users');
 
       await this.userService.updateUserProfilePhoto(result.data.userId, { profilePhoto: cloudResult.secure_url, profilePhotoPublicId: cloudResult.public_id });
 

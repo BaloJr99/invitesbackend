@@ -25,7 +25,7 @@ export class ImagesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) });
       }
 
-      const cloudResult = await this.imagesService.uploadImage(result.data.image);
+      const cloudResult = await this.imagesService.uploadImage(result.data.image, 'invites');
 
       const { eventId } = result.data;
 
