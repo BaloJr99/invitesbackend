@@ -1,30 +1,13 @@
 import { z } from 'zod'
-import {
-  AuthUserModel,
-  FullUserModel,
-  UploadUserProfileModel,
-  UserModel,
-  UserProfileModel
-} from '../interfaces/usersModel.js'
 import moongose from 'mongoose'
+import {
+  IAuthUser,
+  IUpsertUser,
+  IUserProfile,
+  IUserProfilePhotoSource
+} from '../interfaces/usersModel.js'
 
 const fullUserSchema = z.object({
-  username: z.string({
-    required_error: 'The username is required'
-  }),
-  email: z.string({
-    required_error: 'The email is required'
-  }),
-  roles: z
-    .array(
-      z.string({
-        required_error: 'The role is required'
-      })
-    )
-    .nonempty()
-})
-
-const userSchema = z.object({
   username: z.string({
     required_error: 'The username is required'
   }),
@@ -47,7 +30,7 @@ const userSchema = z.object({
 })
 
 const userProfileSchema = z.object({
-  _id: z.string({
+  id: z.string({
     required_error: 'The id is required'
   }),
   username: z.string({
@@ -68,7 +51,7 @@ const userProfileSchema = z.object({
   gender: z.string({
     required_error: 'The gender is required'
   }),
-  profilePhoto: z.string().url().optional().or(z.literal(''))
+  profilePhoto: z.string().url().or(z.literal(''))
 })
 
 const authUserSchema = z.object({
@@ -81,7 +64,7 @@ const authUserSchema = z.object({
 })
 
 const userProfilePhotoSchema = z.object({
-  userId: z.string({
+  id: z.string({
     required_error: 'The user id is required',
     invalid_type_error: 'The user id must be a string'
   }),
@@ -91,19 +74,15 @@ const userProfilePhotoSchema = z.object({
   })
 })
 
-export function validateFullUser(user: FullUserModel) {
+export function validateUser(user: IUpsertUser) {
   return fullUserSchema.safeParse(user)
 }
 
-export function validateUser(user: UserModel) {
-  return userSchema.safeParse(user)
-}
-
-export function validateAuthUser(user: AuthUserModel) {
+export function validateAuthUser(user: IAuthUser) {
   return authUserSchema.safeParse(user)
 }
 
-export function validateUserProfile(user: UserProfileModel) {
+export function validateUserProfile(user: IUserProfile) {
   return userProfileSchema.safeParse(user)
 }
 
@@ -127,6 +106,6 @@ export function validatePassword(password: string) {
     .safeParse(password)
 }
 
-export function validateUserProfilePhoto(photo: UploadUserProfileModel) {
+export function validateUserProfilePhoto(photo: IUserProfilePhotoSource) {
   return userProfilePhotoSchema.safeParse(photo)
 }

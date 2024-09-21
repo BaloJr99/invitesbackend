@@ -73,7 +73,10 @@ export class FamilyGroupsController {
 
       const { id } = req.params
 
-      await this.familyGroupService.updateFamilyGroup(id, result.data)
+      await this.familyGroupService.updateFamilyGroup({
+        id,
+        familyGroup: result.data.familyGroup
+      })
 
       return res.status(201).json({ message: req.t('messages.GROUP_UPDATED') })
     } catch (_e) {

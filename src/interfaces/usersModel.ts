@@ -1,69 +1,60 @@
-import moongose from 'mongoose'
+import mongoose from 'mongoose'
 
-export interface FullUserModel {
-  username: string
-  email: string
-  roles: string[]
-}
-
-export interface UserModel {
-  username: string
-  email: string
-  isActive: boolean
-  roles: moongose.Types.ObjectId[]
-}
-
-export interface UserEventInfoModel extends EventsInfoModel {
+export interface IFullUser {
   id: string
   username: string
   email: string
-  numEvents: number
-  numEntries: number
-  isActive: boolean
-}
-
-export interface EventsInfoModel {
-  numEvents: number
-  numEntries: number
-}
-
-export interface IsDeadlineMet {
-  isDeadlineMet: number
-}
-
-export interface UserInfoModel {
-  _id: moongose.Types.ObjectId
-  username: string
-  email: string
-  isActive: boolean
-}
-
-export interface AuthUserModel {
-  usernameOrEmail: string
   password: string
-}
-
-export interface UserProfileModel {
-  _id: string
-  username: string
   firstName: string
   lastName: string
   phoneNumber: string
-  email: string
   gender: string
-  profilePhoto?: string
+  isActive: boolean
+  profilePhoto: string
+  profilePhotoPublicId: string
+  roles: mongoose.Types.ObjectId[]
 }
 
-export interface UploadUserProfileModel {
-  userId: string
+export type IAuthUser = Pick<IFullUser, 'password'> & {
+  usernameOrEmail: string
+}
+
+export type IUpsertUser = Pick<
+  IFullUser,
+  'id' | 'username' | 'email' | 'isActive' | 'roles'
+>
+
+export type IUserDropdownData = Pick<IFullUser, 'id' | 'username'>
+
+export type IUser = IUserDropdownData &
+  Pick<IFullUser, 'email' | 'profilePhoto' | 'roles'>
+
+export type IUserEventsInfo = Omit<IUpsertUser, 'roles'> & {
+  numEvents: number
+  numEntries: number
+}
+
+export type IUserInfo = Pick<IFullUser, 'username' | 'email' | 'isActive'> & {
+  _id: mongoose.Types.ObjectId
+}
+
+export type IUserProfile = Omit<
+  IFullUser,
+  'isActive' | 'roles' | 'password' | 'profilePhotoPublicId' | 'profilePhoto'
+>
+
+export type IUserProfilePhotoSource = Pick<IFullUser, 'id'> & {
   profilePhotoSource: string
 }
 
-export interface UserProfilePhotoModel {
-  profilePhoto: string
-  profilePhotoPublicId: string
+export interface IUserAction {
+  user: IUpsertUser
+  isNew: boolean
 }
 
-export interface UserFromInvite {
-  userId: string
+export type IUserFromInvite = Pick<IFullUser, 'id'>
+
+export type IUserProfilePhoto = Pick<IUserProfilePhotoSource, 'id'> & {
+  profilePhoto: string
+  profilePhotoPublicId: string
 }

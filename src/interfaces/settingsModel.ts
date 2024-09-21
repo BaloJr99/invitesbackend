@@ -1,8 +1,4 @@
-export interface FullSettingsModel extends SettingsModel {
-  userId: string
-}
-
-export interface SettingsModel {
+export interface IFullSettings {
   eventId: string
   primaryColor: string
   secondaryColor: string

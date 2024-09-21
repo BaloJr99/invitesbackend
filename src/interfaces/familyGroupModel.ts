@@ -1,12 +1,8 @@
-export interface FullFamilyGroupModel extends FamilyGroupModel {
+export interface IFullFamilyGroup {
   id: string
-}
-
-export interface FamilyGroupModel {
   familyGroup: string
   eventId: string
 }
 
-export interface PartialFamilyGroupModel {
-  familyGroup: string
-}
+export type IFamilyGroup = Omit<IFullFamilyGroup, 'id'>
+export type IPartialFamilyGroup = Omit<IFullFamilyGroup, 'eventId'>

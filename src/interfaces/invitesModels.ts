@@ -1,31 +1,57 @@
-export interface FullInviteModel extends PartialInviteModel, ConfirmationModel {
-  id: string
+export interface IFullInvite {
+  id: string;
+  family: string;
+  entriesNumber: number;
+  entriesConfirmed: number | null;
+  message: string | null;
+  confirmation: boolean | null;
+  phoneNumber: string;
+  kidsAllowed: boolean;
+  dateOfConfirmation: string | null;
+  isMessageRead: boolean;
+  eventId: string;
+  familyGroupId: string;
+  inviteViewed: string;
 }
 
-export interface PartialInviteModel {
-  family: string
-  entriesNumber: number
-  phoneNumber: string
-  kidsAllowed: boolean
-  eventId: string
-  familyGroupId: string
-}
+export type IUpsertInvite = Omit<
+  IFullInvite,
+  | 'entriesConfirmed'
+  | 'message'
+  | 'confirmation'
+  | 'dateOfConfirmation'
+  | 'isMessageRead'
+  | 'inviteViewed'
+>;
 
-export interface BulkInviteModel {
-  family: string
-  entriesNumber: number
-  phoneNumber: string
-  familyGroupName: string
-  familyGroupId: string
-  kidsAllowed: boolean
-  eventId: string
-  isNewFamilyGroup: boolean
-}
+export type IBulkInvite = Pick<
+  IFullInvite,
+  | 'family'
+  | 'entriesNumber'
+  | 'phoneNumber'
+  | 'kidsAllowed'
+  | 'eventId'
+  | 'familyGroupId'
+> & { familyGroupName: string; isNewFamilyGroup: boolean };
 
-export interface ConfirmationModel {
-  message: string
-  entriesConfirmed: number
-  confirmation: boolean
-  dateOfConfirmation: string
-  isMessageRead: boolean
-}
+export type IConfirmation = Pick<
+  IFullInvite,
+  | 'confirmation'
+  | 'dateOfConfirmation'
+  | 'entriesConfirmed'
+  | 'entriesNumber'
+  | 'id'
+  | 'message'
+>;
+
+export type IUserInvite = Pick<
+  IFullInvite,
+  'id' | 'family' | 'entriesNumber' | 'confirmation' | 'kidsAllowed' | 'eventId'
+> & {
+  dateOfEvent: string;
+  maxDateOfConfirmation: string;
+  nameOfCelebrated: string;
+  typeOfEvent: string;
+};
+
+export type IDashboardInvite = Omit<IConfirmation, 'id' | 'message'>;

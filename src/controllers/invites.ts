@@ -1,24 +1,17 @@
 import { Request, Response } from 'express'
 import { InvitesService } from '../services/invites.js'
 import {
-  FullInviteModel,
-  PartialInviteModel
-} from '../interfaces/invitesModels.js'
-import {
   validateBulkDeleteInvites,
   validateBulkInvite,
   validateConfirmationSchema,
   validateInvite
 } from '../schemas/invites.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
-import { AuthModel } from '../interfaces/authModel.js'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
 import { FamilyGroupsService } from '../services/familyGroups.js'
-import {
-  FamilyGroupModel,
-  FullFamilyGroupModel
-} from '../interfaces/familyGroupModel.js'
+import { IFullFamilyGroup } from '../interfaces/familyGroupModel.js'
+import { IBulkInvite } from '../interfaces/invitesModels.js'
 
 export class InvitesController {
   errorHandler: ErrorHandler
@@ -36,12 +29,12 @@ export class InvitesController {
     try {
       const token = req.headers.authorization || ''
 
-      const decoded = verifyJwtToken(token) as AuthModel
+      const decoded = verifyJwtToken(token)
       const isAdmin = decoded.roles.some((r) => r.name == 'admin')
-      const [invites] = (await this.invitesService.getAllInvites(
+      const invites = await this.invitesService.getAllInvites(
         decoded.id,
         isAdmin
-      )) as FullInviteModel[]
+      )
 
       return res.status(200).json(invites)
     } catch (_e) {
@@ -56,42 +49,15 @@ export class InvitesController {
     }
   }
 
-  getInviteById = async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params
-
-      const invite = (await this.invitesService.getInviteById(
-        id
-      )) as FullInviteModel[]
-
-      if (invite.length > 0) return res.json(invite.at(0))
-
-      return res
-        .status(404)
-        .json({ message: req.t('messages.INVITE_NOT_FOUND') })
-    } catch (_e) {
-      const e: Error = _e as Error
-      this.errorHandler.handleHttp(
-        res,
-        req,
-        'ERROR_GET_INVITE_BY_ID',
-        e.message,
-        req.userId
-      )
-    }
-  }
-
   getInviteForEvent = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
 
-      const invite = (await this.invitesService.getInvite(
-        id
-      )) as FullInviteModel
+      const invite = await this.invitesService.getInvite(id)
 
-      if (invite) {
+      if (invite.length > 0) {
         await this.invitesService.markAsViewed(id)
-        return res.json(invite)
+        return res.json(invite.at(0))
       }
 
       return res
@@ -117,7 +83,10 @@ export class InvitesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
 
-      const inviteId = await this.invitesService.createInvite(result.data)
+      const inviteId = await this.invitesService.createInvite({
+        ...result.data,
+        id: ''
+      })
 
       return res
         .status(201)
@@ -149,9 +118,9 @@ export class InvitesController {
             familyGroup: x.familyGroupName,
             eventId: x.eventId
           }
-        }) as FamilyGroupModel[]
+        })
 
-      let generatedIds: FullFamilyGroupModel[] = []
+      let generatedIds: IFullFamilyGroup[] = []
 
       if (bulkFamilyGroups) {
         generatedIds = await this.familyGroupsService.bulkFamilyGroup(
@@ -167,9 +136,11 @@ export class InvitesController {
           kidsAllowed: bulk.kidsAllowed,
           eventId: bulk.eventId,
           familyGroupId:
-            bulk.familyGroupId ??
-            generatedIds.find((g) => g.familyGroup === bulk.familyGroupName)?.id
-        } as PartialInviteModel
+            bulk.familyGroupId === ''
+              ? generatedIds.find((g) => g.familyGroup === bulk.familyGroupName)
+                  ?.id
+              : bulk.familyGroupId
+        } as IBulkInvite
       })
 
       await this.invitesService.createBulkInvite(bulkInvites)
@@ -243,7 +214,10 @@ export class InvitesController {
 
       const { id } = req.params
 
-      await this.invitesService.updateInvite(id, result.data)
+      await this.invitesService.updateInvite({
+        ...result.data,
+        id
+      })
 
       return res.status(201).json({ message: req.t('messages.INVITE_UPDATED') })
     } catch (_e) {
@@ -267,7 +241,11 @@ export class InvitesController {
       }
 
       const { id } = req.params
-      await this.invitesService.updateConfirmation(id, result.data)
+      await this.invitesService.updateConfirmation({
+        ...result.data,
+        id,
+        entriesNumber: 0
+      })
 
       return res
         .status(201)

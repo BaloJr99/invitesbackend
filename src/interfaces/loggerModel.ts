@@ -1,4 +1,4 @@
-export interface Logger {
+export interface ILogger {
   dateOfError: Date
   customError: string
   exceptionMessage: string

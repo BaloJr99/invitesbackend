@@ -8,7 +8,6 @@ import { FamilyGroupsService } from './services/familyGroups.js'
 import { UsersService } from './services/users.js'
 import { Server } from 'socket.io'
 import { createServer } from 'http'
-import { UserFromInvite } from './interfaces/usersModel.js'
 import { createApiRouter } from './routes/api.routes.js'
 import { SettingsService } from './services/settings.js'
 import { RolesService } from './services/roles.js'
@@ -16,11 +15,12 @@ import { MailService } from './services/mail.js'
 import { InvitesService } from './services/invites.js'
 import { LoggerService } from './services/logger.js'
 import { ErrorHandler } from './utils/error.handle.js'
-import { FullInviteModel } from './interfaces/invitesModels.js'
+import { IConfirmation } from './interfaces/invitesModels.js'
 import i18next from 'i18next'
 import Backend from 'i18next-fs-backend'
 import { handle, LanguageDetector } from 'i18next-http-middleware'
 import { fileURLToPath } from 'url'
+import { IUserFromInvite } from './interfaces/usersModel.js'
 
 export class App {
   constructor(
@@ -80,15 +80,15 @@ export class App {
         }
       })
 
-      socket.on('sendNotification', async (invite: FullInviteModel) => {
+      socket.on('sendNotification', async (invite: IConfirmation) => {
         try {
-          const result = (await this.invitesService.getUserFromInviteId(
+          const result = await this.invitesService.getUserFromInviteId(
             invite.id
-          )) as UserFromInvite[]
+          )
           if (result.length > 0) {
-            const userId = result.at(0)?.userId ?? ''
+            const user = result.at(0) as IUserFromInvite
 
-            const username = await this.usersService.getUsername(userId)
+            const username = await this.usersService.getUsername(user.id)
 
             if (username) {
               io.to(username).emit('newNotification', invite)

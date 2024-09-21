@@ -1,18 +1,11 @@
 import jwt from 'jsonwebtoken'
 import User from '../models/user.js'
-import Role from '../models/role.js'
-import {
-  AuthUserModel,
-  FullUserModel,
-  UserModel,
-  UserProfileModel,
-  UserProfilePhotoModel
-} from '../interfaces/usersModel.js'
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js'
 import { generatePass } from '../utils/passwordGenerator.hande.js'
+import { IAuthUser, IUpsertUser, IUserProfile, IUserProfilePhoto } from '../interfaces/usersModel.js'
 
 export class UsersService {
-  signin = async (user: AuthUserModel): Promise<string> => {
+  signin = async (user: IAuthUser): Promise<string> => {
     const { usernameOrEmail, password } = user
 
     const userFounded = await User.findOne({
@@ -84,20 +77,35 @@ export class UsersService {
     const usersFounded = await User.find().select({
       username: 1,
       email: 1,
-      isActive: 1
+      isActive: 1,
     })
     return usersFounded
   }
 
   getUsersBasicInfo = async () => {
     const usersFounded = await User.find({ isActive: true }).select({
-      username: 1
+      _id: 0,
+      username: 1,
+      id: '$_id'
     })
     return usersFounded
   }
 
   getUserById = async (userId: string) => {
-    const userFounded = await User.findById(userId).populate('roles')
+    const userFounded = await User.findById(userId).select({
+      _id: 0,
+      id: '$_id',
+      username: 1,
+      email: 1,
+      isActive: 1,
+    }).populate({
+      path: 'roles',
+      select: { 
+        _id: 0,
+        name: 1,
+        id: '$_id',
+      }
+    })
     return userFounded
   }
 
@@ -108,28 +116,24 @@ export class UsersService {
     return usersFounded
   }
 
-  createUser = async (user: FullUserModel) => {
+  createUser = async (user: IUpsertUser) => {
     const { username, email, roles } = user
     const passHash = await encryptPassword(generatePass())
 
     const newUser = new User({
       username,
-      password: passHash,
-      email
+      email,
+      roles,
+      password: passHash
     })
-
-    if (roles) {
-      const foundRoles = await Role.find({ _id: { $in: roles } })
-      newUser.roles = foundRoles.map((role) => role._id)
-    }
 
     const savedUser = await newUser.save()
     return savedUser._id
   }
 
-  updateUser = async (userId: string, user: UserModel) => {
+  updateUser = async (user: IUpsertUser) => {
     const result = await User.updateOne(
-      { _id: userId },
+      { _id: user.id },
       {
         $set: {
           ...user
@@ -205,9 +209,9 @@ export class UsersService {
     return userFounded
   }
 
-  updateUserProfile = async (user: UserProfileModel) => {
+  updateUserProfile = async (user: IUserProfile) => {
     const result = await User.updateOne(
-      { _id: user._id },
+      { _id: user.id },
       {
         $set: {
           ...user
@@ -218,15 +222,14 @@ export class UsersService {
   }
 
   updateUserProfilePhoto = async (
-    userId: string,
-    user: UserProfilePhotoModel
+    userProfilePhoto: IUserProfilePhoto
   ) => {
     const result = await User.updateOne(
-      { _id: userId },
+      { _id: userProfilePhoto.id },
       {
         $set: {
-          profilePhoto: user.profilePhoto,
-          profilePhotoPublicId: user.profilePhotoPublicId
+          profilePhoto: userProfilePhoto.profilePhoto,
+          profilePhotoPublicId: userProfilePhoto.profilePhotoPublicId
         }
       }
     )

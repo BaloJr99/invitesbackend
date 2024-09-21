@@ -1,7 +1,6 @@
 import { validateSettings } from '../schemas/settings.js'
 import { SettingsService } from '../services/settings.js'
 import { Request, Response } from 'express'
-import { FullSettingsModel } from '../interfaces/settingsModel.js'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
 
@@ -20,10 +19,7 @@ export class SettingsController {
     try {
       const { id } = req.params
 
-      const event = (await this.settingsService.getEventSettingsById(
-        id
-      )) as FullSettingsModel[]
-
+      const event = await this.settingsService.getEventSettingsById(id)
       if (event.length > 0) return res.json(event.at(0))
 
       return res
@@ -78,7 +74,10 @@ export class SettingsController {
 
       const { id } = req.params
 
-      await this.settingsService.updateEventSettings(id, result.data)
+      await this.settingsService.updateEventSettings({
+        ...result.data,
+        eventId: id
+      })
 
       return res
         .status(201)

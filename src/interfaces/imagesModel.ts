@@ -1,15 +1,12 @@
-export interface ImageUpload {
-  image: string
-  eventId: string
-}
-
-export interface ImagesModel {
-  eventId: string
+export interface IFullImage {
+  id: string
   imageUrl: string
   publicId: string
-}
-
-export interface ImageUsageModel {
-  id: string
+  image: string
+  eventId: string
   imageUsage: string
 }
+
+export type ImageUpload = Pick<IFullImage, 'image' | 'eventId'>
+export type ImagesModel = Pick<IFullImage, 'imageUrl' | 'publicId' | 'eventId'>
+export type ImageUsageModel = Pick<IFullImage, 'id' | 'imageUsage'>

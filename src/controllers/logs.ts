@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { LoggerService } from '../services/logger.js'
-import { Logger } from '../interfaces/loggerModel.js'
 import { UsersService } from '../services/users.js'
 
 export class LoggersController {
@@ -12,7 +11,7 @@ export class LoggersController {
   }
 
   getLogs = async (req: Request, res: Response) => {
-    const logs = (await this.loggerService.getLogs()) as Logger[]
+    const logs = await this.loggerService.getLogs()
 
     let userIds = [...new Set(logs.map((l) => l.userId))]
 

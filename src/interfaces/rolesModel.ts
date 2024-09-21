@@ -1,8 +1,4 @@
-export interface FullRoleModel {
-  name: string
-}
-
-export interface RoleModel {
+export interface IFullRole {
   name: string
   isActive: boolean
 }

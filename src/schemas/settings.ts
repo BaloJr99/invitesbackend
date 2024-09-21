@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { SettingsModel } from '../interfaces/settingsModel.js'
+import { IFullSettings } from '../interfaces/settingsModel.js'
 
 const settingsSchema = z.object({
   eventId: z.string().uuid({
@@ -57,6 +57,6 @@ const settingsSchema = z.object({
   })
 })
 
-export function validateSettings(settings: SettingsModel) {
+export function validateSettings(settings: IFullSettings) {
   return settingsSchema.safeParse(settings)
 }

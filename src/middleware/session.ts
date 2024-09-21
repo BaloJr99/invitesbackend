@@ -1,7 +1,6 @@
 import User from '../models/user.js'
 import { NextFunction, Request, Response } from 'express'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
-import { AuthModel } from '../interfaces/authModel.js'
 
 export const checkJwt = async (
   req: Request,
@@ -11,7 +10,7 @@ export const checkJwt = async (
   try {
     const jwt = req.headers.authorization || ''
 
-    const decoded = verifyJwtToken(jwt) as AuthModel
+    const decoded = verifyJwtToken(jwt)
 
     if (!decoded)
       return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })

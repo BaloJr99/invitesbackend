@@ -38,7 +38,7 @@ export class ImagesController {
         eventId
       })
 
-      return res.status(201).json({ message: req.t('messages.IMAGE_CREATED') })
+      return res.status(201).json({ message: req.t('messages.IMAGES_CREATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

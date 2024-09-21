@@ -2,19 +2,14 @@ import { UsersService } from '../services/users.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import {
-  validateFullUser,
   validateUser,
   validateUserProfile,
   validateUserProfilePhoto
 } from '../schemas/users.js'
 import { EventsService } from '../services/events.js'
-import {
-  EventsInfoModel,
-  UserEventInfoModel,
-  UserInfoModel
-} from '../interfaces/usersModel.js'
 import { LoggerService } from '../services/logger.js'
 import { ImagesService } from '../config/cloudinary/cloudinary.js'
+import { IUserEventsInfo, IUserInfo } from '../interfaces/usersModel.js'
 
 export class UsersController {
   errorHandler: ErrorHandler
@@ -30,19 +25,20 @@ export class UsersController {
 
   getUsers = async (req: Request, res: Response) => {
     try {
-      const users = await this.userService.getUsers()
+      const users = await this.userService.getUsers() as IUserInfo[]
 
-      const usersId = users.map((u) => u.id)
-      const usersEventInfo: UserEventInfoModel[] = []
+      const usersId = users.map((u) => u._id.toString())
+
+      const usersEventInfo: IUserEventsInfo[] = []
 
       for await (const userId of usersId) {
         const queryResult = await this.eventsService.getEventsInfo(userId)
 
         // Find the user
-        const user = users.find((u) => u.id === userId) as UserInfoModel
+        const user = users.find((u) => u._id.toString() === userId) as IUserInfo
 
         // Create user event info model to insert
-        const newUsersEventInfo: UserEventInfoModel = {
+        const newUsersEventInfo: IUserEventsInfo = {
           id: user._id.toString(),
           username: user.username,
           email: user.email,
@@ -54,7 +50,7 @@ export class UsersController {
         // If there is any result from the server change the values
         if (queryResult.length > 0) {
           // Get the first row, since there's only one row
-          const result = queryResult.at(0) as EventsInfoModel
+          const result = queryResult.at(0) as IUserEventsInfo
           newUsersEventInfo.numEntries = result.numEntries
           newUsersEventInfo.numEvents = result.numEvents
         }
@@ -102,7 +98,7 @@ export class UsersController {
       this.errorHandler.handleHttp(
         res,
         req,
-        'ERROR_GET_ALL_USERS',
+        'ERROR_GET_ALL_USERS_BASIC_INFO',
         e.message,
         req.userId
       )
@@ -111,13 +107,17 @@ export class UsersController {
 
   createUser = async (req: Request, res: Response) => {
     try {
-      const result = validateFullUser(req.body)
+      const result = validateUser(req.body)
 
       if (!result.success) {
         return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
 
-      const userId = await this.userService.createUser(result.data)
+      const userId = await this.userService.createUser({
+        ...result.data,
+        isActive: true,
+        id: ''
+      })
 
       return res
         .status(201)
@@ -144,7 +144,10 @@ export class UsersController {
 
       const { id } = req.params
 
-      await this.userService.updateUser(id, result.data)
+      await this.userService.updateUser({
+        ...result.data,
+        id
+      })
 
       return res.status(201).json({ message: req.t('messages.USER_UPDATED') })
     } catch (_e) {
@@ -247,7 +250,7 @@ export class UsersController {
       }
 
       const searchLastPhoto = await this.userService.getUserProfile(
-        result.data.userId
+        result.data.id
       )
 
       if (searchLastPhoto && searchLastPhoto.profilePhotoPublicId) {
@@ -261,9 +264,10 @@ export class UsersController {
         'users'
       )
 
-      await this.userService.updateUserProfilePhoto(result.data.userId, {
-        profilePhoto: cloudResult.secure_url,
-        profilePhotoPublicId: cloudResult.public_id
+      await this.userService.updateUserProfilePhoto({
+          id: result.data.id,
+          profilePhoto: cloudResult.secure_url,
+          profilePhotoPublicId: cloudResult.public_id
       })
 
       return res

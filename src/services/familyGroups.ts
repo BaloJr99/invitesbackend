@@ -1,8 +1,8 @@
-import { Pool } from 'mysql2/promise'
+import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
 import {
-  FamilyGroupModel,
-  FullFamilyGroupModel,
-  PartialFamilyGroupModel
+  IFamilyGroup,
+  IFullFamilyGroup,
+  IPartialFamilyGroup
 } from '../interfaces/familyGroupModel.js'
 
 export class FamilyGroupsService {
@@ -10,26 +10,26 @@ export class FamilyGroupsService {
     this.connection = connection
   }
 
-  getFamilyGroups = async (eventId: string) => {
-    const [result] = await this.connection.query(
+  getFamilyGroups = async (eventId: string): Promise<IFamilyGroup[]> => {
+    const [result] = (await this.connection.query(
       'SELECT BIN_TO_UUID(id) id, familyGroup FROM familyGroups WHERE eventId = UUID_TO_BIN(?) ORDER BY familyGroup',
       [eventId]
-    )
-    return result
+    )) as [RowDataPacket[], FieldPacket[]]
+    return result as IFamilyGroup[]
   }
 
-  bulkFamilyGroup = async (familyGroups: FamilyGroupModel[]) => {
+  bulkFamilyGroup = async (familyGroups: IFamilyGroup[]) => {
     const newFamilyGroups = familyGroups.reduce(
-      (result: FullFamilyGroupModel[], familyGroupModel) => {
+      (result: IFamilyGroup[], familyGroupModel) => {
         result.push({
           eventId: familyGroupModel.eventId,
           id: crypto.randomUUID(),
           familyGroup: familyGroupModel.familyGroup
-        } as FullFamilyGroupModel)
+        } as IFamilyGroup)
         return result
       },
       []
-    )
+    ) as IFullFamilyGroup[]
 
     newFamilyGroups.forEach(async (familyGroup) => {
       await this.connection.query(
@@ -41,7 +41,7 @@ export class FamilyGroupsService {
     return newFamilyGroups
   }
 
-  createFamilyGroup = async (familyGroups: FamilyGroupModel) => {
+  createFamilyGroup = async (familyGroups: IFamilyGroup) => {
     const { familyGroup, eventId } = familyGroups
 
     const [queryResult] = await this.connection.query('SELECT UUID() uuid')
@@ -56,14 +56,13 @@ export class FamilyGroupsService {
   }
 
   updateFamilyGroup = async (
-    familyGroupId: string,
-    familyGroups: PartialFamilyGroupModel
+    familyGroups: IPartialFamilyGroup
   ) => {
-    const { familyGroup } = familyGroups
+    const { id, familyGroup } = familyGroups
 
     await this.connection.query(
       'UPDATE familyGroups SET ? WHERE id = UUID_TO_BIN(?)',
-      [{ familyGroup }, familyGroupId]
+      [{ familyGroup }, id]
     )
   }
 }

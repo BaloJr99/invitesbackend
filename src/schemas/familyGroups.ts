@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { FamilyGroupModel } from '../interfaces/familyGroupModel.js'
+import { IFamilyGroup } from '../interfaces/familyGroupModel.js'
 
 const familyGroupSchema = z.object({
   familyGroup: z.string({
@@ -11,11 +11,11 @@ const familyGroupSchema = z.object({
   })
 })
 
-export function validateFamilyGroup(familyGroup: FamilyGroupModel) {
+export function validateFamilyGroup(familyGroup: IFamilyGroup) {
   return familyGroupSchema.safeParse(familyGroup)
 }
 
-export function validateUpdateFamilyGroup(familyGroup: FamilyGroupModel) {
+export function validateUpdateFamilyGroup(familyGroup: string) {
   return z
     .object({
       familyGroup: z.string({

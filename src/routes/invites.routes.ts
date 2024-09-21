@@ -42,20 +42,17 @@ export const createInvitesRouter = (
   )
 
   invitesRouter.get(
-    '/:id',
-    [checkJwt, isInvitesAdmin, validateUuid],
-    invitesController.getInviteById
-  )
-  invitesRouter.get(
     '/invite/:id',
     [validateUuid],
     invitesController.getInviteForEvent
   )
+
   invitesRouter.delete(
     '/:id',
     [checkJwt, isInvitesAdmin, validateUuid],
     invitesController.deleteInvite
   )
+
   invitesRouter.put(
     '/:id',
     [checkJwt, isInvitesAdmin, validateUuid],
@@ -67,6 +64,7 @@ export const createInvitesRouter = (
     [checkJwt, isInvitesAdmin, validateUuid],
     invitesController.readMessage
   )
+
   invitesRouter.patch(
     '/:id',
     [validateUuid],

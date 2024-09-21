@@ -1,9 +1,5 @@
 import { z } from 'zod'
-import {
-  BulkInviteModel,
-  ConfirmationModel,
-  PartialInviteModel
-} from '../interfaces/invitesModels.js'
+import { IBulkInvite, IConfirmation, IUpsertInvite } from '../interfaces/invitesModels.js'
 
 const inviteSchema = z.object({
   family: z.string({
@@ -89,8 +85,7 @@ const bulkInviteSchema = z.object({
     .string()
     .uuid({
       message: 'Invalid UUID'
-    })
-    .optional(),
+    }).or(z.literal('')), 
   familyGroupName: z.string({
     invalid_type_error: 'Family group must be a string',
     required_error: 'Family group name is required'
@@ -101,15 +96,15 @@ const bulkInviteSchema = z.object({
   })
 })
 
-export function validateInvite(invite: PartialInviteModel) {
+export function validateInvite(invite: IUpsertInvite) {
   return inviteSchema.safeParse(invite)
 }
 
-export function validateConfirmationSchema(confirmation: ConfirmationModel) {
+export function validateConfirmationSchema(confirmation: IConfirmation) {
   return confirmationSchema.safeParse(confirmation)
 }
 
-export function validateBulkInvite(invites: BulkInviteModel[]) {
+export function validateBulkInvite(invites: IBulkInvite[]) {
   return z.array(bulkInviteSchema).safeParse(invites)
 }
 

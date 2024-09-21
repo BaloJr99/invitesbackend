@@ -1,12 +1,12 @@
 import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
-import { Logger } from '../interfaces/loggerModel.js'
+import { ILogger } from '../interfaces/loggerModel.js'
 
 export class LoggerService {
   constructor(private connection: Pool) {
     this.connection = connection
   }
 
-  addLog = async (logger: Logger) => {
+  addLog = async (logger: ILogger) => {
     const { dateOfError, customError, exceptionMessage, userId } = logger
 
     await this.connection.query(
@@ -15,7 +15,7 @@ export class LoggerService {
     )
   }
 
-  getLogs = async () => {
+  getLogs = async (): Promise<ILogger[]> => {
     const todayMinus31 = new Date()
     todayMinus31.setDate(todayMinus31.getDate() - 31)
 
@@ -24,6 +24,6 @@ export class LoggerService {
       [todayMinus31.toISOString().substring(0, 10)]
     )) as [RowDataPacket[], FieldPacket[]]
 
-    return results
+    return results as ILogger[]
   }
 }

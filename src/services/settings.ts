@@ -1,21 +1,21 @@
-import { Pool } from 'mysql2/promise'
-import { SettingsModel } from '../interfaces/settingsModel.js'
+import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
+import { IFullSettings } from '../interfaces/settingsModel.js'
 
 export class SettingsService {
   constructor(private connection: Pool) {
     this.connection = connection
   }
 
-  getEventSettingsById = async (eventId: string) => {
-    const [result] = await this.connection.query(
+  getEventSettingsById = async (eventId: string): Promise<IFullSettings[]> => {
+    const [result] = (await this.connection.query(
       'SELECT BIN_TO_UUID(eventId) eventId, primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor FROM settings WHERE eventId = UUID_TO_BIN(?)',
       [eventId]
-    )
+    )) as [RowDataPacket[], FieldPacket[]]
 
-    return result
+    return result as IFullSettings[]
   }
 
-  createEventSettings = async (eventSettings: SettingsModel) => {
+  createEventSettings = async (eventSettings: IFullSettings): Promise<string> => {
     const {
       eventId,
       primaryColor,
@@ -58,10 +58,10 @@ export class SettingsService {
   }
 
   updateEventSettings = async (
-    eventId: string,
-    eventSettings: SettingsModel
-  ) => {
+    eventSettings: IFullSettings,
+  ): Promise<void> => {
     const {
+      eventId,
       primaryColor,
       secondaryColor,
       parents,

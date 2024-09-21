@@ -1,10 +1,12 @@
 import { validateEvent } from '../schemas/events.js'
 import { EventsService } from '../services/events.js'
 import { Request, Response } from 'express'
-import { FullEventModel } from '../interfaces/eventsModel.js'
+import {
+  IDashboardEvent,
+  IDropdownEvent
+} from '../interfaces/eventsModel.js'
 import { LoggerService } from '../services/logger.js'
 import { ErrorHandler } from '../utils/error.handle.js'
-import { AuthModel } from '../interfaces/authModel.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
 
 export class EventsController {
@@ -21,10 +23,10 @@ export class EventsController {
     try {
       const token = req.headers.authorization || ''
 
-      const decoded = verifyJwtToken(token) as AuthModel
+      const decoded = verifyJwtToken(token)
       const isAdmin = decoded.roles.some((r) => r.name == 'admin')
 
-      let events
+      let events: IDashboardEvent[]
       if (isAdmin) {
         events = await this.eventService.getAllEvents()
       } else {
@@ -47,10 +49,10 @@ export class EventsController {
     try {
       const token = req.headers.authorization || ''
 
-      const decoded = verifyJwtToken(token) as AuthModel
+      const decoded = verifyJwtToken(token)
       const isAdmin = decoded.roles.some((r) => r.name == 'admin')
 
-      let events
+      let events: IDropdownEvent[]
       if (isAdmin) {
         events = await this.eventService.getDropdownEvents()
       } else {
@@ -95,7 +97,11 @@ export class EventsController {
 
       const deadlineResults = await this.eventService.isDeadlineMet(id)
 
-      return res.json(Boolean(deadlineResults.isDeadlineMet))
+      if (deadlineResults.length === 0) {
+        return res.json(false)
+      }
+
+      return res.json(Boolean(deadlineResults[0].isDeadlineMet))
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -112,9 +118,7 @@ export class EventsController {
     try {
       const { id } = req.params
 
-      const event = (await this.eventService.getEventById(
-        id
-      )) as FullEventModel[]
+      const event = await this.eventService.getEventById(id)
 
       if (event.length > 0) return res.json(event.at(0))
 
