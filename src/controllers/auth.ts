@@ -75,7 +75,7 @@ export class AuthController {
     }
 
     try {
-      const info = await this.mailService.sendMail({
+      await this.mailService.sendMail({
         from: 'InvitesMX',
         to: userFounded.email ?? '',
         html: this.getHtml(
@@ -91,7 +91,7 @@ export class AuthController {
         '',
         true
       )
-      res.status(200).json({ info })
+      res.status(200).json()
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
