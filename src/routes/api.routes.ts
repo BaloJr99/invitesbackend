@@ -1,12 +1,12 @@
 import { Router } from 'express'
 import { createEventsRouter } from './events.routes.js'
 import { createImagesRouter } from './images.routes.js'
-import { createFamilyGroupsRouter } from './familyGroups.routes.js'
+import { createInviteGroupsRouter } from './inviteGroups.routes.js'
 import { createAuthRouter } from './auth.routes.js'
 import { EventsService } from '../services/events.js'
 import { ImagesService } from '../config/cloudinary/cloudinary.js'
 import { InviteImagesService } from '../services/inviteImages.js'
-import { FamilyGroupsService } from '../services/familyGroups.js'
+import { InviteGroupsService } from '../services/inviteGroups.js'
 import { UsersService } from '../services/users.js'
 import { SettingsService } from '../services/settings.js'
 import { createSettingsRouter } from './settings.routes.js'
@@ -25,7 +25,7 @@ export const apiRouter = Router()
 
 export const createApiRouter = (
   eventsService: EventsService,
-  familyGroupService: FamilyGroupsService,
+  inviteGroupsService: InviteGroupsService,
   imagesService: ImagesService,
   inviteImagesService: InviteImagesService,
   invitesService: InvitesService,
@@ -45,9 +45,9 @@ export const createApiRouter = (
     createEventsRouter(eventsService, loggerService)
   )
   apiRouter.use(
-    '/familyGroups',
+    '/inviteGroups',
     [checkJwt, isInvitesAdmin],
-    createFamilyGroupsRouter(familyGroupService, loggerService)
+    createInviteGroupsRouter(inviteGroupsService, loggerService)
   )
   apiRouter.use(
     '/images',
@@ -55,7 +55,7 @@ export const createApiRouter = (
   )
   apiRouter.use(
     '/invites',
-    createInvitesRouter(invitesService, loggerService, familyGroupService)
+    createInvitesRouter(invitesService, loggerService, inviteGroupsService)
   )
   apiRouter.use(
     '/logs',

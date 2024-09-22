@@ -14,7 +14,7 @@ CREATE TABLE invites (
   dateOfConfirmation DATETIME,
   isMessageRead BOOLEAN DEFAULT 0,
   eventId BINARY(16) NOT NULL,
-  familyGroupId BINARY(16) NOT NULL,
+  inviteGroupId BINARY(16) NOT NULL,
   inviteViewed BOOLEAN DEFAULT 0
 );
 
@@ -36,9 +36,9 @@ CREATE TABLE events (
   nameOfcelebrated VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE familyGroups (
+CREATE TABLE inviteGroups (
   id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-  familyGroup VARCHAR(255) NOT NULL,
+  inviteGroup VARCHAR(255) NOT NULL,
   userId BINARY(24) NOT NULL
 );
 

@@ -1,29 +1,29 @@
 import {
-  validateFamilyGroup,
-  validateUpdateFamilyGroup
-} from '../schemas/familyGroups.js'
-import { FamilyGroupsService } from '../services/familyGroups.js'
+  validateInviteGroup,
+  validateUpdateInviteGroup
+} from '../schemas/inviteGroups.js'
+import { InviteGroupsService } from '../services/inviteGroups.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
 
-export class FamilyGroupsController {
+export class InviteGroupsController {
   errorHandler: ErrorHandler
   constructor(
-    private familyGroupService: FamilyGroupsService,
+    private inviteGroupService: InviteGroupsService,
     private loggerService: LoggerService
   ) {
-    this.familyGroupService = familyGroupService
+    this.inviteGroupService = inviteGroupService
     this.errorHandler = new ErrorHandler(this.loggerService)
   }
 
-  getFamilyGroups = async (req: Request, res: Response) => {
+  getInviteGroups = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
 
-      const familyGroups = await this.familyGroupService.getFamilyGroups(id)
+      const inviteGroups = await this.inviteGroupService.getInviteGroups(id)
 
-      return res.json(familyGroups)
+      return res.json(inviteGroups)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -36,21 +36,21 @@ export class FamilyGroupsController {
     }
   }
 
-  createFamilyGroup = async (req: Request, res: Response) => {
+  createInviteGroup = async (req: Request, res: Response) => {
     try {
-      const result = validateFamilyGroup(req.body)
+      const result = validateInviteGroup(req.body)
 
       if (!result.success) {
         return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
 
-      const familyGroupId = await this.familyGroupService.createFamilyGroup(
+      const inviteGroupId = await this.inviteGroupService.createInviteGroup(
         result.data
       )
 
       return res
         .status(201)
-        .json({ id: familyGroupId, message: req.t('messages.GROUP_CREATED') })
+        .json({ id: inviteGroupId, message: req.t('messages.GROUP_CREATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -63,9 +63,9 @@ export class FamilyGroupsController {
     }
   }
 
-  updateFamilyGroup = async (req: Request, res: Response) => {
+  updateInviteGroup = async (req: Request, res: Response) => {
     try {
-      const result = validateUpdateFamilyGroup(req.body)
+      const result = validateUpdateInviteGroup(req.body)
 
       if (!result.success) {
         return res.status(400).json({ error: JSON.parse(result.error.message) })
@@ -73,9 +73,9 @@ export class FamilyGroupsController {
 
       const { id } = req.params
 
-      await this.familyGroupService.updateFamilyGroup({
+      await this.inviteGroupService.updateInviteGroup({
         id,
-        familyGroup: result.data.familyGroup
+        inviteGroup: result.data.inviteGroup
       })
 
       return res.status(201).json({ message: req.t('messages.GROUP_UPDATED') })

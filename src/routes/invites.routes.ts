@@ -5,19 +5,19 @@ import { validateUuid } from '../middleware/validateUuid.js'
 import { checkJwt } from '../middleware/session.js'
 import { LoggerService } from '../services/logger.js'
 import { InvitesController } from '../controllers/invites.js'
-import { FamilyGroupsService } from '../services/familyGroups.js'
+import { InviteGroupsService } from '../services/inviteGroups.js'
 
 export const invitesRouter = Router()
 
 export const createInvitesRouter = (
   invitesService: InvitesService,
   loggerService: LoggerService,
-  familyGroupService: FamilyGroupsService
+  inviteGroupsService: InviteGroupsService
 ) => {
   const invitesController = new InvitesController(
     invitesService,
     loggerService,
-    familyGroupService
+    inviteGroupsService
   )
 
   invitesRouter.get(

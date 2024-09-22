@@ -23,7 +23,7 @@ const inviteSchema = z.object({
   eventId: z.string().uuid({
     message: 'Invalid UUID'
   }),
-  familyGroupId: z.string().uuid({
+  inviteGroupId: z.string().uuid({
     message: 'Invalid UUID'
   })
 })
@@ -81,18 +81,18 @@ const bulkInviteSchema = z.object({
   eventId: z.string().uuid({
     message: 'Invalid UUID'
   }),
-  familyGroupId: z
+  inviteGroupId: z
     .string()
     .uuid({
       message: 'Invalid UUID'
     }).or(z.literal('')), 
-  familyGroupName: z.string({
-    invalid_type_error: 'Family group must be a string',
-    required_error: 'Family group name is required'
+  inviteGroupName: z.string({
+    invalid_type_error: 'Invite group must be a string',
+    required_error: 'Invite group name is required'
   }),
-  isNewFamilyGroup: z.boolean({
-    invalid_type_error: 'Is new family group flag must be boolean',
-    required_error: 'Is new family group flag is required'
+  isNewInviteGroup: z.boolean({
+    invalid_type_error: 'Is new invite group flag must be boolean',
+    required_error: 'Is new invite group flag is required'
   })
 })
 

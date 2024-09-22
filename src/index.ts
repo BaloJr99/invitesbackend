@@ -6,7 +6,7 @@ import { createRoles } from './utils/createRoles.handle.js'
 import { EventsService } from './services/events.js'
 import { ImagesService } from './config/cloudinary/cloudinary.js'
 import { InviteImagesService } from './services/inviteImages.js'
-import { FamilyGroupsService } from './services/familyGroups.js'
+import { InviteGroupsService } from './services/inviteGroups.js'
 import { UsersService } from './services/users.js'
 import { SettingsService } from './services/settings.js'
 import { RolesService } from './services/roles.js'
@@ -28,7 +28,7 @@ const main = () => {
 
   new App(
     new EventsService(mysqlConnection),
-    new FamilyGroupsService(mysqlConnection),
+    new InviteGroupsService(mysqlConnection),
     new ImagesService(),
     new InviteImagesService(mysqlConnection),
     new InvitesService(mysqlConnection),

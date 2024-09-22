@@ -4,7 +4,7 @@ import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js'
 import { EventsService } from './services/events.js'
 import { InviteImagesService } from './services/inviteImages.js'
 import { ImagesService } from './config/cloudinary/cloudinary.js'
-import { FamilyGroupsService } from './services/familyGroups.js'
+import { InviteGroupsService } from './services/inviteGroups.js'
 import { UsersService } from './services/users.js'
 import { Server } from 'socket.io'
 import { createServer } from 'http'
@@ -25,7 +25,7 @@ import { IUserFromInvite } from './interfaces/usersModel.js'
 export class App {
   constructor(
     private eventsService: EventsService,
-    private familyGroupsService: FamilyGroupsService,
+    private inviteGroupsService: InviteGroupsService,
     private imagesService: ImagesService,
     private inviteImagesService: InviteImagesService,
     private invitesService: InvitesService,
@@ -36,7 +36,7 @@ export class App {
     private usersService: UsersService
   ) {
     this.eventsService = eventsService
-    this.familyGroupsService = familyGroupsService
+    this.inviteGroupsService = inviteGroupsService
     this.imagesService = imagesService
     this.inviteImagesService = inviteImagesService
     this.invitesService = invitesService
@@ -115,7 +115,7 @@ export class App {
       '/api',
       createApiRouter(
         this.eventsService,
-        this.familyGroupsService,
+        this.inviteGroupsService,
         this.imagesService,
         this.inviteImagesService,
         this.invitesService,

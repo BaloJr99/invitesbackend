@@ -47,15 +47,15 @@ export class InvitesService {
       phoneNumber,
       kidsAllowed,
       eventId,
-      familyGroupId
+      inviteGroupId
     } = invite
 
     const [queryResult] = await this.connection.query('SELECT UUID() uuid')
     const [{ uuid }] = queryResult as { uuid: string }[]
 
     await this.connection.query(
-      `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, familyGroupId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
-      [family, entriesNumber, phoneNumber, kidsAllowed, eventId, familyGroupId]
+      `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+      [family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId]
     )
 
     return uuid
@@ -64,14 +64,14 @@ export class InvitesService {
   createBulkInvite = async (invites: IBulkInvite[]): Promise<void> => {
     invites.forEach(async (invite) => {
       await this.connection.query(
-        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, familyGroupId) VALUES (UUID_TO_BIN('${crypto.randomUUID()}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN('${crypto.randomUUID()}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
         [
           invite.family,
           invite.entriesNumber,
           invite.phoneNumber,
           invite.kidsAllowed,
           invite.eventId,
-          invite.familyGroupId
+          invite.inviteGroupId
         ]
       )
     })

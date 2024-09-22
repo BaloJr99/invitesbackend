@@ -9,8 +9,8 @@ import {
 import { verifyJwtToken } from '../utils/jwt.handle.js'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
-import { FamilyGroupsService } from '../services/familyGroups.js'
-import { IFullFamilyGroup } from '../interfaces/familyGroupModel.js'
+import { InviteGroupsService } from '../services/inviteGroups.js'
+import { IFullInviteGroup } from '../interfaces/inviteGroupsModel.js'
 import { IBulkInvite } from '../interfaces/invitesModels.js'
 
 export class InvitesController {
@@ -19,7 +19,7 @@ export class InvitesController {
   constructor(
     private invitesService: InvitesService,
     private loggerService: LoggerService,
-    private familyGroupsService: FamilyGroupsService
+    private inviteGroupsService: InviteGroupsService
   ) {
     this.invitesService = invitesService
     this.errorHandler = new ErrorHandler(this.loggerService)
@@ -111,20 +111,20 @@ export class InvitesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
 
-      const bulkFamilyGroups = result.data
-        .filter((f) => f.isNewFamilyGroup)
+      const bulkInviteGroups = result.data
+        .filter((f) => f.isNewInviteGroup)
         .map((x) => {
           return {
-            familyGroup: x.familyGroupName,
+            inviteGroup: x.inviteGroupName,
             eventId: x.eventId
           }
         })
 
-      let generatedIds: IFullFamilyGroup[] = []
+      let generatedIds: IFullInviteGroup[] = []
 
-      if (bulkFamilyGroups) {
-        generatedIds = await this.familyGroupsService.bulkFamilyGroup(
-          bulkFamilyGroups
+      if (bulkInviteGroups) {
+        generatedIds = await this.inviteGroupsService.bulkInviteGroup(
+          bulkInviteGroups
         )
       }
 
@@ -135,11 +135,11 @@ export class InvitesController {
           phoneNumber: bulk.phoneNumber,
           kidsAllowed: bulk.kidsAllowed,
           eventId: bulk.eventId,
-          familyGroupId:
-            bulk.familyGroupId === ''
-              ? generatedIds.find((g) => g.familyGroup === bulk.familyGroupName)
+          inviteGroupId:
+            bulk.inviteGroupId === ''
+              ? generatedIds.find((g) => g.inviteGroup === bulk.inviteGroupName)
                   ?.id
-              : bulk.familyGroupId
+              : bulk.inviteGroupId
         } as IBulkInvite
       })
 
