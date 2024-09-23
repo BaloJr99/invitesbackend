@@ -14,18 +14,20 @@ export const createEventsRouter = (
 
   eventsRouter.get('/', eventController.getAllEvents)
   eventsRouter.get('/dropdown', eventController.getDropdownEvents)
+
   eventsRouter.get(
     '/invites/:id',
     [validateUuid],
     eventController.getEventInvites
   )
+
   eventsRouter.get(
     '/invites/:id/deadlineMet',
     [validateUuid],
     eventController.isDeadlineMet
   )
-  eventsRouter.post('/', eventController.createEvent)
 
+  eventsRouter.post('/', eventController.createEvent)
   eventsRouter.get('/:id', [validateUuid], eventController.getEventById)
   eventsRouter.delete('/:id', [validateUuid], eventController.deleteEvent)
   eventsRouter.put('/:id', [validateUuid], eventController.updateEvent)

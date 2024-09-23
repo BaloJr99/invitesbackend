@@ -1,46 +1,47 @@
+import { IFullRole } from '../interfaces/rolesModel.js'
 import Role from '../models/role.js'
 //import { FullRoleModel, RoleModel } from '../interfaces/rolesModel.js'
 
 export class RolesService {
   getRoles = async () => {
-    const rolesFounded = await Role.find({
-      isActive: true
-    }).select({
+    const rolesFounded = await Role.find().select({
       _id: 0,
       name: 1,
-      id: '$_id'
+      id: '$_id',
+      isActive: 1
     })
     return rolesFounded
   }
 
-  // createRole = async (user: FullRoleModel) => {
-  //   const { name } = user
+  createRole = async (role: IFullRole) => {
+    const { name, isActive } = role
 
-  //   const newRole = new Role({
-  //     name
-  //   })
+    const newRole = new Role({
+      name,
+      isActive
+    })
 
-  //   const savedRole = await newRole.save()
-  //   return savedRole._id
-  // }
+    const savedRole = await newRole.save()
+    return savedRole._id
+  }
 
-  // updateRole = async (roleId: string, user: RoleModel) => {
-  //   const result = await Role.updateOne(
-  //     { _id: roleId },
-  //     {
-  //       $set: {
-  //         ...user
-  //       }
-  //     }
-  //   )
-  //   return result
-  // }
+  updateRole = async (role: IFullRole) => {
+    const result = await Role.updateOne(
+      { _id: role.id },
+      {
+        $set: {
+          ...role
+        }
+      }
+    )
+    return result
+  }
 
-  // deleteRole = async (roleId: string) => {
-  //   const result = await Role.updateOne(
-  //     { _id: roleId },
-  //     { $set: { isActive: false } }
-  //   )
-  //   return result
-  // }
+  checkRoleName = async (roleName: string) => {
+    const roleFounded = await Role.findOne({
+      name: roleName
+    })
+
+    return roleFounded ? true : false
+  }
 }

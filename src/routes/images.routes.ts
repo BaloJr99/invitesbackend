@@ -27,11 +27,13 @@ export const createImagesRouter = (
   )
 
   imagesRouter.get('/:id', [validateUuid], imagesController.getAllImages)
+
   imagesRouter.delete(
     '/',
     [checkJwt, isInvitesAdmin],
     imagesController.deleteImage
   )
+  
   imagesRouter.put(
     '/',
     [checkJwt, isInvitesAdmin],

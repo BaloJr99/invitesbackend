@@ -28,6 +28,7 @@ export const createUsersRouter = (
   usersRouter.get('/', [isAdmin], userController.getUsers)
   usersRouter.get('/basic', [isInvitesAdmin], userController.getUsersBasicInfo)
   usersRouter.get('/:id', [isAdmin], userController.getUserById)
+
   usersRouter.post(
     '/',
     [checkDuplicateUsernameOrEmail, checkRolesExisted, isAdmin],
@@ -39,16 +40,19 @@ export const createUsersRouter = (
     [isInvitesAdmin],
     userController.updateUserProfile
   )
+
   usersRouter.put(
     '/profile/photo',
     [isInvitesAdmin],
     userController.uploadProfilePhoto
   )
+
   usersRouter.get(
     '/profile/check-username/:username',
     [isInvitesAdmin],
     userController.checkUsername
   )
+
   usersRouter.get(
     '/profile/:id',
     [isInvitesAdmin],

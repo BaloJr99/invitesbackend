@@ -2,7 +2,6 @@ import { Router } from 'express'
 import { RolesController } from '../controllers/roles.js'
 import { RolesService } from '../services/roles.js'
 import { LoggerService } from '../services/logger.js'
-//import { validateUuid } from '../middleware/validateUuid.js'
 
 export const rolesRouter = Router()
 
@@ -13,10 +12,14 @@ export const createRolesRouter = (
   const rolesController = new RolesController(rolesService, loggerService)
 
   rolesRouter.get('/', rolesController.getRoles)
-  //rolesRouter.post('/', rolesController.createRole)
 
-  //rolesRouter.put('/:id', [validateUuid], rolesController.updateRole)
-  //rolesRouter.delete('/:id', [validateUuid], rolesController.deleteRole)
+  rolesRouter.get(
+    '/profile/check-roleName/:roleName',
+    rolesController.checkRoleName
+  )
+
+  rolesRouter.post('/', rolesController.createRole)
+  rolesRouter.put('/:id', rolesController.updateRole)
 
   return rolesRouter
 }

@@ -20,6 +20,7 @@ export const createInviteGroupsRouter = (
     [validateUuid],
     inviteGroupController.getInviteGroups
   )
+  
   inviteGroupsRouter.post('/', inviteGroupController.createInviteGroup)
 
   inviteGroupsRouter.put(
