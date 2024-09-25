@@ -1,4 +1,4 @@
-import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
+import { FieldPacket, Pool, QueryResult, RowDataPacket } from 'mysql2/promise'
 import {
   IInviteGroup,
   IFullInviteGroup,
@@ -31,14 +31,38 @@ export class InviteGroupsService {
       []
     ) as IFullInviteGroup[]
 
-    newInviteGroups.forEach(async (inviteGroup) => {
-      await this.connection.query(
-        `INSERT INTO inviteGroups (id, inviteGroup, eventId) VALUES (UUID_TO_BIN(?), ?, UUID_TO_BIN(?))`,
-        [inviteGroup.id, inviteGroup.inviteGroup, inviteGroup.eventId]
-      )
-    })
+    const actualConnection = await this.connection.getConnection()
 
-    return newInviteGroups
+    try {
+      // Begin transaction with current connection
+      await actualConnection.beginTransaction()
+
+      const queryPromises: Promise<[QueryResult, FieldPacket[]]>[] = []
+
+      // Insert query into promise array
+      newInviteGroups.forEach((inviteGroup) => {
+        queryPromises.push(
+          actualConnection.query(
+            `INSERT INTO inviteGroups (id, inviteGroup, eventId) VALUES (UUID_TO_BIN(?), ?, UUID_TO_BIN(?))`,
+            [inviteGroup.id, inviteGroup.inviteGroup, inviteGroup.eventId]
+          )
+        )
+      })
+
+      // Execute all promises
+      await Promise.all(queryPromises)
+
+      // Commit transaction
+      await actualConnection.commit()
+      return newInviteGroups
+    } catch (err) {
+      // Rollback transaction
+      await actualConnection.rollback()
+
+      // Release connection
+      actualConnection.release()
+      return Promise.reject(err)
+    }
   }
 
   createInviteGroup = async (inviteGroups: IInviteGroup) => {

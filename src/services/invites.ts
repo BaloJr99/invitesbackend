@@ -1,4 +1,4 @@
-import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
+import { FieldPacket, Pool, QueryResult, RowDataPacket } from 'mysql2/promise'
 import {
   IBulkInvite,
   IConfirmation,
@@ -63,7 +63,7 @@ export class InvitesService {
 
   createBulkInvite = async (
     invites: IBulkInvite[]
-  ): Promise<IUpsertInvite[]> => {
+  ) => {
     const invitesToInsert = invites.map((invite) => ({
       id: crypto.randomUUID().toString(),
       family: invite.family,
@@ -72,24 +72,46 @@ export class InvitesService {
       kidsAllowed: invite.kidsAllowed,
       eventId: invite.eventId,
       inviteGroupId: invite.inviteGroupId
-    }))
+    })) as IUpsertInvite[]
 
-    invites.forEach(async (invite, index) => {
-      await this.connection.query(
-        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
-        [
-          invitesToInsert[index].id,
-          invite.family,
-          invite.entriesNumber,
-          invite.phoneNumber,
-          invite.kidsAllowed,
-          invite.eventId,
-          invite.inviteGroupId
-        ]
-      )
-    })
+    const actualConnection = await this.connection.getConnection()
 
-    return invitesToInsert as IUpsertInvite[]
+    try {
+      // Begin transaction with current connection
+      await actualConnection.beginTransaction()
+
+      const queryPromises: Promise<[QueryResult, FieldPacket[]]>[] = []
+
+      // Insert query into promise array
+      invitesToInsert.forEach((invite) => {
+        this.connection.query(
+          `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+          [
+            invite.id,
+            invite.family,
+            invite.entriesNumber,
+            invite.phoneNumber,
+            invite.kidsAllowed,
+            invite.eventId,
+            invite.inviteGroupId
+          ]
+        )
+      })
+
+      // Execute all promises
+      await Promise.all(queryPromises)
+
+      // Commit transaction
+      await actualConnection.commit()
+      return invitesToInsert
+    } catch (err) {
+      // Rollback transaction
+      await actualConnection.rollback()
+
+      // Release connection
+      actualConnection.release()
+      return Promise.reject(err)
+    }
   }
 
   bulkDeleteInvite = async (invites: string[]): Promise<void> => {
