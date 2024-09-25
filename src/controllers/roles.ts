@@ -97,7 +97,7 @@ export class RolesController {
       this.errorHandler.handleHttp(
         res,
         req,
-        'ERROR_CHECK_USERNAME',
+        'ERROR_CHECK_ROLE',
         e.message,
         req.userId
       )

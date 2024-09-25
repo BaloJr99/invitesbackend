@@ -90,4 +90,22 @@ export class InviteGroupsController {
       )
     }
   }
+
+  checkInviteGroup = async (req: Request, res: Response) => {
+    try {
+      const { eventId, inviteGroup } = req.params
+      const isDuplicated = await this.inviteGroupService.checkInviteGroup(eventId, inviteGroup)
+
+      return res.json(isDuplicated)
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_CHECK_INVITE_GROUP',
+        e.message,
+        req.userId
+      )
+    }
+  }
 }

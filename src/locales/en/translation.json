@@ -86,6 +86,8 @@
     "ERROR_DELETE_USER": "Error deleting user",
     "ERROR_UPDATE_USER_PROFILE": "Error updating user profile",
     "ERROR_CHECK_USERNAME": "Error checking username",
+    "ERROR_CHECK_ROLE": "Error checking role",
+    "ERROR_CHECK_INVITE_GROUP": "Error checking invite group",
     "ERROR_UPDATE_PROFILE_PHOTO": "Error updating profile photo"
   }
 }

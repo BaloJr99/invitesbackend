@@ -63,4 +63,13 @@ export class InviteGroupsService {
       [{ inviteGroup }, id]
     )
   }
+
+  checkInviteGroup = async (eventId: string, inviteGroup: string) => {
+    const [inviteGroupFounded] = (await this.connection.query(
+      'SELECT * FROM inviteGroups WHERE eventId = UUID_TO_BIN(?) AND inviteGroup = ?',
+      [eventId, inviteGroup]
+    )) as [RowDataPacket[], FieldPacket[]]
+
+    return inviteGroupFounded.length > 0 ? true : false
+  }
 }

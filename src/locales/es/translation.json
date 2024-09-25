@@ -87,6 +87,8 @@
     "ERROR_GET_USER_PROFILE": "Error al obtener perfil de usuario",
     "ERROR_UPDATE_USER_PROFILE": "Error al actualizar perfil de usuario",
     "ERROR_CHECK_USERNAME": "Error al verificar nombre de usuario",
+    "ERROR_CHECK_ROLE": "Error al verificar rol",
+    "ERROR_CHECK_INVITE_GROUP": "Error al verificar grupo de invitación",
     "ERROR_UPDATE_PROFILE_PHOTO": "Error al actualizar foto de perfil"
   }
 }
