@@ -120,10 +120,10 @@ export class InvitesController {
           }
         })
 
-      let generatedIds: IFullInviteGroup[] = []
+      let generatedInviteGroups: IFullInviteGroup[] = []
 
       if (bulkInviteGroups) {
-        generatedIds = await this.inviteGroupsService.bulkInviteGroup(
+        generatedInviteGroups = await this.inviteGroupsService.bulkInviteGroup(
           bulkInviteGroups
         )
       }
@@ -137,17 +137,22 @@ export class InvitesController {
           eventId: bulk.eventId,
           inviteGroupId:
             bulk.inviteGroupId === ''
-              ? generatedIds.find((g) => g.inviteGroup === bulk.inviteGroupName)
-                  ?.id
+              ? generatedInviteGroups.find(
+                  (g) => g.inviteGroup === bulk.inviteGroupName
+                )?.id
               : bulk.inviteGroupId
         } as IBulkInvite
       })
 
-      await this.invitesService.createBulkInvite(bulkInvites)
+      const generatedInvites = await this.invitesService.createBulkInvite(
+        bulkInvites
+      )
 
-      return res
-        .status(201)
-        .json({ message: req.t('messages.INVITES_CREATED') })
+      return res.status(201).json({
+        inviteGroupsGenerated: generatedInviteGroups,
+        invitesGenerated: generatedInvites,
+        message: req.t('messages.INVITES_CREATED')
+      })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

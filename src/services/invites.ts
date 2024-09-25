@@ -61,11 +61,24 @@ export class InvitesService {
     return uuid
   }
 
-  createBulkInvite = async (invites: IBulkInvite[]): Promise<void> => {
-    invites.forEach(async (invite) => {
+  createBulkInvite = async (
+    invites: IBulkInvite[]
+  ): Promise<IUpsertInvite[]> => {
+    const invitesToInsert = invites.map((invite) => ({
+      id: crypto.randomUUID().toString(),
+      family: invite.family,
+      entriesNumber: invite.entriesNumber,
+      phoneNumber: invite.phoneNumber,
+      kidsAllowed: invite.kidsAllowed,
+      eventId: invite.eventId,
+      inviteGroupId: invite.inviteGroupId
+    }))
+
+    invites.forEach(async (invite, index) => {
       await this.connection.query(
-        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN('${crypto.randomUUID()}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
         [
+          invitesToInsert[index].id,
           invite.family,
           invite.entriesNumber,
           invite.phoneNumber,
@@ -75,6 +88,8 @@ export class InvitesService {
         ]
       )
     })
+
+    return invitesToInsert as IUpsertInvite[]
   }
 
   bulkDeleteInvite = async (invites: string[]): Promise<void> => {
@@ -118,11 +133,13 @@ export class InvitesService {
     )
   }
 
-  getUserFromInviteId = async (inviteId: string): Promise<IUserFromInvite[]> => {
-    const [result] = await this.connection.query(
+  getUserFromInviteId = async (
+    inviteId: string
+  ): Promise<IUserFromInvite[]> => {
+    const [result] = (await this.connection.query(
       'SELECT CAST(userId as CHAR) AS id FROM invites AS i INNER JOIN events AS e ON e.id = i.eventId WHERE i.id = UUID_TO_BIN(?)',
       [inviteId]
-    ) as [RowDataPacket[], FieldPacket[]]
+    )) as [RowDataPacket[], FieldPacket[]]
 
     return result as IUserFromInvite[]
   }
