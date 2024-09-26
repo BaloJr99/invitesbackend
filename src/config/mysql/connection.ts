@@ -11,8 +11,7 @@ export const connection = () => {
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
       timezone: '+00:00',
-      connectionLimit: 10,
-      dateStrings: true
+      connectionLimit: 10
     })
   } else {
     connection = createPool(process.env.DATABASE_URL)
