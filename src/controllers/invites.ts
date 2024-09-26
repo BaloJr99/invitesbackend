@@ -111,19 +111,21 @@ export class InvitesController {
         return res.status(422).json({ error: JSON.parse(result.error.message) })
       }
 
-      const bulkInviteGroups = result.data
-        .filter((f) => f.isNewInviteGroup)
-        .map((x) => {
-          return {
-            inviteGroup: x.inviteGroupName,
-            eventId: x.eventId
-          }
-        })
+      const bulkInviteGroups = [
+        ...new Set(
+          result.data
+            .filter((f) => f.isNewInviteGroup)
+            .map((x) => {
+              return x.inviteGroupName
+            })
+        )
+      ]
 
       let generatedInviteGroups: IFullInviteGroup[] = []
 
       if (bulkInviteGroups) {
         generatedInviteGroups = await this.inviteGroupsService.bulkInviteGroup(
+          result.data[0].eventId,
           bulkInviteGroups
         )
       }

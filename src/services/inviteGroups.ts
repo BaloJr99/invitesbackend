@@ -18,13 +18,13 @@ export class InviteGroupsService {
     return result as IInviteGroup[]
   }
 
-  bulkInviteGroup = async (inviteGroups: IInviteGroup[]) => {
+  bulkInviteGroup = async (eventId: string, inviteGroups: string[]) => {
     const newInviteGroups = inviteGroups.reduce(
-      (result: IInviteGroup[], inviteGroupModel) => {
+      (result: IInviteGroup[], inviteGroup) => {
         result.push({
-          eventId: inviteGroupModel.eventId,
+          eventId: eventId,
           id: crypto.randomUUID(),
-          inviteGroup: inviteGroupModel.inviteGroup
+          inviteGroup: inviteGroup
         } as IInviteGroup)
         return result
       },
