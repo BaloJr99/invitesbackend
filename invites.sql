@@ -29,7 +29,7 @@ CREATE TABLE errorLogs (
 CREATE TABLE events (
   id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
   nameOfEvent VARCHAR(255) NOT NULL,
-  dateOfEvent DATETIME NOT NULL,
+  dateOfEvent DATE NOT NULL,
   maxDateOfConfirmation DATETIME NOT NULL,
   userId BINARY(24) NOT NULL,
   typeOfEvent CHAR(1) NOT NULL,

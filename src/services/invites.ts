@@ -3,6 +3,7 @@ import {
   IBulkInvite,
   IConfirmation,
   IDashboardInvite,
+  IInviteEventType,
   IUpsertInvite,
   IUserInvite
 } from '../interfaces/invitesModels.js'
@@ -164,5 +165,14 @@ export class InvitesService {
     )) as [RowDataPacket[], FieldPacket[]]
 
     return result as IUserFromInvite[]
+  }
+
+  getInviteEventType = async (id: string): Promise<IInviteEventType[]> => {
+    const [result] = (await this.connection.query(
+      'SELECT typeOfEvent FROM invites AS i INNER JOIN events as ev ON i.eventId = ev.id WHERE i.id = UUID_TO_BIN(?)',
+      [id]
+    )) as [RowDataPacket[], FieldPacket[]]
+
+    return result as IInviteEventType[]
   }
 }

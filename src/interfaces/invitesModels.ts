@@ -55,3 +55,7 @@ export type IUserInvite = Pick<
 };
 
 export type IDashboardInvite = Omit<IConfirmation, 'id' | 'message'>;
+
+export interface IInviteEventType {
+  typeOfEvent: string;
+}

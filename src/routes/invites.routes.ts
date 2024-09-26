@@ -42,6 +42,12 @@ export const createInvitesRouter = (
   )
 
   invitesRouter.get(
+    '/invite/:id/event',
+    [validateUuid],
+    invitesController.getInviteEventType
+  )
+
+  invitesRouter.get(
     '/invite/:id',
     [validateUuid],
     invitesController.getInviteForEvent

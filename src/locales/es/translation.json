@@ -89,6 +89,7 @@
     "ERROR_CHECK_USERNAME": "Error al verificar nombre de usuario",
     "ERROR_CHECK_ROLE": "Error al verificar rol",
     "ERROR_CHECK_INVITE_GROUP": "Error al verificar grupo de invitación",
-    "ERROR_UPDATE_PROFILE_PHOTO": "Error al actualizar foto de perfil"
+    "ERROR_UPDATE_PROFILE_PHOTO": "Error al actualizar foto de perfil",
+    "ERROR_GET_INVITE_EVENT_TYPE": "Error al obtener tipo de evento de la invitación"
   }
 }

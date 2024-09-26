@@ -283,4 +283,29 @@ export class InvitesController {
       )
     }
   }
+
+  getInviteEventType = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params
+
+      const invite = await this.invitesService.getInviteEventType(id)
+
+      if (invite.length > 0) {
+        return res.json(invite[0].typeOfEvent)
+      }
+
+      return res
+        .status(404)
+        .json({ message: req.t('messages.INVITE_NOT_FOUND') })
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_GET_INVITE_EVENT_TYPE',
+        e.message,
+        req.userId
+      )
+    }
+  }
 }
