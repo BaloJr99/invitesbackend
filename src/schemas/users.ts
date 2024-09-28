@@ -8,49 +8,102 @@ import {
 } from '../interfaces/usersModel.js'
 
 const fullUserSchema = z.object({
-  username: z.string({
-    required_error: 'The username is required'
-  }),
-  email: z.string({
-    required_error: 'The email is required'
-  }),
+  username: z
+    .string({
+      required_error: 'The username is required',
+      invalid_type_error: 'The username must be a string'
+    })
+    .min(1, {
+      message: 'You must provide a username'
+    }),
+  email: z
+    .string({
+      required_error: 'The email is required',
+      invalid_type_error: 'The email must be a string'
+    })
+    .email({
+      message: 'You must provide an email'
+    }),
   isActive: z.boolean({
-    required_error: 'The isActive flag is required'
+    required_error: 'The isActive flag is required',
+    invalid_type_error: 'The isActive flag must be a boolean'
   }),
   roles: z
     .array(
-      z.string({
-        required_error: 'The role is required'
-      })
+      z
+        .string({
+          required_error: 'The role is required',
+          invalid_type_error: 'The role must be a string'
+        })
+        .min(1, {
+          message: 'You must provide a role'
+        })
     )
-    .nonempty()
+    .nonempty({
+      message: 'You must provide at least one role'
+    })
     .transform((objectIds) =>
       objectIds.map((x) => new moongose.Types.ObjectId(x))
     )
 })
 
 const userProfileSchema = z.object({
-  id: z.string({
-    required_error: 'The id is required'
-  }),
-  username: z.string({
-    required_error: 'The username is required'
-  }),
-  firstName: z.string({
-    required_error: 'The first name is required'
-  }),
-  lastName: z.string({
-    required_error: 'The last name is required'
-  }),
-  phoneNumber: z.string({
-    required_error: 'The phone number is required'
-  }),
-  email: z.string({
-    required_error: 'The email is required'
-  }),
-  gender: z.string({
-    required_error: 'The gender is required'
-  }),
+  id: z
+    .string({
+      invalid_type_error: 'The id must be a string',
+      required_error: 'The id is required'
+    })
+    .min(1, {
+      message: 'You must provide the user id'
+    }),
+  username: z
+    .string({
+      invalid_type_error: 'The username must be a string',
+      required_error: 'The username is required'
+    })
+    .min(1, {
+      message: 'You must provide the username'
+    }),
+  firstName: z
+    .string({
+      invalid_type_error: 'The first name must be a string',
+      required_error: 'The first name is required'
+    })
+    .min(1, {
+      message: 'You must provide the first name'
+    }),
+  lastName: z
+    .string({
+      invalid_type_error: 'The last name must be a string',
+      required_error: 'The last name is required'
+    })
+    .min(1, {
+      message: 'You must provide the last name'
+    }),
+  phoneNumber: z
+    .string({
+      invalid_type_error: 'The phone number must be a string',
+      required_error: 'The phone number is required'
+    })
+    .min(10, {
+      message: 'You must have a valid phone number'
+    }),
+  email: z
+    .string({
+      invalid_type_error: 'The email must be a string',
+      required_error: 'The email is required'
+    })
+    .email({
+      message: 'You must provide an email'
+    }),
+  gender: z
+    .string({
+      invalid_type_error: 'The gender must be a char',
+      required_error: 'The gender is required'
+    })
+    .length(1, {
+      message: 'You must provide a valid gender'
+    }),
   profilePhoto: z.string().url().or(z.literal(''))
 })
 

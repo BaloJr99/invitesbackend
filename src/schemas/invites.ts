@@ -1,31 +1,56 @@
 import { z } from 'zod'
-import { IBulkInvite, IConfirmation, IUpsertInvite } from '../interfaces/invitesModels.js'
+import {
+  IBulkInvite,
+  IConfirmation,
+  IUpsertInvite
+} from '../interfaces/invitesModels.js'
 
 const inviteSchema = z.object({
-  family: z.string({
-    invalid_type_error: 'Family must be a string',
-    required_error: 'The Family is required'
-  }),
+  family: z
+    .string({
+      invalid_type_error: 'Family must be a string',
+      required_error: 'The Family is required'
+    })
+    .min(1, {
+      message: 'You must provide the family name'
+    }),
   entriesNumber: z
     .number({
-      required_error: 'The number of entries is required',
-      invalid_type_error: 'The entries number must be a number'
+      invalid_type_error: 'The entries number must be a number',
+      required_error: 'The number of entries is required'
     })
-    .int()
+    .int({
+      message: 'The entries number must be an integer'
+    })
     .min(1, 'The minimum number of entries is 1'),
-  phoneNumber: z.string({
-    required_error: 'The phone number is required'
-  }),
+  phoneNumber: z
+    .string({
+      invalid_type_error: 'The phone number must be a string',
+      required_error: 'The phone number is required'
+    })
+    .length(10, {
+      message: 'The phone number must be 10 digits long'
+    }),
   kidsAllowed: z.boolean({
-    required_error: 'The kids value is required',
-    invalid_type_error: 'The kids allowed must be a boolean'
+    invalid_type_error: 'The kids allowed must be a boolean',
+    required_error: 'The kids value is required'
   }),
-  eventId: z.string().uuid({
-    message: 'Invalid UUID'
-  }),
-  inviteGroupId: z.string().uuid({
-    message: 'Invalid UUID'
-  })
+  eventId: z
+    .string({
+      invalid_type_error: 'The event id must be a string',
+      required_error: 'The event id is required'
+    })
+    .uuid({
+      message: 'Invalid UUID'
+    }),
+  inviteGroupId: z
+    .string({
+      invalid_type_error: 'The invite group id must be a string',
+      required_error: 'The invite group id is required'
+    })
+    .uuid({
+      message: 'Invalid UUID'
+    })
 })
 
 const confirmationSchema = z
@@ -38,13 +63,24 @@ const confirmationSchema = z
       required_error: 'The number of entries are required'
     }),
     confirmation: z.boolean({
-      required_error: 'The confirmation must be responded'
+      invalid_type_error: 'The confirmation must be a boolean',
+      required_error: 'The confirmation is required'
     }),
     dateOfConfirmation: z
-      .string()
-      .datetime()
+      .string({
+        invalid_type_error: 'The date of confirmation must be a string',
+        required_error: 'The date of confirmation is required'
+      })
+      .datetime({
+        message: 'Invalid date time format'
+      })
       .transform((value) => value.replace('T', ' ').replace('Z', '')),
-    isMessageRead: z.boolean().default(false)
+    isMessageRead: z
+      .boolean({
+        invalid_type_error: 'The is message read must be a boolean',
+        required_error: 'The is message read is required'
+      })
+      .default(false)
   })
   .superRefine(({ confirmation, entriesConfirmed }, refinementContext) => {
     if (
@@ -60,32 +96,52 @@ const confirmationSchema = z
   })
 
 const bulkInviteSchema = z.object({
-  family: z.string({
-    invalid_type_error: 'Family must be a string',
-    required_error: 'The Family is required'
-  }),
+  family: z
+    .string({
+      invalid_type_error: 'Family must be a string',
+      required_error: 'The Family is required'
+    })
+    .min(1, {
+      message: 'You must provide the family name'
+    }),
   entriesNumber: z
     .number({
-      required_error: 'The number of entries is required',
-      invalid_type_error: 'The entries number must be a number'
+      invalid_type_error: 'The entries number must be a number',
+      required_error: 'The number of entries is required'
     })
-    .int()
+    .int({
+      message: 'The entries number must be an integer'
+    })
     .min(1, 'The minimum number of entries is 1'),
-  phoneNumber: z.string({
-    required_error: 'The phone number is required'
-  }),
+  phoneNumber: z
+    .string({
+      invalid_type_error: 'The phone number must be a string',
+      required_error: 'The phone number is required'
+    })
+    .length(10, {
+      message: 'The phone number must be 10 digits long'
+    }),
   kidsAllowed: z.boolean({
-    required_error: 'The kids value is required',
-    invalid_type_error: 'The kids allowed must be a boolean'
+    invalid_type_error: 'The kids allowed must be a boolean',
+    required_error: 'The kids value is required'
   }),
-  eventId: z.string().uuid({
-    message: 'Invalid UUID'
-  }),
-  inviteGroupId: z
-    .string()
+  eventId: z
+    .string({
+      invalid_type_error: 'The event id must be a string',
+      required_error: 'The event id is required'
+    })
     .uuid({
       message: 'Invalid UUID'
-    }).or(z.literal('')), 
+    }),
+  inviteGroupId: z
+    .string({
+      invalid_type_error: 'The invite group id must be a string',
+      required_error: 'The invite group id is required'
+    })
+    .uuid({
+      message: 'Invalid UUID'
+    })
+    .or(z.literal('')),
   inviteGroupName: z.string({
     invalid_type_error: 'Invite group must be a string',
     required_error: 'Invite group name is required'
