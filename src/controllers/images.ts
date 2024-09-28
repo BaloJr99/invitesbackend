@@ -22,7 +22,7 @@ export class ImagesController {
       const result = validateImages(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const cloudResult = await this.imagesService.uploadImage(
@@ -56,7 +56,7 @@ export class ImagesController {
       const result = validateImageUsage(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       await this.inviteImagesService.updateImages(result.data)

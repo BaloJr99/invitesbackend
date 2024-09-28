@@ -41,7 +41,7 @@ export class InviteGroupsController {
       const result = validateInviteGroup(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const inviteGroupId = await this.inviteGroupService.createInviteGroup(
@@ -68,7 +68,7 @@ export class InviteGroupsController {
       const result = validateUpdateInviteGroup(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const { id } = req.params
@@ -94,7 +94,10 @@ export class InviteGroupsController {
   checkInviteGroup = async (req: Request, res: Response) => {
     try {
       const { eventId, inviteGroup } = req.params
-      const isDuplicated = await this.inviteGroupService.checkInviteGroup(eventId, inviteGroup)
+      const isDuplicated = await this.inviteGroupService.checkInviteGroup(
+        eventId,
+        inviteGroup
+      )
 
       return res.json(isDuplicated)
     } catch (_e) {

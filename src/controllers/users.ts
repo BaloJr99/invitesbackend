@@ -25,7 +25,7 @@ export class UsersController {
 
   getUsers = async (req: Request, res: Response) => {
     try {
-      const users = await this.userService.getUsers() as IUserInfo[]
+      const users = (await this.userService.getUsers()) as IUserInfo[]
 
       const usersId = users.map((u) => u._id.toString())
 
@@ -110,7 +110,7 @@ export class UsersController {
       const result = validateUser(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const userId = await this.userService.createUser({
@@ -139,7 +139,7 @@ export class UsersController {
       const result = validateUser(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const { id } = req.params
@@ -203,7 +203,7 @@ export class UsersController {
       const result = validateUserProfile(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       await this.userService.updateUserProfile(result.data)
@@ -246,7 +246,7 @@ export class UsersController {
       const result = validateUserProfilePhoto(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const searchLastPhoto = await this.userService.getUserProfile(
@@ -265,17 +265,15 @@ export class UsersController {
       )
 
       await this.userService.updateUserProfilePhoto({
-          id: result.data.id,
-          profilePhoto: cloudResult.secure_url,
-          profilePhotoPublicId: cloudResult.public_id
+        id: result.data.id,
+        profilePhoto: cloudResult.secure_url,
+        profilePhotoPublicId: cloudResult.public_id
       })
 
-      return res
-        .status(201)
-        .json({
-          id: cloudResult.secure_url,
-          message: req.t('messages.PROFILE_PHOTO_UPDATED')
-        })
+      return res.status(201).json({
+        id: cloudResult.secure_url,
+        message: req.t('messages.PROFILE_PHOTO_UPDATED')
+      })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

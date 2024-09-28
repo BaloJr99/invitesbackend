@@ -27,6 +27,6 @@ export class LoggersController {
       log.userId = usernames.find((u) => u.id === log.userId)?.username ?? ''
     })
 
-    return res.status(200).json(logs)
+    return res.json(logs)
   }
 }

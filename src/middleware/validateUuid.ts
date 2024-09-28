@@ -30,7 +30,7 @@ export const validateUuid = (
   })
 
   if (errors.length > 0) {
-    return res.status(400).json(req.t('messages.WRONG_UUID'))
+    return res.status(422).json(JSON.parse(errors[0].message))
   }
 
   next()

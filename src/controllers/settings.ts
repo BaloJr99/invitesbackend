@@ -42,7 +42,7 @@ export class SettingsController {
       const result = validateSettings(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const settingId = await this.settingsService.createEventSettings(
@@ -69,7 +69,7 @@ export class SettingsController {
       const result = validateSettings(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const { id } = req.params

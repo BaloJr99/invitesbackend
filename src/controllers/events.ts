@@ -1,10 +1,7 @@
 import { validateEvent } from '../schemas/events.js'
 import { EventsService } from '../services/events.js'
 import { Request, Response } from 'express'
-import {
-  IDashboardEvent,
-  IDropdownEvent
-} from '../interfaces/eventsModel.js'
+import { IDashboardEvent, IDropdownEvent } from '../interfaces/eventsModel.js'
 import { LoggerService } from '../services/logger.js'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
@@ -142,7 +139,7 @@ export class EventsController {
       const result = validateEvent(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const eventId = await this.eventService.createEvent(result.data)
@@ -185,7 +182,7 @@ export class EventsController {
       const result = validateEvent(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const { id } = req.params

@@ -36,7 +36,7 @@ export class InvitesController {
         isAdmin
       )
 
-      return res.status(200).json(invites)
+      return res.json(invites)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -80,7 +80,7 @@ export class InvitesController {
       const result = validateInvite(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const inviteId = await this.invitesService.createInvite({
@@ -108,7 +108,7 @@ export class InvitesController {
       const result = validateBulkInvite(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const bulkInviteGroups = [
@@ -172,7 +172,7 @@ export class InvitesController {
       const result = validateBulkDeleteInvites(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       await this.invitesService.bulkDeleteInvite(result.data)
@@ -216,7 +216,7 @@ export class InvitesController {
       const result = validateInvite(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const { id } = req.params
@@ -244,7 +244,7 @@ export class InvitesController {
       const result = validateConfirmationSchema(req.body)
 
       if (!result.success) {
-        return res.status(400).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const { id } = req.params
@@ -273,7 +273,7 @@ export class InvitesController {
     try {
       const { id } = req.params
       await this.invitesService.readMessage(id)
-      return res.status(201).json({ message: req.t('messages.MESSAGE_READ') })
+      return res.json({ message: req.t('messages.MESSAGE_READ') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

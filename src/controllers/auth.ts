@@ -28,7 +28,7 @@ export class AuthController {
       const result = validateAuthUser(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const signInResponse = await this.userService.signin(result.data)
@@ -46,7 +46,7 @@ export class AuthController {
           .json({ error: req.t('messages.INACTIVE_ACCOUNT') })
       }
 
-      res.status(200).json({ token: signInResponse })
+      res.json({ token: signInResponse })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -63,7 +63,7 @@ export class AuthController {
     const result = validateUsernameOrEmail(req.body)
 
     if (!result.success) {
-      return res.status(422).json({ error: JSON.parse(result.error.message) })
+      return res.status(422).json(JSON.parse(result.error.message))
     }
 
     const userFounded = await this.userService.findUser(
@@ -91,7 +91,7 @@ export class AuthController {
         '',
         true
       )
-      res.status(200).json()
+      res.json()
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -108,7 +108,7 @@ export class AuthController {
     const result = validateUserId(req.body)
 
     if (!result.success) {
-      return res.status(422).json({ error: JSON.parse(result.error.message) })
+      return res.status(422).json(JSON.parse(result.error.message))
     }
 
     const userFounded = await this.userService.findUserById(result.data.id)
@@ -134,7 +134,7 @@ export class AuthController {
         '',
         true
       )
-      res.status(200).json({ message: req.t('messages.USER_PASSWORD_RESET') })
+      res.json({ message: req.t('messages.USER_PASSWORD_RESET') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -152,7 +152,7 @@ export class AuthController {
       const { id } = req.params
 
       const resetting = await this.userService.isUserResettingPassword(id)
-      return res.status(200).json(resetting)
+      return res.json(resetting)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -170,13 +170,13 @@ export class AuthController {
       const result = validatePassword(req.body)
 
       if (!result.success) {
-        return res.status(422).json({ error: JSON.parse(result.error.message) })
+        return res.status(422).json(JSON.parse(result.error.message))
       }
 
       const { id } = req.params
 
       await this.userService.updateResetPasword(id, result.data.password, false)
-      return res.status(200).json({ message: req.t('messages.PASSWORD_RESET') })
+      return res.json({ message: req.t('messages.PASSWORD_RESET') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
