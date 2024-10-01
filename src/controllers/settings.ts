@@ -20,7 +20,10 @@ export class SettingsController {
       const { id } = req.params
 
       const event = await this.settingsService.getEventSettingsById(id)
-      if (event.length > 0) return res.json(event.at(0))
+      if (event.length > 0) return res.json({
+        ...event[0],
+        ...JSON.parse(event[0].settings)
+      })
 
       return res
         .status(404)
@@ -45,9 +48,12 @@ export class SettingsController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const settingId = await this.settingsService.createEventSettings(
-        result.data
-      )
+      const { eventId, ...settings } = result.data
+
+      const settingId = await this.settingsService.createEventSettings({
+        eventId,
+        settings: JSON.stringify(settings)
+      })
 
       return res
         .status(201)
@@ -72,11 +78,11 @@ export class SettingsController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const { id } = req.params
+      const { eventId, ...settings } = result.data
 
       await this.settingsService.updateEventSettings({
-        ...result.data,
-        eventId: id
+        eventId,
+        settings: JSON.stringify(settings)
       })
 
       return res

@@ -1,4 +1,9 @@
-export interface IFullSettings {
+export interface IBaseSettings {
+  eventId: string
+  settings: string
+}
+
+export interface ISweetXvSettings {
   eventId: string
   primaryColor: string
   secondaryColor: string
@@ -13,5 +18,13 @@ export interface IFullSettings {
   receptionTime: string
   receptionPlace: string
   receptionAddress: string
+  dressCodeColor: string
+}
+
+export interface ISaveTheDateSettings {
+  eventId: string
+  primaryColor: string
+  secondaryColor: string
+  receptionPlace: string
   dressCodeColor: string
 }

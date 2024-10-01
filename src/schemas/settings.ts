@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { IFullSettings } from '../interfaces/settingsModel.js'
+import { ISweetXvSettings } from '../interfaces/settingsModel.js'
 
-const settingsSchema = z.object({
+const sweetXvSettingsSchema = z.object({
   eventId: z.string().uuid({
     message: 'Invalid UUID'
   }),
@@ -119,6 +119,6 @@ const settingsSchema = z.object({
     })
 })
 
-export function validateSettings(settings: IFullSettings) {
-  return settingsSchema.safeParse(settings)
+export function validateSettings(settings: ISweetXvSettings) {
+  return sweetXvSettingsSchema.safeParse(settings)
 }

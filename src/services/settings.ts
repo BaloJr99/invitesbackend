@@ -1,101 +1,44 @@
 import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
-import { IFullSettings } from '../interfaces/settingsModel.js'
+import { IBaseSettings } from '../interfaces/settingsModel.js'
 
 export class SettingsService {
   constructor(private connection: Pool) {
     this.connection = connection
   }
 
-  getEventSettingsById = async (eventId: string): Promise<IFullSettings[]> => {
+  getEventSettingsById = async (eventId: string): Promise<IBaseSettings[]> => {
     const [result] = (await this.connection.query(
-      'SELECT BIN_TO_UUID(eventId) eventId, primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor FROM settings WHERE eventId = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(eventId) eventId, settings FROM settings WHERE eventId = UUID_TO_BIN(?)',
       [eventId]
     )) as [RowDataPacket[], FieldPacket[]]
 
-    return result as IFullSettings[]
+    return result as IBaseSettings[]
   }
 
-  createEventSettings = async (eventSettings: IFullSettings): Promise<string> => {
-    const {
-      eventId,
-      primaryColor,
-      secondaryColor,
-      parents,
-      godParents,
-      firstSectionSentences,
-      secondSectionSentences,
-      massUrl,
-      massTime,
-      massAddress,
-      receptionUrl,
-      receptionTime,
-      receptionPlace,
-      receptionAddress,
-      dressCodeColor
-    } = eventSettings
+  createEventSettings = async (
+    eventSettings: IBaseSettings
+  ): Promise<string> => {
+    const { eventId, settings } = eventSettings
 
     await this.connection.query(
-      `INSERT INTO settings (eventId, primaryColor, secondaryColor, parents, godParents, firstSectionSentences, secondSectionSentences, massUrl, massTime, massAddress, receptionUrl, receptionTime, receptionPlace, receptionAddress, dressCodeColor) VALUES (UUID_TO_BIN('${eventId}'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        primaryColor,
-        secondaryColor,
-        parents,
-        godParents,
-        firstSectionSentences,
-        secondSectionSentences,
-        massUrl,
-        massTime,
-        massAddress,
-        receptionUrl,
-        receptionTime,
-        receptionPlace,
-        receptionAddress,
-        dressCodeColor
-      ]
+      `INSERT INTO settings (eventId, settings) VALUES (UUID_TO_BIN(?), ?)`,
+      [eventId, settings]
     )
 
     return eventId
   }
 
-  updateEventSettings = async (
-    eventSettings: IFullSettings,
-  ): Promise<void> => {
+  updateEventSettings = async (eventSettings: IBaseSettings): Promise<void> => {
     const {
       eventId,
-      primaryColor,
-      secondaryColor,
-      parents,
-      godParents,
-      firstSectionSentences,
-      secondSectionSentences,
-      massUrl,
-      massTime,
-      massAddress,
-      receptionUrl,
-      receptionTime,
-      receptionPlace,
-      receptionAddress,
-      dressCodeColor
+      settings
     } = eventSettings
 
     await this.connection.query(
       'UPDATE settings SET ? WHERE eventId = UUID_TO_BIN(?)',
       [
         {
-          primaryColor,
-          secondaryColor,
-          parents,
-          godParents,
-          firstSectionSentences,
-          secondSectionSentences,
-          massUrl,
-          massTime,
-          massAddress,
-          receptionUrl,
-          receptionTime,
-          receptionPlace,
-          receptionAddress,
-          dressCodeColor
+          settings
         },
         eventId
       ]
