@@ -20,10 +20,10 @@ export class SettingsController {
       const { id } = req.params
 
       const event = await this.settingsService.getEventSettingsById(id)
-      if (event.length > 0) return res.json({
-        ...event[0],
-        ...JSON.parse(event[0].settings)
-      })
+      if (event.length > 0)
+        return res.json({
+          ...event[0]
+        })
 
       return res
         .status(404)

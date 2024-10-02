@@ -13,7 +13,7 @@ export type IDashboardEvent = Pick<
   'id' | 'nameOfEvent' | 'dateOfEvent'
 > & { allowCreateInvites: boolean }
 
-export type IDropdownEvent = Pick<IFullEvent, 'id' | 'nameOfEvent'>
+export type IDropdownEvent = Pick<IFullEvent, 'id' | 'nameOfEvent' | 'typeOfEvent'>
 
 export interface IUserEventsInfo {
   numEvents: number

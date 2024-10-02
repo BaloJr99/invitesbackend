@@ -33,7 +33,7 @@ export class EventsService {
 
   getDropdownEvents = async (): Promise<IDropdownEvent[]> => {
     const [result] = (await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, nameOfEvent FROM events WHERE dateOfEvent > now() ORDER BY nameOfEvent'
+      'SELECT BIN_TO_UUID(id) id, nameOfEvent, typeOfEvent FROM events WHERE dateOfEvent > now() ORDER BY nameOfEvent'
     )) as [RowDataPacket[], FieldPacket[]]
 
     return result as IDropdownEvent[]
@@ -43,7 +43,7 @@ export class EventsService {
     userId: string
   ): Promise<IDropdownEvent[]> => {
     const [result] = (await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, nameOfEvent FROM events WHERE userId = CAST(? AS BINARY) AND dateOfEvent > now() ORDER BY nameOfEvent',
+      'SELECT BIN_TO_UUID(id) id, nameOfEvent, typeOfEvent FROM events WHERE userId = CAST(? AS BINARY) AND dateOfEvent > now() ORDER BY nameOfEvent',
       [userId]
     )) as [RowDataPacket[], FieldPacket[]]
 

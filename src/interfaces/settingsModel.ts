@@ -26,5 +26,4 @@ export interface ISaveTheDateSettings {
   primaryColor: string
   secondaryColor: string
   receptionPlace: string
-  dressCodeColor: string
 }
