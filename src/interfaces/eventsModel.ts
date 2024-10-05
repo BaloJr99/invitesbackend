@@ -15,6 +15,8 @@ export type IDashboardEvent = Pick<
 
 export type IDropdownEvent = Pick<IFullEvent, 'id' | 'nameOfEvent' | 'typeOfEvent'>
 
+export type IEventType = Pick<IFullEvent, 'typeOfEvent'>
+
 export interface IUserEventsInfo {
   numEvents: number
   numEntries: number

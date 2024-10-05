@@ -4,6 +4,7 @@ import {
   IConfirmation,
   IDashboardInvite,
   IInviteEventType,
+  ISaveTheDateConfirmation,
   IUpsertInvite,
   IUserInvite
 } from '../interfaces/invitesModels.js'
@@ -27,7 +28,7 @@ export class InvitesService {
 
   getInvite = async (id: string): Promise<IUserInvite[]> => {
     const [result] = (await this.connection.query(
-      'SELECT BIN_TO_UUID(e.id) id, family, entriesNumber, confirmation, kidsAllowed, ev.dateOfEvent, ev.maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, BIN_TO_UUID(eventId) eventId FROM invites AS e INNER JOIN events as ev ON e.eventId = ev.id WHERE e.id = UUID_TO_BIN(?)',
+      'SELECT BIN_TO_UUID(e.id) id, family, entriesNumber, confirmation, kidsAllowed, ev.dateOfEvent, ev.maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, BIN_TO_UUID(eventId) eventId, needsAccomodation FROM invites AS e INNER JOIN events as ev ON e.eventId = ev.id WHERE e.id = UUID_TO_BIN(?)',
       [id]
     )) as [RowDataPacket[], FieldPacket[]]
 
@@ -37,7 +38,7 @@ export class InvitesService {
   markAsViewed = async (id: string): Promise<void> => {
     await this.connection.query(
       'UPDATE invites SET inviteViewed = ? WHERE id = UUID_TO_BIN(?)',
-      [new Date(), id]
+      [true, id]
     )
   }
 
@@ -139,13 +140,23 @@ export class InvitesService {
     )
   }
 
-  updateConfirmation = async (confirmations: IConfirmation) => {
+  updateSweetXvConfirmation = async (confirmations: IConfirmation) => {
     const { id, entriesConfirmed, message, confirmation, dateOfConfirmation } =
       confirmations
 
     await this.connection.query(
       'UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)',
       [{ entriesConfirmed, message, confirmation, dateOfConfirmation }, id]
+    )
+  }
+
+  updateSaveTheDateConfirmation = async (confirmations: ISaveTheDateConfirmation) => {
+    const { id, needsAccomodation } =
+      confirmations
+
+    await this.connection.query(
+      'UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)',
+      [{ needsAccomodation }, id]
     )
   }
 

@@ -72,7 +72,7 @@ export const createInvitesRouter = (
   )
 
   invitesRouter.patch(
-    '/:id',
+    '/:id/:eventType',
     [validateUuid],
     invitesController.updateConfirmation
   )

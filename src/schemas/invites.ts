@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   IBulkInvite,
   IConfirmation,
+  ISaveTheDateConfirmation,
   IUpsertInvite
 } from '../interfaces/invitesModels.js'
 
@@ -95,6 +96,13 @@ const confirmationSchema = z
     }
   })
 
+const saveTheDateconfirmationSchema = z.object({
+  needsAccomodation: z.boolean({
+    invalid_type_error: 'The accomodation flag must be a boolean',
+    required_error: 'The accomodation flag is required'
+  })
+})
+
 const bulkInviteSchema = z.object({
   family: z
     .string({
@@ -158,6 +166,12 @@ export function validateInvite(invite: IUpsertInvite) {
 
 export function validateConfirmationSchema(confirmation: IConfirmation) {
   return confirmationSchema.safeParse(confirmation)
+}
+
+export function validateSaveTheDateConfirmationSchema(
+  confirmation: ISaveTheDateConfirmation
+) {
+  return saveTheDateconfirmationSchema.safeParse(confirmation)
 }
 
 export function validateBulkInvite(invites: IBulkInvite[]) {

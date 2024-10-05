@@ -119,6 +119,40 @@ const sweetXvSettingsSchema = z.object({
     })
 })
 
-export function validateSettings(settings: ISweetXvSettings) {
+const saveTheDateSettingsSchema = z.object({
+  eventId: z.string().uuid({
+    message: 'Invalid UUID'
+  }),
+  primaryColor: z
+    .string({
+      invalid_type_error: 'The primary color must be a string',
+      required_error: 'The primary color is required'
+    })
+    .min(7, {
+      message: 'You must provide a valid hex color code'
+    }),
+  secondaryColor: z
+    .string({
+      invalid_type_error: 'The secondary color must be a string',
+      required_error: 'The secondary color is required'
+    })
+    .min(7, {
+      message: 'You must provide a valid hex color code'
+    }),
+  receptionPlace: z
+    .string({
+      invalid_type_error: 'The reception place must be a string',
+      required_error: 'The reception place is required'
+    })
+    .min(1, {
+      message: 'You must provide the reception place'
+    })
+})
+
+export function validateSweetXvSettings(settings: ISweetXvSettings) {
   return sweetXvSettingsSchema.safeParse(settings)
+}
+
+export function validateSaveTheDateSettings(settings: ISweetXvSettings) {
+  return saveTheDateSettingsSchema.safeParse(settings)
 }

@@ -21,13 +21,13 @@ export const createSettingsRouter = (
   )
   
   settingsRouter.post(
-    '/',
+    '/:eventType',
     [checkJwt, isInvitesAdmin],
     eventController.createEventSettings
   )
   
   settingsRouter.put(
-    '/:id',
+    '/:id/:eventType',
     [checkJwt, isInvitesAdmin, validateUuid],
     eventController.updateEventSettings
   )

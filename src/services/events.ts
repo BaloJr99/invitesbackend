@@ -3,6 +3,7 @@ import {
   EventModel,
   IDashboardEvent,
   IDropdownEvent,
+  IEventType,
   IFullEvent,
   IsDeadlineMet,
   IUserEventsInfo
@@ -39,6 +40,15 @@ export class EventsService {
     return result as IDropdownEvent[]
   }
 
+  getEventType = async (eventId: string): Promise<IEventType[]> => {
+    const [result] = (await this.connection.query(
+      'SELECT typeOfEvent FROM events WHERE id = UUID_TO_BIN(?)',
+      [eventId]
+    )) as [RowDataPacket[], FieldPacket[]]
+
+    return result as IEventType[]
+  }
+
   getDropdownEventsByUserId = async (
     userId: string
   ): Promise<IDropdownEvent[]> => {
@@ -52,7 +62,7 @@ export class EventsService {
 
   getEventInvites = async (eventId: string): Promise<IFullInvite[]> => {
     const [result] = (await this.connection.query(
-      'SELECT BIN_TO_UUID(inv.id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead, BIN_TO_UUID(inviteGroupId) inviteGroupId, inviteViewed FROM invites as inv INNER JOIN events AS ev ON inv.eventId = ev.id WHERE eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
+      'SELECT BIN_TO_UUID(inv.id) id, family, entriesNumber, message, confirmation, phoneNumber, entriesConfirmed, kidsAllowed, dateOfConfirmation, isMessageRead, BIN_TO_UUID(inviteGroupId) inviteGroupId, inviteViewed, needsAccomodation FROM invites as inv INNER JOIN events AS ev ON inv.eventId = ev.id WHERE eventId = UUID_TO_BIN(?) ORDER BY dateOfConfirmation DESC',
       [eventId]
     )) as [RowDataPacket[], FieldPacket[]]
 

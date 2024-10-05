@@ -1,8 +1,12 @@
-import { validateSettings } from '../schemas/settings.js'
 import { SettingsService } from '../services/settings.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
+import {
+  validateSaveTheDateSettings,
+  validateSweetXvSettings
+} from '../schemas/settings.js'
+import { EventType } from '../interfaces/enum.js'
 
 export class SettingsController {
   errorHandler: ErrorHandler
@@ -42,7 +46,15 @@ export class SettingsController {
 
   createEventSettings = async (req: Request, res: Response) => {
     try {
-      const result = validateSettings(req.body)
+      const { eventType } = req.params
+
+      let result
+
+      if (eventType === EventType.Xv) {
+        result = validateSweetXvSettings(req.body)
+      } else {
+        result = validateSaveTheDateSettings(req.body)
+      }
 
       if (!result.success) {
         return res.status(422).json(JSON.parse(result.error.message))
@@ -72,7 +84,15 @@ export class SettingsController {
 
   updateEventSettings = async (req: Request, res: Response) => {
     try {
-      const result = validateSettings(req.body)
+      const { eventType } = req.params
+
+      let result
+
+      if (eventType === EventType.Xv) {
+        result = validateSweetXvSettings(req.body)
+      } else {
+        result = validateSaveTheDateSettings(req.body)
+      }
 
       if (!result.success) {
         return res.status(422).json(JSON.parse(result.error.message))

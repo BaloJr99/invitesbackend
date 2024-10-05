@@ -1,17 +1,18 @@
 export interface IFullInvite {
-  id: string;
-  family: string;
-  entriesNumber: number;
-  entriesConfirmed: number | null;
-  message: string | null;
-  confirmation: boolean | null;
-  phoneNumber: string;
-  kidsAllowed: boolean;
-  dateOfConfirmation: string | null;
-  isMessageRead: boolean;
-  eventId: string;
-  inviteGroupId: string;
-  inviteViewed: string;
+  id: string
+  family: string
+  entriesNumber: number
+  entriesConfirmed: number | null
+  message: string | null
+  confirmation: boolean | null
+  phoneNumber: string
+  kidsAllowed: boolean
+  dateOfConfirmation: string | null
+  isMessageRead: boolean
+  eventId: string
+  inviteGroupId: string
+  inviteViewed: string
+  needsAccomodation: boolean | null
 }
 
 export type IUpsertInvite = Omit<
@@ -22,7 +23,8 @@ export type IUpsertInvite = Omit<
   | 'dateOfConfirmation'
   | 'isMessageRead'
   | 'inviteViewed'
->;
+  | 'needsAccomodation'
+>
 
 export type IBulkInvite = Pick<
   IFullInvite,
@@ -32,30 +34,36 @@ export type IBulkInvite = Pick<
   | 'kidsAllowed'
   | 'eventId'
   | 'inviteGroupId'
-> & { inviteGroupName: string; isNewInviteGroup: boolean };
+> & { inviteGroupName: string; isNewInviteGroup: boolean }
+
+export type ISaveTheDateConfirmation = Pick<
+  IFullInvite,
+  'id' | 'needsAccomodation'
+>
 
 export type IConfirmation = Pick<
   IFullInvite,
-  | 'confirmation'
-  | 'dateOfConfirmation'
-  | 'entriesConfirmed'
-  | 'entriesNumber'
-  | 'id'
-  | 'message'
->;
+  'confirmation' | 'dateOfConfirmation' | 'entriesConfirmed' | 'id' | 'message'
+>
 
 export type IUserInvite = Pick<
   IFullInvite,
-  'id' | 'family' | 'entriesNumber' | 'confirmation' | 'kidsAllowed' | 'eventId'
+  | 'id'
+  | 'family'
+  | 'entriesNumber'
+  | 'confirmation'
+  | 'kidsAllowed'
+  | 'eventId'
+  | 'needsAccomodation'
 > & {
-  dateOfEvent: string;
-  maxDateOfConfirmation: string;
-  nameOfCelebrated: string;
-  typeOfEvent: string;
-};
+  dateOfEvent: string
+  maxDateOfConfirmation: string
+  nameOfCelebrated: string
+  typeOfEvent: string
+}
 
-export type IDashboardInvite = Omit<IConfirmation, 'id' | 'message'>;
+export type IDashboardInvite = Omit<IConfirmation, 'id' | 'message'>
 
 export interface IInviteEventType {
-  typeOfEvent: string;
+  typeOfEvent: string
 }

@@ -3,8 +3,9 @@ import { InvitesService } from '../services/invites.js'
 import {
   validateBulkDeleteInvites,
   validateBulkInvite,
+  validateInvite,
   validateConfirmationSchema,
-  validateInvite
+  validateSaveTheDateConfirmationSchema,
 } from '../schemas/invites.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
 import { ErrorHandler } from '../utils/error.handle.js'
@@ -12,6 +13,7 @@ import { LoggerService } from '../services/logger.js'
 import { InviteGroupsService } from '../services/inviteGroups.js'
 import { IFullInviteGroup } from '../interfaces/inviteGroupsModel.js'
 import { IBulkInvite } from '../interfaces/invitesModels.js'
+import { EventType } from '../interfaces/enum.js'
 
 export class InvitesController {
   errorHandler: ErrorHandler
@@ -241,18 +243,33 @@ export class InvitesController {
 
   updateConfirmation = async (req: Request, res: Response) => {
     try {
-      const result = validateConfirmationSchema(req.body)
+      let result
 
-      if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+      const { id, eventType } = req.params
+
+      if (eventType === EventType.Xv) {
+        result = validateConfirmationSchema(req.body)
+
+        if (!result.success) {
+          return res.status(422).json(JSON.parse(result.error.message))
+        }
+        
+        await this.invitesService.updateSweetXvConfirmation({
+          ...result.data,
+          id,
+        })
+      } else {
+        result = validateSaveTheDateConfirmationSchema(req.body)
+
+        if (!result.success) {
+          return res.status(422).json(JSON.parse(result.error.message))
+        }
+        
+        await this.invitesService.updateSaveTheDateConfirmation({
+          ...result.data,
+          id,
+        })
       }
-
-      const { id } = req.params
-      await this.invitesService.updateConfirmation({
-        ...result.data,
-        id,
-        entriesNumber: 0
-      })
 
       return res
         .status(201)

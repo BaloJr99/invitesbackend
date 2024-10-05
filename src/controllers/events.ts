@@ -69,6 +69,29 @@ export class EventsController {
     }
   }
 
+  getEventType = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params
+
+      const eventType = await this.eventService.getEventType(id)
+
+      if (eventType.length > 0) return res.json(eventType[0].typeOfEvent)
+
+      return res
+        .status(404)
+        .json({ message: req.t('messages.EVENT_NOT_FOUND') })
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_GET_DROPDOWN_EVENTS',
+        e.message,
+        req.userId
+      )
+    }
+  }
+
   getEventInvites = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
