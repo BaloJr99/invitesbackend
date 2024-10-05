@@ -15,7 +15,8 @@ CREATE TABLE invites (
   isMessageRead BOOLEAN DEFAULT 0,
   eventId BINARY(16) NOT NULL,
   inviteGroupId BINARY(16) NOT NULL,
-  inviteViewed BOOLEAN DEFAULT 0
+  inviteViewed BOOLEAN DEFAULT 0,
+  needsAccomodation BOOLEAN NULL,
 );
 
 CREATE TABLE errorLogs (
