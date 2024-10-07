@@ -1,4 +1,4 @@
-import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
+import { FieldPacket, Pool, QueryResult, RowDataPacket } from 'mysql2/promise'
 import {
   EventModel,
   IDashboardEvent,
@@ -122,7 +122,11 @@ export class EventsService {
     )
   }
 
-  updateEvent = async (eventId: string, event: EventModel): Promise<void> => {
+  updateEvent = async (
+    eventId: string,
+    event: EventModel,
+    override: boolean
+  ): Promise<void> => {
     const {
       nameOfEvent,
       dateOfEvent,
@@ -132,20 +136,58 @@ export class EventsService {
       userId
     } = event
 
-    await this.connection.query(
-      'UPDATE events SET ?, userId = CAST(? AS BINARY) WHERE id = UUID_TO_BIN(?)',
-      [
-        {
-          nameOfEvent,
-          dateOfEvent,
-          maxDateOfConfirmation,
-          nameOfCelebrated,
-          typeOfEvent
-        },
-        userId,
-        eventId
-      ]
-    )
+    const actualConnection = await this.connection.getConnection()
+
+    try {
+      // Begin transaction with current connection
+      await actualConnection.beginTransaction()
+
+      const queryPromises: Promise<[QueryResult, FieldPacket[]]>[] = []
+
+      // Insert query into promise array
+      queryPromises.push(
+        actualConnection.query(
+          'UPDATE events SET ?, userId = CAST(? AS BINARY) WHERE id = UUID_TO_BIN(?)',
+          [
+            {
+              nameOfEvent,
+              dateOfEvent,
+              maxDateOfConfirmation,
+              nameOfCelebrated,
+              typeOfEvent
+            },
+            userId,
+            eventId
+          ]
+        )
+      )
+
+      if (override) {
+        queryPromises.push(
+          actualConnection.query(
+            'UPDATE invites SET confirmation = NULL, message = NULL, dateOfConfirmation = NULL, isMessageRead = 0, inviteViewed = 0, needsAccomodation = NULL, entriesConfirmed = NULL WHERE eventId = UUID_TO_BIN(?)',
+            [eventId]
+          ),
+          actualConnection.query(
+            'DELETE FROM settings WHERE eventId = UUID_TO_BIN(?)',
+            [eventId]
+          )
+        )
+      }
+
+      // Execute all promises
+      await Promise.all(queryPromises)
+
+      // Commit transaction
+      await actualConnection.commit()
+    } catch (err) {
+      // Rollback transaction
+      await actualConnection.rollback()
+
+      // Release connection
+      actualConnection.release()
+      return Promise.reject(err)
+    }
   }
 
   getEventsInfo = async (userId: string): Promise<IUserEventsInfo[]> => {

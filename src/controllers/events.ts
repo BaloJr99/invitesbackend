@@ -203,6 +203,7 @@ export class EventsController {
   updateEvent = async (req: Request, res: Response) => {
     try {
       const result = validateEvent(req.body)
+      const { override } = req.query;
 
       if (!result.success) {
         return res.status(422).json(JSON.parse(result.error.message))
@@ -210,7 +211,7 @@ export class EventsController {
 
       const { id } = req.params
 
-      await this.eventService.updateEvent(id, result.data)
+      await this.eventService.updateEvent(id, result.data, Boolean(override))
 
       return res.status(201).json({ message: req.t('messages.EVENT_UPDATED') })
     } catch (_e) {

@@ -63,9 +63,7 @@ export class InvitesService {
     return uuid
   }
 
-  createBulkInvite = async (
-    invites: IBulkInvite[]
-  ) => {
+  createBulkInvite = async (invites: IBulkInvite[]) => {
     const invitesToInsert = invites.map((invite) => ({
       id: crypto.randomUUID().toString(),
       family: invite.family,
@@ -86,17 +84,19 @@ export class InvitesService {
 
       // Insert query into promise array
       invitesToInsert.forEach((invite) => {
-        this.connection.query(
-          `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
-          [
-            invite.id,
-            invite.family,
-            invite.entriesNumber,
-            invite.phoneNumber,
-            invite.kidsAllowed,
-            invite.eventId,
-            invite.inviteGroupId
-          ]
+        queryPromises.push(
+          actualConnection.query(
+            `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+            [
+              invite.id,
+              invite.family,
+              invite.entriesNumber,
+              invite.phoneNumber,
+              invite.kidsAllowed,
+              invite.eventId,
+              invite.inviteGroupId
+            ]
+          )
         )
       })
 
@@ -150,9 +150,10 @@ export class InvitesService {
     )
   }
 
-  updateSaveTheDateConfirmation = async (confirmations: ISaveTheDateConfirmation) => {
-    const { id, needsAccomodation } =
-      confirmations
+  updateSaveTheDateConfirmation = async (
+    confirmations: ISaveTheDateConfirmation
+  ) => {
+    const { id, needsAccomodation } = confirmations
 
     await this.connection.query(
       'UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)',
