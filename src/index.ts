@@ -4,7 +4,6 @@ import { connection } from './config/mysql/connection.js'
 import dbConnect from './config/mongo/mongo.js'
 import { createRoles } from './utils/createRoles.handle.js'
 import { EventsService } from './services/events.js'
-import { ImagesService } from './config/cloudinary/cloudinary.js'
 import { InviteImagesService } from './services/inviteImages.js'
 import { InviteGroupsService } from './services/inviteGroups.js'
 import { UsersService } from './services/users.js'
@@ -14,6 +13,8 @@ import { mailConnection } from './config/nodemailer/transporter.js'
 import { MailService } from './services/mail.js'
 import { InvitesService } from './services/invites.js'
 import { LoggerService } from './services/logger.js'
+import { ImagesService } from './services/images.js'
+import { cloudinaryConfig } from './config/cloudinary/cloudinary.js'
 dotenv.config()
 
 const main = () => {
@@ -29,7 +30,7 @@ const main = () => {
   new App(
     new EventsService(mysqlConnection),
     new InviteGroupsService(mysqlConnection),
-    new ImagesService(),
+    new ImagesService(cloudinaryConfig),
     new InviteImagesService(mysqlConnection),
     new InvitesService(mysqlConnection),
     new LoggerService(mysqlConnection),

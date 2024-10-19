@@ -2,10 +2,10 @@ import { Router } from 'express'
 import { ImagesController } from '../controllers/images.js'
 import { validateUuid } from '../middleware/validateUuid.js'
 import { InviteImagesService } from '../services/inviteImages.js'
-import { ImagesService } from '../config/cloudinary/cloudinary.js'
 import { LoggerService } from '../services/logger.js'
 import { isInvitesAdmin } from '../middleware/auth.js'
 import { checkJwt } from '../middleware/session.js'
+import { ImagesService } from '../services/images.js'
 
 export const imagesRouter = Router()
 
@@ -33,7 +33,7 @@ export const createImagesRouter = (
     [checkJwt, isInvitesAdmin],
     imagesController.deleteImage
   )
-  
+
   imagesRouter.put(
     '/',
     [checkJwt, isInvitesAdmin],

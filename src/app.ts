@@ -3,7 +3,6 @@ import path from 'path'
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js'
 import { EventsService } from './services/events.js'
 import { InviteImagesService } from './services/inviteImages.js'
-import { ImagesService } from './config/cloudinary/cloudinary.js'
 import { InviteGroupsService } from './services/inviteGroups.js'
 import { UsersService } from './services/users.js'
 import { Server } from 'socket.io'
@@ -21,6 +20,7 @@ import Backend from 'i18next-fs-backend'
 import { handle, LanguageDetector } from 'i18next-http-middleware'
 import { fileURLToPath } from 'url'
 import { IUserFromInvite } from './interfaces/usersModel.js'
+import { ImagesService } from './services/images.js'
 
 export class App {
   constructor(

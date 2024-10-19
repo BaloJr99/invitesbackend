@@ -1,9 +1,9 @@
-import { ImagesService } from '../config/cloudinary/cloudinary.js'
 import { validateImageUsage, validateImages } from '../schemas/images.js'
 import { InviteImagesService } from '../services/inviteImages.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
+import { ImagesService } from '../services/images.js'
 
 export class ImagesController {
   errorHandler: ErrorHandler

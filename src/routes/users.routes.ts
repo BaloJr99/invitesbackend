@@ -8,7 +8,7 @@ import {
 import { EventsService } from '../services/events.js'
 import { LoggerService } from '../services/logger.js'
 import { isAdmin, isInvitesAdmin } from '../middleware/auth.js'
-import { ImagesService } from '../config/cloudinary/cloudinary.js'
+import { ImagesService } from '../services/images.js'
 
 export const usersRouter = Router()
 

@@ -8,14 +8,4 @@ cloudinary.config({
   secure: true
 })
 
-export class ImagesService {
-  uploadImage = async (image: string, folder: string) => {
-    return await cloudinary.uploader.upload(image, {
-      folder
-    })
-  }
-
-  deleteImage = async (imageId: string) => {
-    return await cloudinary.uploader.destroy(imageId)
-  }
-}
+export const cloudinaryConfig = cloudinary

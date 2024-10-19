@@ -4,7 +4,6 @@ import { createImagesRouter } from './images.routes.js'
 import { createInviteGroupsRouter } from './inviteGroups.routes.js'
 import { createAuthRouter } from './auth.routes.js'
 import { EventsService } from '../services/events.js'
-import { ImagesService } from '../config/cloudinary/cloudinary.js'
 import { InviteImagesService } from '../services/inviteImages.js'
 import { InviteGroupsService } from '../services/inviteGroups.js'
 import { UsersService } from '../services/users.js'
@@ -20,6 +19,7 @@ import { LoggerService } from '../services/logger.js'
 import { isAdmin, isInvitesAdmin } from '../middleware/auth.js'
 import { checkJwt } from '../middleware/session.js'
 import { createLoggersRouter } from './logger.routes.js'
+import { ImagesService } from '../services/images.js'
 
 export const apiRouter = Router()
 

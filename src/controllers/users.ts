@@ -8,8 +8,8 @@ import {
 } from '../schemas/users.js'
 import { EventsService } from '../services/events.js'
 import { LoggerService } from '../services/logger.js'
-import { ImagesService } from '../config/cloudinary/cloudinary.js'
 import { IUserEventsInfo, IUserInfo } from '../interfaces/usersModel.js'
+import { ImagesService } from '../services/images.js'
 
 export class UsersController {
   errorHandler: ErrorHandler
