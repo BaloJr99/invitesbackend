@@ -71,7 +71,7 @@ export class FilesController {
         )
       }
 
-      return res.status(201).json({ message: req.t('messages.FILE_CREATED') })
+      return res.status(201).json({ message: req.t('messages.FILES_CREATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -94,7 +94,7 @@ export class FilesController {
 
       await this.filesService.updateImages(result.data)
 
-      return res.status(201).json({ message: req.t('messages.FILE_UPDATED') })
+      return res.status(201).json({ message: req.t('messages.FILES_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
