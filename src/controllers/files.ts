@@ -1,4 +1,8 @@
-import { validateFileUsage, validateFile, validateEventId } from '../schemas/images.js'
+import {
+  validateFileUsage,
+  validateFile,
+  validateEventId
+} from '../schemas/images.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
@@ -21,24 +25,27 @@ export class FilesController {
     try {
       if (req.file) {
         const result = validateEventId(req.body)
-        
+
         if (!result.success) {
           return res.status(422).json(JSON.parse(result.error.message))
         }
 
-        const cloudResult = await this.filesService.uploadFile(
+        const cloudResult = (await this.filesService.uploadAsset(
           req.file.buffer,
           'audios',
           FileType.Video
-        ) as UploadApiResponse
+        )) as UploadApiResponse
 
         const { eventId } = result.data
 
-        await this.filesService.createFile({
-          fileUrl: cloudResult.secure_url,
-          publicId: cloudResult.public_id,
-          eventId
-        }, FileType.Video)
+        await this.filesService.createFile(
+          {
+            fileUrl: cloudResult.secure_url,
+            publicId: cloudResult.public_id,
+            eventId
+          },
+          FileType.Video
+        )
       } else {
         const result = validateFile(req.body)
 
@@ -46,7 +53,7 @@ export class FilesController {
           return res.status(422).json(JSON.parse(result.error.message))
         }
 
-        const cloudResult = (await this.filesService.uploadFile(
+        const cloudResult = (await this.filesService.uploadAsset(
           result.data.image,
           'invites',
           FileType.Image
@@ -54,11 +61,14 @@ export class FilesController {
 
         const { eventId } = result.data
 
-        await this.filesService.createFile({
-          fileUrl: cloudResult.secure_url,
-          publicId: cloudResult.public_id,
-          eventId
-        }, FileType.Image)
+        await this.filesService.createFile(
+          {
+            fileUrl: cloudResult.secure_url,
+            publicId: cloudResult.public_id,
+            eventId
+          },
+          FileType.Image
+        )
       }
 
       return res.status(201).json({ message: req.t('messages.FILE_CREATED') })
@@ -101,9 +111,14 @@ export class FilesController {
     try {
       const image = req.body
 
-      await this.filesService.deleteFile(image.publicId)
+      const fileType =
+        image.publicId.split('/')[0] === 'audios'
+          ? FileType.Video
+          : FileType.Image
 
-      await this.filesService.deleteImage(image.id)
+      await this.filesService.deleteAsset(image.publicId, fileType)
+
+      await this.filesService.deleteFile(image.id, fileType)
 
       return res.json({ message: req.t('messages.FILE_DELETED') })
     } catch (_e) {

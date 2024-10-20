@@ -256,12 +256,13 @@ export class UsersController {
       )
 
       if (searchLastPhoto && searchLastPhoto.profilePhotoPublicId) {
-        await this.filesService.deleteFile(
-          searchLastPhoto.profilePhotoPublicId
+        await this.filesService.deleteAsset(
+          searchLastPhoto.profilePhotoPublicId,
+          FileType.Image
         )
       }
 
-      const cloudResult = await this.filesService.uploadFile(
+      const cloudResult = await this.filesService.uploadAsset(
         result.data.profilePhotoSource,
         'users',
         FileType.Image

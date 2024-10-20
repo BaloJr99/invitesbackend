@@ -50,7 +50,7 @@ export const createApiRouter = (
     createInviteGroupsRouter(inviteGroupsService, loggerService)
   )
 
-  apiRouter.use('/images', createFilesRouter(filesService, loggerService))
+  apiRouter.use('/files', createFilesRouter(filesService, loggerService))
 
   apiRouter.use(
     '/invites',

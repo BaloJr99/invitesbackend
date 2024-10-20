@@ -32,7 +32,9 @@ export class FilesService {
     const [{ uuid }] = queryResult as { uuid: string }[]
 
     await this.connection.query(
-      `INSERT INTO ${fileType === FileType.Image ? 'inviteImages' : 'invitesAudio'} (id, fileUrl, publicId, eventId) VALUES (UUID_TO_BIN(?), ?, ?, UUID_TO_BIN(?))`,
+      `INSERT INTO ${
+        fileType === FileType.Image ? 'inviteImages' : 'invitesAudio'
+      } (id, fileUrl, publicId, eventId) VALUES (UUID_TO_BIN(?), ?, ?, UUID_TO_BIN(?))`,
       [uuid, fileUrl, publicId, eventId]
     )
   }
@@ -47,14 +49,14 @@ export class FilesService {
     }
   }
 
-  deleteImage = async (imageId: string) => {
+  deleteFile = async (imageId: string, fileType: FileType) => {
     await this.connection.query(
-      'DELETE FROM inviteImages WHERE id = UUID_TO_BIN(?)',
+      `DELETE FROM ${fileType === FileType.Video ? 'invitesAudio' : 'inviteImages'} WHERE id = UUID_TO_BIN(?)`,
       [imageId]
     )
   }
 
-  uploadFile = async (
+  uploadAsset = async (
     file: string | Buffer,
     folder: string,
     fileType: FileType
@@ -67,9 +69,9 @@ export class FilesService {
     } else {
       return new Promise((resolve, reject) => {
         const stream = this.cloudinary.uploader.upload_stream(
-          { 
+          {
             folder,
-            resource_type: 'video' 
+            resource_type: 'video'
           },
           (error, result) => {
             if (error) reject(error)
@@ -81,7 +83,16 @@ export class FilesService {
     }
   }
 
-  deleteFile = async (imageId: string) => {
-    return await this.cloudinary.uploader.destroy(imageId)
+  deleteAsset = async (imageId: string, fileType: FileType) => {
+    if (fileType === FileType.Video) {
+      await this.cloudinary.uploader.destroy(imageId, {
+        resource_type: 'video',
+        invalidate: true
+      })
+    } else {
+      return await this.cloudinary.uploader.destroy(imageId, {
+        resource_type: 'image'
+      })
+    }
   }
 }
