@@ -1,5 +1,12 @@
 export const enum EventType {
   Xv = 'X',
   Boda = 'W',
-  SaveTheDate = 'S',
+  SaveTheDate = 'S'
+}
+
+export const enum FileType {
+  Image = 'image',
+  Video = 'video',
+  Raw = 'raw',
+  Auto = 'auto'
 }

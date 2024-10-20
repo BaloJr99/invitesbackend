@@ -8,7 +8,7 @@ import {
 import { EventsService } from '../services/events.js'
 import { LoggerService } from '../services/logger.js'
 import { isAdmin, isInvitesAdmin } from '../middleware/auth.js'
-import { ImagesService } from '../services/images.js'
+import { FilesService } from '../services/files.js'
 
 export const usersRouter = Router()
 
@@ -16,13 +16,13 @@ export const createUsersRouter = (
   userService: UsersService,
   eventsService: EventsService,
   loggerService: LoggerService,
-  imagesService: ImagesService
+  filesService: FilesService
 ) => {
   const userController = new UsersController(
     userService,
     eventsService,
     loggerService,
-    imagesService
+    filesService
   )
 
   usersRouter.get('/', [isAdmin], userController.getUsers)

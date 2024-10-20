@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ImageUsageModel, ImagesModel } from '../interfaces/imagesModel.js'
+import { IFilesUpload, IImageUsageModel } from '../interfaces/filesModel.js'
 
 const imagesSchema = z.object({
   image: z
@@ -44,10 +44,14 @@ const imageUsageSchema = z
   })
   .array()
 
-export function validateImages(images: ImagesModel) {
+export function validateFile(images: IFilesUpload) {
   return imagesSchema.safeParse(images)
 }
 
-export function validateImageUsage(imageUsage: ImageUsageModel[]) {
+export function validateEventId(images: IFilesUpload) {
+  return imagesSchema.pick({ eventId: true }).safeParse(images)
+}
+
+export function validateFileUsage(imageUsage: IImageUsageModel[]) {
   return imageUsageSchema.safeParse(imageUsage)
 }

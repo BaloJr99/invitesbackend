@@ -1,10 +1,8 @@
 import { Router } from 'express'
 import { createEventsRouter } from './events.routes.js'
-import { createImagesRouter } from './images.routes.js'
 import { createInviteGroupsRouter } from './inviteGroups.routes.js'
 import { createAuthRouter } from './auth.routes.js'
 import { EventsService } from '../services/events.js'
-import { InviteImagesService } from '../services/inviteImages.js'
 import { InviteGroupsService } from '../services/inviteGroups.js'
 import { UsersService } from '../services/users.js'
 import { SettingsService } from '../services/settings.js'
@@ -19,15 +17,15 @@ import { LoggerService } from '../services/logger.js'
 import { isAdmin, isInvitesAdmin } from '../middleware/auth.js'
 import { checkJwt } from '../middleware/session.js'
 import { createLoggersRouter } from './logger.routes.js'
-import { ImagesService } from '../services/images.js'
+import { FilesService } from '../services/files.js'
+import { createFilesRouter } from './files.routes.js'
 
 export const apiRouter = Router()
 
 export const createApiRouter = (
   eventsService: EventsService,
   inviteGroupsService: InviteGroupsService,
-  imagesService: ImagesService,
-  inviteImagesService: InviteImagesService,
+  filesService: FilesService,
   invitesService: InvitesService,
   loggerService: LoggerService,
   mailService: MailService,
@@ -52,10 +50,7 @@ export const createApiRouter = (
     createInviteGroupsRouter(inviteGroupsService, loggerService)
   )
 
-  apiRouter.use(
-    '/images',
-    createImagesRouter(imagesService, inviteImagesService, loggerService)
-  )
+  apiRouter.use('/images', createFilesRouter(filesService, loggerService))
 
   apiRouter.use(
     '/invites',
@@ -82,7 +77,7 @@ export const createApiRouter = (
   apiRouter.use(
     '/users',
     [checkJwt],
-    createUsersRouter(userService, eventsService, loggerService, imagesService)
+    createUsersRouter(userService, eventsService, loggerService, filesService)
   )
 
   return apiRouter

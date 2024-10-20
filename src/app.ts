@@ -2,7 +2,6 @@ import express, { json } from 'express'
 import path from 'path'
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js'
 import { EventsService } from './services/events.js'
-import { InviteImagesService } from './services/inviteImages.js'
 import { InviteGroupsService } from './services/inviteGroups.js'
 import { UsersService } from './services/users.js'
 import { Server } from 'socket.io'
@@ -20,14 +19,13 @@ import Backend from 'i18next-fs-backend'
 import { handle, LanguageDetector } from 'i18next-http-middleware'
 import { fileURLToPath } from 'url'
 import { IUserFromInvite } from './interfaces/usersModel.js'
-import { ImagesService } from './services/images.js'
+import { FilesService } from './services/files.js'
 
 export class App {
   constructor(
     private eventsService: EventsService,
     private inviteGroupsService: InviteGroupsService,
-    private imagesService: ImagesService,
-    private inviteImagesService: InviteImagesService,
+    private filesService: FilesService,
     private invitesService: InvitesService,
     private loggerService: LoggerService,
     private mailService: MailService,
@@ -37,8 +35,7 @@ export class App {
   ) {
     this.eventsService = eventsService
     this.inviteGroupsService = inviteGroupsService
-    this.imagesService = imagesService
-    this.inviteImagesService = inviteImagesService
+    this.filesService = filesService
     this.invitesService = invitesService
     this.loggerService = loggerService
     this.mailService = mailService
@@ -116,8 +113,7 @@ export class App {
       createApiRouter(
         this.eventsService,
         this.inviteGroupsService,
-        this.imagesService,
-        this.inviteImagesService,
+        this.filesService,
         this.invitesService,
         this.loggerService,
         this.mailService,

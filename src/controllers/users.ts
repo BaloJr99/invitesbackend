@@ -9,7 +9,9 @@ import {
 import { EventsService } from '../services/events.js'
 import { LoggerService } from '../services/logger.js'
 import { IUserEventsInfo, IUserInfo } from '../interfaces/usersModel.js'
-import { ImagesService } from '../services/images.js'
+import { FilesService } from '../services/files.js'
+import { FileType } from '../interfaces/enum.js'
+import { UploadApiResponse } from 'cloudinary'
 
 export class UsersController {
   errorHandler: ErrorHandler
@@ -17,7 +19,7 @@ export class UsersController {
     private userService: UsersService,
     private eventsService: EventsService,
     private loggerService: LoggerService,
-    private imagesService: ImagesService
+    private filesService: FilesService
   ) {
     this.userService = userService
     this.errorHandler = new ErrorHandler(this.loggerService)
@@ -254,15 +256,16 @@ export class UsersController {
       )
 
       if (searchLastPhoto && searchLastPhoto.profilePhotoPublicId) {
-        await this.imagesService.deleteImage(
+        await this.filesService.deleteFile(
           searchLastPhoto.profilePhotoPublicId
         )
       }
 
-      const cloudResult = await this.imagesService.uploadImage(
+      const cloudResult = await this.filesService.uploadFile(
         result.data.profilePhotoSource,
-        'users'
-      )
+        'users',
+        FileType.Image
+      ) as UploadApiResponse
 
       await this.userService.updateUserProfilePhoto({
         id: result.data.id,
