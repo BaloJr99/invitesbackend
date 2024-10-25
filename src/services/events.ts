@@ -3,7 +3,7 @@ import {
   EventModel,
   IDashboardEvent,
   IDropdownEvent,
-  IEventType,
+  IEventInformation,
   IFullEvent,
   IsDeadlineMet,
   IUserEventsInfo
@@ -40,13 +40,13 @@ export class EventsService {
     return result as IDropdownEvent[]
   }
 
-  getEventType = async (eventId: string): Promise<IEventType[]> => {
+  eventInformation = async (eventId: string): Promise<IEventInformation[]> => {
     const [result] = (await this.connection.query(
-      'SELECT typeOfEvent FROM events WHERE id = UUID_TO_BIN(?)',
+      'SELECT typeOfEvent, settings FROM events AS e INNER JOIN settings AS s ON e.id = s.eventId WHERE id = UUID_TO_BIN(?)',
       [eventId]
     )) as [RowDataPacket[], FieldPacket[]]
 
-    return result as IEventType[]
+    return result as IEventInformation[]
   }
 
   getDropdownEventsByUserId = async (

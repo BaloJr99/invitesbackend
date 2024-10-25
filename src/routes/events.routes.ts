@@ -14,7 +14,7 @@ export const createEventsRouter = (
 
   eventsRouter.get('/', eventController.getAllEvents)
   eventsRouter.get('/dropdown', eventController.getDropdownEvents)
-  eventsRouter.get('/:id/eventType', eventController.getEventType)
+  eventsRouter.get('/:id/eventInformation', eventController.eventInformation)
 
   eventsRouter.get(
     '/invites/:id',

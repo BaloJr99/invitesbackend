@@ -146,6 +146,30 @@ const saveTheDateSettingsSchema = z.object({
     })
     .min(1, {
       message: 'You must provide the reception place'
+    }),
+  copyMessage: z
+    .string({
+      invalid_type_error: 'The copy message must be a string',
+      required_error: 'The copy message is required'
+    })
+    .min(1, {
+      message: 'You must provide the copy message'
+    }),
+  hotelName: z
+    .string({
+      invalid_type_error: 'The hotel name must be a string',
+      required_error: 'The hotel name is required'
+    })
+    .min(1, {
+      message: 'You must provide the hotel name'
+    }),
+  hotelInformation: z
+    .string({
+      invalid_type_error: 'The hotel information must be a string',
+      required_error: 'The hotel information is required'
+    })
+    .url({
+      message: 'The hotel information must be a valid URL'
     })
 })
 

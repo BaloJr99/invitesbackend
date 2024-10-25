@@ -69,13 +69,30 @@ export class EventsController {
     }
   }
 
-  getEventType = async (req: Request, res: Response) => {
+  eventInformation = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
+      const { eventSettings } = req.query
 
-      const eventType = await this.eventService.getEventType(id)
+      const eventType = await this.eventService.eventInformation(id)
 
-      if (eventType.length > 0) return res.json(eventType[0].typeOfEvent)
+      if (eventType.length > 0) {
+        const eventData = eventType[0]
+        const filterSettings = eventSettings as string
+
+        const settings = JSON.parse(eventData.settings)
+
+        return res.json({
+          typeOfEvent: eventData.typeOfEvent,
+          settings: JSON.stringify(
+            Object.fromEntries(
+              Object.entries(settings).filter(([key]) =>
+                filterSettings.includes(key)
+              )
+            )
+          )
+        })
+      }
 
       return res
         .status(404)
@@ -211,7 +228,11 @@ export class EventsController {
 
       const { id } = req.params
 
-      await this.eventService.updateEvent(id, result.data, JSON.parse(override as string))
+      await this.eventService.updateEvent(
+        id,
+        result.data,
+        JSON.parse(override as string)
+      )
 
       return res.status(201).json({ message: req.t('messages.EVENT_UPDATED') })
     } catch (_e) {
