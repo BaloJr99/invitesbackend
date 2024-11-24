@@ -1,4 +1,4 @@
-export interface IFullFiles {
+export interface IFullFile {
   id: string
   fileUrl: string
   publicId: string
@@ -7,6 +7,9 @@ export interface IFullFiles {
   imageUsage: string
 }
 
-export type IFilesUpload = Pick<IFullFiles, 'image' | 'eventId'>
-export type IFilesModel = Pick<IFullFiles, 'fileUrl' | 'publicId' | 'eventId'>
-export type IImageUsageModel = Pick<IFullFiles, 'id' | 'imageUsage'>
+export type IFilesUpload = Pick<IFullFile, 'image' | 'eventId'>
+export type IFilesModel = Pick<IFullFile, 'fileUrl' | 'publicId' | 'eventId'>
+export type IImageUsageModel = Pick<IFullFile, 'id' | 'imageUsage'>
+
+export type IDownloadImage = Omit<IFullFile, 'image' | 'eventId'>;
+export type IDownloadAudio = Omit<IFullFile, 'image' | 'eventId' | 'imageUsage'>;

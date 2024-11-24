@@ -7,41 +7,57 @@ export class SettingsService {
   }
 
   getEventSettingsById = async (eventId: string): Promise<IBaseSettings[]> => {
-    const [result] = (await this.connection.query(
-      'SELECT BIN_TO_UUID(eventId) eventId, settings FROM settings WHERE eventId = UUID_TO_BIN(?)',
-      [eventId]
-    )) as [RowDataPacket[], FieldPacket[]]
+    try {
+      const conn = await this.connection.getConnection()
 
-    return result as IBaseSettings[]
+      const [result] = (await conn.query(
+        'SELECT BIN_TO_UUID(eventId) eventId, settings FROM settings WHERE eventId = UUID_TO_BIN(?)',
+        [eventId]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      conn.release()
+      return result as IBaseSettings[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   createEventSettings = async (
     eventSettings: IBaseSettings
   ): Promise<string> => {
-    const { eventId, settings } = eventSettings
+    try {
+      const conn = await this.connection.getConnection()
 
-    await this.connection.query(
-      `INSERT INTO settings (eventId, settings) VALUES (UUID_TO_BIN(?), ?)`,
-      [eventId, settings]
-    )
+      const { eventId, settings } = eventSettings
 
-    return eventId
+      await conn.query(
+        `INSERT INTO settings (eventId, settings) VALUES (UUID_TO_BIN(?), ?)`,
+        [eventId, settings]
+      )
+
+      conn.release()
+      return eventId
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   updateEventSettings = async (eventSettings: IBaseSettings): Promise<void> => {
-    const {
-      eventId,
-      settings
-    } = eventSettings
+    try {
+      const { eventId, settings } = eventSettings
 
-    await this.connection.query(
-      'UPDATE settings SET ? WHERE eventId = UUID_TO_BIN(?)',
-      [
+      const conn = await this.connection.getConnection()
+
+      await conn.query('UPDATE settings SET ? WHERE eventId = UUID_TO_BIN(?)', [
         {
           settings
         },
         eventId
-      ]
-    )
+      ])
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

@@ -1,5 +1,10 @@
-import { Pool } from 'mysql2/promise'
-import { IFilesModel, IImageUsageModel } from '../interfaces/filesModel.js'
+import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
+import {
+  IDownloadAudio,
+  IDownloadImage,
+  IFilesModel,
+  IImageUsageModel
+} from '../interfaces/filesModel.js'
 import { cloudinaryConfig } from '../config/cloudinary/cloudinary.js'
 import { FileType } from '../interfaces/enum.js'
 
@@ -11,49 +16,92 @@ export class FilesService {
     this.connection = connection
   }
 
-  getImageByEventId = async (eventId: string) => {
-    return await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, fileUrl, publicId, imageUsage FROM inviteImages WHERE eventId = UUID_TO_BIN(?) ORDER BY imageUsage',
-      [eventId]
-    )
+  getImageByEventId = async (eventId: string): Promise<IDownloadImage[]> => {
+    try {
+      const conn = await this.connection.getConnection()
+
+      const [results] = (await conn.query(
+        'SELECT BIN_TO_UUID(id) id, fileUrl, publicId, imageUsage FROM inviteImages WHERE eventId = UUID_TO_BIN(?) ORDER BY imageUsage',
+        [eventId]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      conn.release()
+      return results as IDownloadImage[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
-  getAudioByEventId = async (eventId: string) => {
-    return await this.connection.query(
-      'SELECT BIN_TO_UUID(id) id, fileUrl, publicId FROM invitesAudio WHERE eventId = UUID_TO_BIN(?)',
-      [eventId]
-    )
+  getAudioByEventId = async (eventId: string): Promise<IDownloadAudio[]> => {
+    try {
+      const conn = await this.connection.getConnection()
+
+      const [results] = (await conn.query(
+        'SELECT BIN_TO_UUID(id) id, fileUrl, publicId FROM invitesAudio WHERE eventId = UUID_TO_BIN(?)',
+        [eventId]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      return results as IDownloadAudio[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   createFile = async (image: IFilesModel, fileType: FileType) => {
-    const { fileUrl, publicId, eventId } = image
+    try {
+      const conn = await this.connection.getConnection()
 
-    const [queryResult] = await this.connection.query('SELECT UUID() uuid')
-    const [{ uuid }] = queryResult as { uuid: string }[]
+      const { fileUrl, publicId, eventId } = image
 
-    await this.connection.query(
-      `INSERT INTO ${
-        fileType === FileType.Image ? 'inviteImages' : 'invitesAudio'
-      } (id, fileUrl, publicId, eventId) VALUES (UUID_TO_BIN(?), ?, ?, UUID_TO_BIN(?))`,
-      [uuid, fileUrl, publicId, eventId]
-    )
+      const [queryResult] = await conn.query('SELECT UUID() uuid')
+      const [{ uuid }] = queryResult as { uuid: string }[]
+
+      await conn.query(
+        `INSERT INTO ${
+          fileType === FileType.Image ? 'inviteImages' : 'invitesAudio'
+        } (id, fileUrl, publicId, eventId) VALUES (UUID_TO_BIN(?), ?, ?, UUID_TO_BIN(?))`,
+        [uuid, fileUrl, publicId, eventId]
+      )
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   updateImages = async (images: IImageUsageModel[]) => {
-    for (const image of images) {
-      const { id, imageUsage } = image
-      await this.connection.query(
-        'UPDATE inviteImages SET imageUsage = ? WHERE id = UUID_TO_BIN(?)',
-        [imageUsage, id]
-      )
+    try {
+      const conn = await this.connection.getConnection()
+
+      for (const image of images) {
+        const { id, imageUsage } = image
+        await conn.query(
+          'UPDATE inviteImages SET imageUsage = ? WHERE id = UUID_TO_BIN(?)',
+          [imageUsage, id]
+        )
+      }
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
     }
   }
 
   deleteFile = async (imageId: string, fileType: FileType) => {
-    await this.connection.query(
-      `DELETE FROM ${fileType === FileType.Video ? 'invitesAudio' : 'inviteImages'} WHERE id = UUID_TO_BIN(?)`,
-      [imageId]
-    )
+    try {
+      const conn = await this.connection.getConnection()
+
+      await conn.query(
+        `DELETE FROM ${
+          fileType === FileType.Video ? 'invitesAudio' : 'inviteImages'
+        } WHERE id = UUID_TO_BIN(?)`,
+        [imageId]
+      )
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   uploadAsset = async (

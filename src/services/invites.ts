@@ -19,51 +19,90 @@ export class InvitesService {
     userId: string,
     isAdmin: boolean
   ): Promise<IDashboardInvite[]> => {
-    const [result] = (await this.connection.execute(
-      'CALL getInvites(CAST(? AS BINARY), ?)',
-      [userId, +isAdmin]
-    )) as [RowDataPacket[], FieldPacket[]]
-    return result.at(0) as IDashboardInvite[]
+    try {
+      const conn = await this.connection.getConnection()
+
+      const [result] = (await conn.execute(
+        'CALL getInvites(CAST(? AS BINARY), ?)',
+        [userId, +isAdmin]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      conn.release()
+      return result.at(0) as IDashboardInvite[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   getInvite = async (id: string): Promise<IUserInvite[]> => {
-    const [result] = (await this.connection.query(
-      'SELECT BIN_TO_UUID(e.id) id, family, entriesNumber, confirmation, kidsAllowed, ev.dateOfEvent, ev.maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, BIN_TO_UUID(eventId) eventId, needsAccomodation FROM invites AS e INNER JOIN events as ev ON e.eventId = ev.id WHERE e.id = UUID_TO_BIN(?)',
-      [id]
-    )) as [RowDataPacket[], FieldPacket[]]
+    try {
+      const conn = await this.connection.getConnection()
 
-    return result as IUserInvite[]
+      const [result] = (await conn.query(
+        'SELECT BIN_TO_UUID(e.id) id, family, entriesNumber, confirmation, kidsAllowed, ev.dateOfEvent, ev.maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, BIN_TO_UUID(eventId) eventId, needsAccomodation FROM invites AS e INNER JOIN events as ev ON e.eventId = ev.id WHERE e.id = UUID_TO_BIN(?)',
+        [id]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      conn.release()
+      return result as IUserInvite[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   markAsViewed = async (id: string): Promise<void> => {
-    await this.connection.query(
-      'UPDATE invites SET inviteViewed = ? WHERE id = UUID_TO_BIN(?)',
-      [true, id]
-    )
+    try {
+      const conn = await this.connection.getConnection()
+
+      await conn.query(
+        'UPDATE invites SET inviteViewed = ? WHERE id = UUID_TO_BIN(?)',
+        [true, id]
+      )
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   createInvite = async (invite: IUpsertInvite): Promise<string> => {
-    const {
-      family,
-      entriesNumber,
-      phoneNumber,
-      kidsAllowed,
-      eventId,
-      inviteGroupId
-    } = invite
+    try {
+      const {
+        family,
+        entriesNumber,
+        phoneNumber,
+        kidsAllowed,
+        eventId,
+        inviteGroupId
+      } = invite
 
-    const [queryResult] = await this.connection.query('SELECT UUID() uuid')
-    const [{ uuid }] = queryResult as { uuid: string }[]
+      const conn = await this.connection.getConnection()
 
-    await this.connection.query(
-      `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
-      [family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId]
-    )
+      const [queryResult] = await conn.query('SELECT UUID() uuid')
+      const [{ uuid }] = queryResult as { uuid: string }[]
 
-    return uuid
+      await conn.query(
+        `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN('${uuid}'), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
+        [
+          family,
+          entriesNumber,
+          phoneNumber,
+          kidsAllowed,
+          eventId,
+          inviteGroupId
+        ]
+      )
+
+      conn.release()
+      return uuid
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
-  createBulkInvite = async (invites: IBulkInvite[]) => {
+  createBulkInvite = async (
+    invites: IBulkInvite[]
+  ): Promise<IUpsertInvite[]> => {
     const invitesToInsert = invites.map((invite) => ({
       id: crypto.randomUUID().toString(),
       family: invite.family,
@@ -74,18 +113,18 @@ export class InvitesService {
       inviteGroupId: invite.inviteGroupId
     })) as IUpsertInvite[]
 
-    const actualConnection = await this.connection.getConnection()
+    const conn = await this.connection.getConnection()
 
     try {
       // Begin transaction with current connection
-      await actualConnection.beginTransaction()
+      await conn.beginTransaction()
 
       const queryPromises: Promise<[QueryResult, FieldPacket[]]>[] = []
 
       // Insert query into promise array
       invitesToInsert.forEach((invite) => {
         queryPromises.push(
-          actualConnection.query(
+          conn.query(
             `INSERT INTO invites (id, family, entriesNumber, phoneNumber, kidsAllowed, eventId, inviteGroupId) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(?), UUID_TO_BIN(?))`,
             [
               invite.id,
@@ -104,87 +143,150 @@ export class InvitesService {
       await Promise.all(queryPromises)
 
       // Commit transaction
-      await actualConnection.commit()
+      await conn.commit()
       return invitesToInsert
     } catch (err) {
       // Rollback transaction
-      await actualConnection.rollback()
+      await conn.rollback()
 
       // Release connection
-      actualConnection.release()
+      conn.release()
       return Promise.reject(err)
     }
   }
 
   bulkDeleteInvite = async (invites: string[]): Promise<void> => {
-    const placeholders = invites.map(() => 'UUID_TO_BIN(?)').join(', ')
-    await this.connection.query(
-      `DELETE FROM invites WHERE id IN (${placeholders})`,
-      invites
-    )
+    try {
+      const conn = await this.connection.getConnection()
+
+      const placeholders = invites.map(() => 'UUID_TO_BIN(?)').join(', ')
+      await conn.query(
+        `DELETE FROM invites WHERE id IN (${placeholders})`,
+        invites
+      )
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   deleteInvite = async (inviteId: string): Promise<void> => {
-    await this.connection.query(
-      'DELETE FROM invites WHERE id = UUID_TO_BIN(?)',
-      [inviteId]
-    )
+    try {
+      const conn = await this.connection.getConnection()
+
+      await conn.query('DELETE FROM invites WHERE id = UUID_TO_BIN(?)', [
+        inviteId
+      ])
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   updateInvite = async (entryModel: IUpsertInvite) => {
-    const { id, family, entriesNumber, phoneNumber, kidsAllowed } = entryModel
+    try {
+      const { id, family, entriesNumber, phoneNumber, kidsAllowed } = entryModel
+      const conn = await this.connection.getConnection()
 
-    await this.connection.query(
-      'UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)',
-      [{ family, entriesNumber, phoneNumber, kidsAllowed }, id]
-    )
+      await conn.query('UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)', [
+        { family, entriesNumber, phoneNumber, kidsAllowed },
+        id
+      ])
+      conn.release
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   updateSweetXvConfirmation = async (confirmations: IConfirmation) => {
-    const { id, entriesConfirmed, message, confirmation, dateOfConfirmation } =
-      confirmations
+    try {
+      const {
+        id,
+        entriesConfirmed,
+        message,
+        confirmation,
+        dateOfConfirmation
+      } = confirmations
 
-    await this.connection.query(
-      'UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)',
-      [{ entriesConfirmed, message, confirmation, dateOfConfirmation }, id]
-    )
+      const conn = await this.connection.getConnection()
+
+      await conn.query('UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)', [
+        { entriesConfirmed, message, confirmation, dateOfConfirmation },
+        id
+      ])
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   updateSaveTheDateConfirmation = async (
     confirmations: ISaveTheDateConfirmation
   ) => {
-    const { id, needsAccomodation } = confirmations
+    try {
+      const { id, needsAccomodation } = confirmations
+      const conn = await this.connection.getConnection()
 
-    await this.connection.query(
-      'UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)',
-      [{ needsAccomodation }, id]
-    )
+      await conn.query('UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)', [
+        { needsAccomodation },
+        id
+      ])
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   readMessage = async (inviteId: string) => {
-    await this.connection.query(
-      'UPDATE invites SET isMessageRead = true WHERE id = UUID_TO_BIN(?)',
-      [inviteId]
-    )
+    try {
+      const conn = await this.connection.getConnection()
+
+      await conn.query(
+        'UPDATE invites SET isMessageRead = true WHERE id = UUID_TO_BIN(?)',
+        [inviteId]
+      )
+
+      conn.release()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   getUserFromInviteId = async (
     inviteId: string
   ): Promise<IUserFromInvite[]> => {
-    const [result] = (await this.connection.query(
-      'SELECT CAST(userId as CHAR) AS id FROM invites AS i INNER JOIN events AS e ON e.id = i.eventId WHERE i.id = UUID_TO_BIN(?)',
-      [inviteId]
-    )) as [RowDataPacket[], FieldPacket[]]
+    try {
+      const conn = await this.connection.getConnection()
 
-    return result as IUserFromInvite[]
+      const [result] = (await conn.query(
+        'SELECT CAST(userId as CHAR) AS id FROM invites AS i INNER JOIN events AS e ON e.id = i.eventId WHERE i.id = UUID_TO_BIN(?)',
+        [inviteId]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      conn.release()
+      return result as IUserFromInvite[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   getInviteEventType = async (id: string): Promise<IInviteEventType[]> => {
-    const [result] = (await this.connection.query(
-      'SELECT typeOfEvent FROM invites AS i INNER JOIN events as ev ON i.eventId = ev.id WHERE i.id = UUID_TO_BIN(?)',
-      [id]
-    )) as [RowDataPacket[], FieldPacket[]]
+    try {
+      const conn = await this.connection.getConnection()
 
-    return result as IInviteEventType[]
+      const [result] = (await conn.query(
+        'SELECT typeOfEvent FROM invites AS i INNER JOIN events as ev ON i.eventId = ev.id WHERE i.id = UUID_TO_BIN(?)',
+        [id]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      conn.release()
+      return result as IInviteEventType[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
