@@ -1,6 +1,6 @@
 import { Pool, createPool } from 'mysql2/promise'
 
-export const connection = () => {
+export const establishConnection = () => {
   let connection: Pool
 
   if (process.env.NODE_ENV === 'development') {
@@ -16,17 +16,6 @@ export const connection = () => {
   } else {
     connection = createPool(process.env.DATABASE_URL)
   }
-
-  connection.on('connection', function (connection) {
-    console.log('DB Connection established')
-
-    connection.on('error', function (err) {
-      console.error(new Date(), 'MySQL error', err.code)
-    })
-    connection.on('close', function (err) {
-      console.error(new Date(), 'MySQL close', err)
-    })
-  })
 
   return connection
 }
