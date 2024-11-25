@@ -1,6 +1,6 @@
 import { App } from './app.js'
 import dotenv from 'dotenv'
-import { establishConnection } from './config/mysql/connection.js'
+import { ConnectionHandler } from './config/mysql/connection.js'
 import dbConnect from './config/mongo/mongo.js'
 import { createRoles } from './utils/createRoles.handle.js'
 import { EventsService } from './services/events.js'
@@ -17,7 +17,8 @@ import { FilesService } from './services/files.js'
 dotenv.config()
 
 const main = () => {
-  let mysqlConnection = establishConnection()
+  const connectionHandler = new ConnectionHandler()
+  const mysqlConnection = connectionHandler.getConnection()
 
   mysqlConnection.on('connection', function (connection) {
     console.log('DB Connection established')
@@ -27,9 +28,10 @@ const main = () => {
 
       if (err.code === 'PROTOCOL_CONNECTION_LOST') {
         console.log('Attempting to reconnect to database')
-        mysqlConnection = establishConnection()
+        connectionHandler.establishConnection()
       }
     })
+
     connection.on('close', function (err) {
       console.error(new Date(), 'MySQL close', err)
     })

@@ -25,7 +25,7 @@ export class FilesService {
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return results as IDownloadImage[]
     } catch (error) {
       return Promise.reject(error)
@@ -63,7 +63,7 @@ export class FilesService {
         [uuid, fileUrl, publicId, eventId]
       )
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -81,7 +81,7 @@ export class FilesService {
         )
       }
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -98,7 +98,7 @@ export class FilesService {
         [imageId]
       )
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }

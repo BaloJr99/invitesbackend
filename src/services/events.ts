@@ -23,7 +23,7 @@ export class EventsService {
         'SELECT BIN_TO_UUID(e.id) id, nameOfEvent, dateOfEvent, IF(count(s.eventId) > 0, true, false) AS allowCreateInvites FROM events AS e LEFT JOIN settings AS s ON s.eventId = e.id GROUP BY nameOfEvent, e.id ORDER BY nameOfEvent'
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IDashboardEvent[]
     } catch (error) {
       return Promise.reject(error)
@@ -39,7 +39,7 @@ export class EventsService {
         [userId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IDashboardEvent[]
     } catch (error) {
       return Promise.reject(error)
@@ -54,7 +54,7 @@ export class EventsService {
         'SELECT BIN_TO_UUID(id) id, nameOfEvent, typeOfEvent FROM events WHERE dateOfEvent > now() ORDER BY nameOfEvent'
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IDropdownEvent[]
     } catch (error) {
       return Promise.reject(error)
@@ -70,7 +70,7 @@ export class EventsService {
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IEventInformation[]
     } catch (error) {
       return Promise.reject(error)
@@ -88,7 +88,7 @@ export class EventsService {
         [userId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IDropdownEvent[]
     } catch (error) {
       return Promise.reject(error)
@@ -104,7 +104,7 @@ export class EventsService {
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IFullInvite[]
     } catch (error) {
       return Promise.reject(error)
@@ -120,7 +120,7 @@ export class EventsService {
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return results as IsDeadlineMet[]
     } catch (error) {
       return Promise.reject(error)
@@ -136,7 +136,7 @@ export class EventsService {
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IFullEvent[]
     } catch (error) {
       return Promise.reject(error)
@@ -171,7 +171,7 @@ export class EventsService {
         ]
       )
 
-      conn.release()
+      conn.destroy()
       return uuid
     } catch (error) {
       return Promise.reject(error)
@@ -186,7 +186,7 @@ export class EventsService {
         eventId
       ])
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -271,7 +271,7 @@ export class EventsService {
         userId
       ])) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return results.at(0) as IUserEventsInfo[]
     } catch (error) {
       return Promise.reject(error)

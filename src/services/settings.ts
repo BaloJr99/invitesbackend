@@ -15,7 +15,7 @@ export class SettingsService {
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IBaseSettings[]
     } catch (error) {
       return Promise.reject(error)
@@ -35,7 +35,7 @@ export class SettingsService {
         [eventId, settings]
       )
 
-      conn.release()
+      conn.destroy()
       return eventId
     } catch (error) {
       return Promise.reject(error)
@@ -55,7 +55,7 @@ export class SettingsService {
         eventId
       ])
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }

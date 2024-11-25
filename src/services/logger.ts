@@ -16,7 +16,7 @@ export class LoggerService {
         [dateOfError, customError, exceptionMessage, userId]
       )
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.log(error)
     }
@@ -34,7 +34,7 @@ export class LoggerService {
         [todayMinus31.toISOString().substring(0, 10)]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return results as ILogger[]
     } catch (error) {
       return Promise.reject(error)

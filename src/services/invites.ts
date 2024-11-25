@@ -27,7 +27,7 @@ export class InvitesService {
         [userId, +isAdmin]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result.at(0) as IDashboardInvite[]
     } catch (error) {
       return Promise.reject(error)
@@ -43,7 +43,7 @@ export class InvitesService {
         [id]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IUserInvite[]
     } catch (error) {
       return Promise.reject(error)
@@ -59,7 +59,7 @@ export class InvitesService {
         [true, id]
       )
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -93,7 +93,7 @@ export class InvitesService {
         ]
       )
 
-      conn.release()
+      conn.destroy()
       return uuid
     } catch (error) {
       return Promise.reject(error)
@@ -150,7 +150,7 @@ export class InvitesService {
       await conn.rollback()
 
       // Release connection
-      conn.release()
+      conn.destroy()
       return Promise.reject(err)
     }
   }
@@ -165,7 +165,7 @@ export class InvitesService {
         invites
       )
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -179,7 +179,7 @@ export class InvitesService {
         inviteId
       ])
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -217,7 +217,7 @@ export class InvitesService {
         id
       ])
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -235,7 +235,7 @@ export class InvitesService {
         id
       ])
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -250,7 +250,7 @@ export class InvitesService {
         [inviteId]
       )
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
@@ -267,7 +267,7 @@ export class InvitesService {
         [inviteId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IUserFromInvite[]
     } catch (error) {
       return Promise.reject(error)
@@ -283,7 +283,7 @@ export class InvitesService {
         [id]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.release()
+      conn.destroy()
       return result as IInviteEventType[]
     } catch (error) {
       return Promise.reject(error)

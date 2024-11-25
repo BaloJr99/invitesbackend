@@ -65,14 +65,14 @@ export class InviteGroupsService {
       await conn.commit()
 
       // Release connection
-      conn.release()
+      conn.destroy()
       return newInviteGroups
     } catch (error) {
       // Rollback transaction
       await conn.rollback()
 
       // Release connection
-      conn.release()
+      conn.destroy()
       return Promise.reject(error)
     }
   }
@@ -91,7 +91,7 @@ export class InviteGroupsService {
         [inviteGroup, eventId]
       )
 
-      conn.release()
+      conn.destroy()
       return uuid
     } catch (error) {
       return Promise.reject(error)
@@ -111,7 +111,7 @@ export class InviteGroupsService {
         id
       ])
 
-      conn.release()
+      conn.destroy()
     } catch (error) {
       console.error(error)
     }
