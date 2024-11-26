@@ -149,9 +149,9 @@ export class AuthController {
 
   isUserResettingPassword = async (req: Request, res: Response) => {
     try {
-      const { id } = req.params
+      const { user } = req.params
 
-      const resetting = await this.userService.isUserResettingPassword(id)
+      const resetting = await this.userService.isUserResettingPassword(user)
       return res.json(resetting)
     } catch (_e) {
       const e: Error = _e as Error
@@ -173,9 +173,9 @@ export class AuthController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const { id } = req.params
+      const { user } = req.params
 
-      await this.userService.updateResetPasword(id, result.data.password, false)
+      await this.userService.updateResetPasword(user, result.data.password, false)
       return res.json({ message: req.t('messages.PASSWORD_RESET') })
     } catch (_e) {
       const e: Error = _e as Error

@@ -23,13 +23,13 @@ export const createAuthRouter = (
   authRouter.post('/forgotPasswordToUser', authController.forgotPasswordToUser)
   
   authRouter.get(
-    '/forgotPassword/:id',
+    '/forgotPassword/:user',
     [validateUuid],
     authController.isUserResettingPassword
   )
 
   authRouter.post(
-    '/resetPassword/:id',
+    '/resetPassword/:user',
     [validateUuid],
     authController.resetPassword
   )
