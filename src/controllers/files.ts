@@ -145,8 +145,8 @@ export class FilesController {
     try {
       const { id } = req.params
 
-      const [eventImages] = await this.filesService.getImageByEventId(id)
-      const [eventAudios] = await this.filesService.getAudioByEventId(id)
+      const eventImages = await this.filesService.getImageByEventId(id)
+      const eventAudios = await this.filesService.getAudioByEventId(id)
 
       return res.json({ eventImages, eventAudios })
     } catch (_e) {
