@@ -40,7 +40,9 @@
     "PROFILE_UPDATED": "Perfil actualizado",
     "PROFILE_PHOTO_UPDATED": "Foto de perfil actualizada",
     "USER_PASSWORD_RESET": "Se ha enviado un correo electrónico al usuario asociado a la cuenta",
-    "PASSWORD_RESET": "Se ha actualizado la contraseña"
+    "PASSWORD_RESET": "Se ha actualizado la contraseña",
+    "ENVIRONMENT_CLEANED": "Entorno limpiado",
+    "INVALID_ENV": "Entorno inválido"
   },
   "errors": {
     "ERROR_SIGN_IN": "Error al iniciar sesión",
@@ -90,6 +92,7 @@
     "ERROR_CHECK_ROLE": "Error al verificar rol",
     "ERROR_CHECK_INVITE_GROUP": "Error al verificar grupo de invitación",
     "ERROR_UPDATE_PROFILE_PHOTO": "Error al actualizar foto de perfil",
-    "ERROR_GET_INVITE_EVENT_TYPE": "Error al obtener tipo de evento de la invitación"
+    "ERROR_GET_INVITE_EVENT_TYPE": "Error al obtener tipo de evento de la invitación",
+    "ERROR_CLEAN_ENVIRONMENT": "Error al limpiar entorno"
   }
 }

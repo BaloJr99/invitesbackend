@@ -84,3 +84,17 @@ BEGIN
 	GROUP BY ev.userId;
 END //
 delimiter ;
+
+DROP PROCEDURE IF EXISTS cleanEnvironment;
+
+delimiter //
+CREATE PROCEDURE cleanEnvironment () 
+BEGIN
+  DELETE FROM invites;
+  DELETE FROM events;
+  DELETE FROM invitegroups;
+  DELETE FROM inviteimages;
+  DELETE FROM invitesaudio;
+  DELETE FROM settings;
+END //
+delimiter ;

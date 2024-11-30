@@ -20,9 +20,11 @@ import { handle, LanguageDetector } from 'i18next-http-middleware'
 import { fileURLToPath } from 'url'
 import { IUserFromInvite } from './interfaces/usersModel.js'
 import { FilesService } from './services/files.js'
+import { EnvironmentService } from './services/environment.js'
 
 export class App {
   constructor(
+    private environmentService: EnvironmentService,
     private eventsService: EventsService,
     private inviteGroupsService: InviteGroupsService,
     private filesService: FilesService,
@@ -33,6 +35,7 @@ export class App {
     private settingsService: SettingsService,
     private usersService: UsersService
   ) {
+    this.environmentService = environmentService
     this.eventsService = eventsService
     this.inviteGroupsService = inviteGroupsService
     this.filesService = filesService
@@ -111,6 +114,7 @@ export class App {
     app.use(
       '/api',
       createApiRouter(
+        this.environmentService,
         this.eventsService,
         this.inviteGroupsService,
         this.filesService,

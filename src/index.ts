@@ -14,6 +14,7 @@ import { InvitesService } from './services/invites.js'
 import { LoggerService } from './services/logger.js'
 import { cloudinaryConfig } from './config/cloudinary/cloudinary.js'
 import { FilesService } from './services/files.js'
+import { EnvironmentService } from './services/environment.js'
 dotenv.config()
 
 const main = () => {
@@ -45,6 +46,7 @@ const main = () => {
   const nodemailerConnection = mailConnection()
 
   new App(
+    new EnvironmentService(mysqlConnection),
     new EventsService(mysqlConnection),
     new InviteGroupsService(mysqlConnection),
     new FilesService(mysqlConnection, cloudinaryConfig),

@@ -19,10 +19,14 @@ import { checkJwt } from '../middleware/session.js'
 import { createLoggersRouter } from './logger.routes.js'
 import { FilesService } from '../services/files.js'
 import { createFilesRouter } from './files.routes.js'
+import { EnvironmentService } from '../services/environment.js'
+import { isDevelopment } from '../middleware/isDevelopment.js'
+import { createEnvironmentRouter } from './environment.routes.js'
 
 export const apiRouter = Router()
 
 export const createApiRouter = (
+  environmentService: EnvironmentService,
   eventsService: EventsService,
   inviteGroupsService: InviteGroupsService,
   filesService: FilesService,
@@ -78,6 +82,12 @@ export const createApiRouter = (
     '/users',
     [checkJwt],
     createUsersRouter(userService, eventsService, loggerService, filesService)
+  )
+
+  apiRouter.use(
+    '/environment',
+    [checkJwt, isAdmin, isDevelopment],
+    createEnvironmentRouter(environmentService, loggerService)
   )
 
   return apiRouter

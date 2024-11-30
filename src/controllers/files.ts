@@ -30,9 +30,12 @@ export class FilesController {
           return res.status(422).json(JSON.parse(result.error.message))
         }
 
+        const folder =
+          process.env.NODE_ENV === 'development' ? 'test/audios' : 'prod/audios'
+
         const cloudResult = (await this.filesService.uploadAsset(
           req.file.buffer,
-          'audios',
+          folder,
           FileType.Video
         )) as UploadApiResponse
 
@@ -53,9 +56,14 @@ export class FilesController {
           return res.status(422).json(JSON.parse(result.error.message))
         }
 
+        const folder =
+          process.env.NODE_ENV === 'development'
+            ? 'test/invites'
+            : 'prod/invites'
+
         const cloudResult = (await this.filesService.uploadAsset(
           result.data.image,
-          'invites',
+          folder,
           FileType.Image
         )) as UploadApiResponse
 

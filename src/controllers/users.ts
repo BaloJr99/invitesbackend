@@ -262,11 +262,14 @@ export class UsersController {
         )
       }
 
-      const cloudResult = await this.filesService.uploadAsset(
+      const folder =
+        process.env.NODE_ENV === 'development' ? 'test/users' : 'prod/users'
+
+      const cloudResult = (await this.filesService.uploadAsset(
         result.data.profilePhotoSource,
-        'users',
+        folder,
         FileType.Image
-      ) as UploadApiResponse
+      )) as UploadApiResponse
 
       await this.userService.updateUserProfilePhoto({
         id: result.data.id,
