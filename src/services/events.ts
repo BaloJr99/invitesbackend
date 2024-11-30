@@ -66,7 +66,7 @@ export class EventsService {
       const conn = await this.connection.getConnection()
 
       const [result] = (await conn.query(
-        'SELECT typeOfEvent, settings FROM events AS e INNER JOIN settings AS s ON e.id = s.eventId WHERE id = UUID_TO_BIN(?)',
+        'SELECT typeOfEvent, settings FROM events AS e LEFT JOIN settings AS s ON e.id = s.eventId WHERE id = UUID_TO_BIN(?)',
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 

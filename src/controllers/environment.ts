@@ -15,6 +15,7 @@ export class EnvironmentController {
 
   cleanEnvironment = async (req: Request, res: Response) => {
     try {
+      console.log('Cleaning environment')
       await this.environmentService.cleanEnvironment()
 
       return res.json({ message: req.t('messages.ENVIRONMENT_CLEANED') })

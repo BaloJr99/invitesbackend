@@ -75,7 +75,6 @@ export class EventsController {
       const { eventSettings } = req.query
 
       const eventType = await this.eventService.eventInformation(id)
-
       if (eventType.length > 0) {
         const eventData = eventType[0]
         const filterSettings = eventSettings as string
@@ -84,13 +83,15 @@ export class EventsController {
 
         return res.json({
           typeOfEvent: eventData.typeOfEvent,
-          settings: JSON.stringify(
-            Object.fromEntries(
-              Object.entries(settings).filter(([key]) =>
-                filterSettings.includes(key)
+          settings: settings
+            ? JSON.stringify(
+                Object.fromEntries(
+                  Object.entries(settings).filter(([key]) =>
+                    filterSettings.includes(key)
+                  )
+                )
               )
-            )
-          )
+            : '{}' // return empty object if no settings
         })
       }
 
