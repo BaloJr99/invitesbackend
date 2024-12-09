@@ -13,3 +13,4 @@ export type IImageUsageModel = Pick<IFullFile, 'id' | 'imageUsage'>
 
 export type IDownloadImage = Omit<IFullFile, 'image' | 'eventId'>;
 export type IDownloadAudio = Omit<IFullFile, 'image' | 'eventId' | 'imageUsage'>;
+export type IFilesId = Pick<IFullFile, 'publicId'>;

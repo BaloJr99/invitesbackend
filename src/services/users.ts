@@ -200,12 +200,18 @@ export class UsersService {
     return result
   }
 
-  deleteUser = async (userId: string) => {
+  deactivateUser = async (userId: string) => {
     const result = await User.updateOne(
       { _id: userId },
       { $set: { isActive: false } }
     )
     return result
+  }
+
+  deleteUserTestingData = async () => {
+    await User.deleteOne({
+      username: 'test-user'
+    })
   }
 
   getUserProfile = async (userId: string) => {

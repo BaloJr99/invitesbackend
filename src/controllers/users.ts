@@ -164,10 +164,10 @@ export class UsersController {
     }
   }
 
-  deleteUser = async (req: Request, res: Response) => {
+  deactivateUser = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      await this.userService.deleteUser(id)
+      await this.userService.deactivateUser(id)
 
       return res.json({ message: req.t('messages.USER_DELETED') })
     } catch (_e) {

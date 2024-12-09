@@ -60,7 +60,7 @@ export const createUsersRouter = (
   )
 
   usersRouter.put('/:id', [isAdmin], userController.updateUser)
-  usersRouter.delete('/:id', [isAdmin], userController.deleteUser)
+  usersRouter.delete('/:id', [isAdmin], userController.deactivateUser)
 
   return usersRouter
 }

@@ -2,6 +2,7 @@ import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
 import {
   IDownloadAudio,
   IDownloadImage,
+  IFilesId,
   IFilesModel,
   IImageUsageModel
 } from '../interfaces/filesModel.js'
@@ -141,6 +142,35 @@ export class FilesService {
       return await this.cloudinary.uploader.destroy(imageId, {
         resource_type: 'image'
       })
+    }
+  }
+
+  getAllImages = async (): Promise<IFilesId[]> => {
+    try {
+      const conn = await this.connection.getConnection()
+
+      const [results] = (await conn.query(
+        'SELECT publicId FROM inviteImages'
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      conn.destroy()
+      return results as IFilesId[]
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
+  getAllAudios = async (): Promise<IFilesId[]> => {
+    try {
+      const conn = await this.connection.getConnection()
+
+      const [results] = (await conn.query(
+        'SELECT publicId FROM invitesAudio'
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      return results as IFilesId[]
+    } catch (error) {
+      return Promise.reject(error)
     }
   }
 }

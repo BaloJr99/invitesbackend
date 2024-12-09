@@ -1,6 +1,5 @@
 import { IFullRole } from '../interfaces/rolesModel.js'
 import Role from '../models/role.js'
-//import { FullRoleModel, RoleModel } from '../interfaces/rolesModel.js'
 
 export class RolesService {
   getRoles = async () => {
@@ -43,5 +42,11 @@ export class RolesService {
     })
 
     return roleFounded ? true : false
+  }
+
+  deleteRoleTestingData = async () => {
+    await Role.deleteOne({
+      name: 'testRole'
+    })
   }
 }

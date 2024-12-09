@@ -87,7 +87,13 @@ export const createApiRouter = (
   apiRouter.use(
     '/environment',
     [checkJwt, isAdmin, isDevelopment],
-    createEnvironmentRouter(environmentService, loggerService)
+    createEnvironmentRouter(
+      environmentService,
+      filesService,
+      loggerService,
+      rolesService,
+      userService
+    )
   )
 
   return apiRouter

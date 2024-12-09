@@ -15,7 +15,7 @@ export class FilesController {
 
   constructor(
     private filesService: FilesService,
-    private loggerService: LoggerService
+    private loggerService: LoggerService,
   ) {
     this.filesService = filesService
     this.errorHandler = new ErrorHandler(this.loggerService)
@@ -120,7 +120,7 @@ export class FilesController {
       const image = req.body
 
       const fileType =
-        image.publicId.split('/')[0] === 'audios'
+        image.publicId.split('/')[1] === 'audios'
           ? FileType.Video
           : FileType.Image
 

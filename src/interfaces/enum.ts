@@ -7,6 +7,4 @@ export const enum EventType {
 export const enum FileType {
   Image = 'image',
   Video = 'video',
-  Raw = 'raw',
-  Auto = 'auto'
 }
