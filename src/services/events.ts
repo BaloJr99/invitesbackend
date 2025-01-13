@@ -195,7 +195,8 @@ export class EventsService {
   updateEvent = async (
     eventId: string,
     event: EventModel,
-    override: boolean
+    override: boolean,
+    overrideViewed: boolean
   ): Promise<void> => {
     const {
       nameOfEvent,
@@ -240,6 +241,13 @@ export class EventsService {
           ),
           actualConnection.query(
             'DELETE FROM settings WHERE eventId = UUID_TO_BIN(?)',
+            [eventId]
+          )
+        )
+      } else if (overrideViewed) {
+        queryPromises.push(
+          actualConnection.query(
+            'UPDATE invites SET inviteViewed = 0 WHERE eventId = UUID_TO_BIN(?)',
             [eventId]
           )
         )

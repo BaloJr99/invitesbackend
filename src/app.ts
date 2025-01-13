@@ -107,7 +107,7 @@ export class App {
       })
     })
 
-    app.use(json({ limit: '2mb' }))
+    app.use(json({ limit: '3mb' }))
     app.use(corsMiddleware())
     app.use(handle(i18next))
 

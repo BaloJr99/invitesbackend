@@ -1,6 +1,6 @@
 export const enum EventType {
   Xv = 'X',
-  Boda = 'W',
+  Wedding = 'W',
   SaveTheDate = 'S'
 }
 

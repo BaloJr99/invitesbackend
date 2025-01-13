@@ -4,7 +4,8 @@ import { ErrorHandler } from '../utils/error.handle.js'
 import { LoggerService } from '../services/logger.js'
 import {
   validateSaveTheDateSettings,
-  validateSweetXvSettings
+  validateSweetXvSettings,
+  validateWeddingSettings
 } from '../schemas/settings.js'
 import { EventType } from '../interfaces/enum.js'
 
@@ -90,6 +91,8 @@ export class SettingsController {
 
       if (eventType === EventType.Xv) {
         result = validateSweetXvSettings(req.body)
+      } else if (eventType === EventType.Wedding) {
+        result = validateWeddingSettings(req.body)
       } else {
         result = validateSaveTheDateSettings(req.body)
       }
