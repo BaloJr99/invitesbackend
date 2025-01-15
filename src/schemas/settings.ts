@@ -289,6 +289,14 @@ const weddingSettingsSchema = z
       .min(7, {
         message: 'You must provide a valid hex color code'
       }),
+    weddingCopyMessage: z
+      .string({
+        invalid_type_error: 'The wedding copy message must be a string',
+        required_error: 'The wedding copy message is required'
+      })
+      .min(1, {
+        message: 'You must provide the wedding copy message'
+      }),
     groomParents: z
       .string({
         invalid_type_error: 'The groom parents must be a string',
