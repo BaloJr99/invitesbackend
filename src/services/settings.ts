@@ -1,4 +1,9 @@
-import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
+import {
+  FieldPacket,
+  Pool,
+  PoolConnection,
+  RowDataPacket
+} from 'mysql2/promise'
 import { IBaseSettings } from '../interfaces/settingsModel.js'
 
 export class SettingsService {
@@ -7,57 +12,65 @@ export class SettingsService {
   }
 
   getEventSettingsById = async (eventId: string): Promise<IBaseSettings[]> => {
-    try {
-      const conn = await this.connection.getConnection()
+    let connection: PoolConnection | undefined
 
-      const [result] = (await conn.query(
+    try {
+      connection = await this.connection.getConnection()
+
+      const [result] = (await connection.query(
         'SELECT BIN_TO_UUID(eventId) eventId, settings FROM settings WHERE eventId = UUID_TO_BIN(?)',
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.destroy()
       return result as IBaseSettings[]
     } catch (error) {
       return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
   createEventSettings = async (
     eventSettings: IBaseSettings
   ): Promise<string> => {
+    let connection: PoolConnection | undefined
+
     try {
-      const conn = await this.connection.getConnection()
+      connection = await this.connection.getConnection()
 
       const { eventId, settings } = eventSettings
 
-      await conn.query(
+      await connection.query(
         `INSERT INTO settings (eventId, settings) VALUES (UUID_TO_BIN(?), ?)`,
         [eventId, settings]
       )
 
-      conn.destroy()
       return eventId
     } catch (error) {
       return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
   updateEventSettings = async (eventSettings: IBaseSettings): Promise<void> => {
+    let connection: PoolConnection | undefined
+
     try {
       const { eventId, settings } = eventSettings
 
-      const conn = await this.connection.getConnection()
+      connection = await this.connection.getConnection()
 
-      await conn.query('UPDATE settings SET ? WHERE eventId = UUID_TO_BIN(?)', [
+      await connection.query('UPDATE settings SET ? WHERE eventId = UUID_TO_BIN(?)', [
         {
           settings
         },
         eventId
       ])
-
-      conn.destroy()
     } catch (error) {
       console.error(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 }

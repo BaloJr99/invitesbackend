@@ -1,4 +1,4 @@
-import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
+import { FieldPacket, Pool, PoolConnection, RowDataPacket } from 'mysql2/promise'
 import {
   IDownloadAudio,
   IDownloadImage,
@@ -18,26 +18,31 @@ export class FilesService {
   }
 
   getImageByEventId = async (eventId: string): Promise<IDownloadImage[]> => {
-    try {
-      const conn = await this.connection.getConnection()
+    let connection: PoolConnection | undefined
 
-      const [results] = (await conn.query(
+    try {
+      connection = await this.connection.getConnection()
+
+      const [results] = (await connection.query(
         'SELECT BIN_TO_UUID(id) id, fileUrl, publicId, imageUsage FROM inviteImages WHERE eventId = UUID_TO_BIN(?) ORDER BY imageUsage',
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.destroy()
       return results as IDownloadImage[]
     } catch (error) {
       return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
   getAudioByEventId = async (eventId: string): Promise<IDownloadAudio[]> => {
-    try {
-      const conn = await this.connection.getConnection()
+    let connection: PoolConnection | undefined
 
-      const [results] = (await conn.query(
+    try {
+      connection = await this.connection.getConnection()
+
+      const [results] = (await connection.query(
         'SELECT BIN_TO_UUID(id) id, fileUrl, publicId FROM invitesAudio WHERE eventId = UUID_TO_BIN(?)',
         [eventId]
       )) as [RowDataPacket[], FieldPacket[]]
@@ -45,63 +50,71 @@ export class FilesService {
       return results as IDownloadAudio[]
     } catch (error) {
       return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
   createFile = async (image: IFilesModel, fileType: FileType) => {
+    let connection: PoolConnection | undefined
+
     try {
-      const conn = await this.connection.getConnection()
+      connection = await this.connection.getConnection()
 
       const { fileUrl, publicId, eventId } = image
 
-      const [queryResult] = await conn.query('SELECT UUID() uuid')
+      const [queryResult] = await connection.query('SELECT UUID() uuid')
       const [{ uuid }] = queryResult as { uuid: string }[]
 
-      await conn.query(
+      await connection.query(
         `INSERT INTO ${
           fileType === FileType.Image ? 'inviteImages' : 'invitesAudio'
         } (id, fileUrl, publicId, eventId) VALUES (UUID_TO_BIN(?), ?, ?, UUID_TO_BIN(?))`,
         [uuid, fileUrl, publicId, eventId]
       )
-
-      conn.destroy()
     } catch (error) {
       console.error(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
   updateImages = async (images: IImageUsageModel[]) => {
+    let connection: PoolConnection | undefined
+
     try {
-      const conn = await this.connection.getConnection()
+      connection = await this.connection.getConnection()
 
       for (const image of images) {
         const { id, imageUsage } = image
-        await conn.query(
+        await connection.query(
           'UPDATE inviteImages SET imageUsage = ? WHERE id = UUID_TO_BIN(?)',
           [imageUsage, id]
         )
       }
-
-      conn.destroy()
     } catch (error) {
       console.error(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
   deleteFile = async (imageId: string, fileType: FileType) => {
-    try {
-      const conn = await this.connection.getConnection()
+    let connection: PoolConnection | undefined
 
-      await conn.query(
+    try {
+      connection = await this.connection.getConnection()
+
+      await connection.query(
         `DELETE FROM ${
           fileType === FileType.Video ? 'invitesAudio' : 'inviteImages'
         } WHERE id = UUID_TO_BIN(?)`,
         [imageId]
       )
-
-      conn.destroy()
     } catch (error) {
       console.error(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
@@ -146,31 +159,38 @@ export class FilesService {
   }
 
   getAllImages = async (): Promise<IFilesId[]> => {
-    try {
-      const conn = await this.connection.getConnection()
+    let connection: PoolConnection | undefined
 
-      const [results] = (await conn.query(
+    try {
+      connection = await this.connection.getConnection()
+
+      const [results] = (await connection.query(
         'SELECT publicId FROM inviteImages'
       )) as [RowDataPacket[], FieldPacket[]]
 
-      conn.destroy()
       return results as IFilesId[]
     } catch (error) {
       return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 
   getAllAudios = async (): Promise<IFilesId[]> => {
-    try {
-      const conn = await this.connection.getConnection()
+    let connection: PoolConnection | undefined
 
-      const [results] = (await conn.query(
+    try {
+      connection = await this.connection.getConnection()
+
+      const [results] = (await connection.query(
         'SELECT publicId FROM invitesAudio'
       )) as [RowDataPacket[], FieldPacket[]]
 
       return results as IFilesId[]
     } catch (error) {
       return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
     }
   }
 }

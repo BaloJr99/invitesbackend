@@ -1,4 +1,4 @@
-import { Pool } from 'mysql2/promise'
+import { Pool, PoolConnection } from 'mysql2/promise'
 
 export class EnvironmentService {
   constructor(private connection: Pool) {
@@ -6,10 +6,13 @@ export class EnvironmentService {
   }
 
   cleanEnvironment = async () => {
-    const conn = await this.connection.getConnection()
+    let connection: PoolConnection | undefined
 
-    await conn.execute('CALL cleanEnvironment()')
-
-    conn.destroy()
+    try {
+      connection = await this.connection.getConnection()
+      await connection.execute('CALL cleanEnvironment()')
+    } finally {
+      if (connection) connection.release()
+    }
   }
 }

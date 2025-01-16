@@ -19,24 +19,7 @@ dotenv.config()
 
 const main = () => {
   const connectionHandler = new ConnectionHandler()
-  const mysqlConnection = connectionHandler.getConnection()
-
-  mysqlConnection.on('connection', function (connection) {
-    console.log('DB Connection established')
-
-    connection.on('error', function (err) {
-      console.error(new Date(), 'MySQL error', err.code)
-
-      if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-        console.log('Attempting to reconnect to database')
-        connectionHandler.establishConnection()
-      }
-    })
-
-    connection.on('close', function (err) {
-      console.error(new Date(), 'MySQL close', err)
-    })
-  })
+  const mysqlConnection = connectionHandler.connection;
 
   dbConnect().then(() => {
     createRoles()

@@ -1,7 +1,7 @@
 import { Pool, createPool } from 'mysql2/promise'
 
 export class ConnectionHandler {
-  private connection: Pool
+  public connection: Pool
 
   constructor() {
     this.connection = this.establishConnection()
@@ -20,16 +20,13 @@ export class ConnectionHandler {
         timezone: '+00:00',
         connectionLimit: 100,
         idleTimeout: 60000,
-        connectTimeout: 60000
+        connectTimeout: 60000,
+        enableKeepAlive: true
       })
     } else {
       connection = createPool(process.env.DATABASE_URL)
     }
 
     return connection
-  }
-
-  getConnection = () => {
-    return this.connection
   }
 }
