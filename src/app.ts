@@ -16,6 +16,7 @@ import { ErrorHandler } from './utils/error.handle.js'
 import { IConfirmation } from './interfaces/invitesModels.js'
 import i18next from 'i18next'
 import Backend from 'i18next-fs-backend'
+import cookieParser from 'cookie-parser'
 import { handle, LanguageDetector } from 'i18next-http-middleware'
 import { fileURLToPath } from 'url'
 import { IUserFromInvite } from './interfaces/usersModel.js'
@@ -110,6 +111,7 @@ export class App {
     app.use(json({ limit: '3mb' }))
     app.use(corsMiddleware())
     app.use(handle(i18next))
+    app.use(cookieParser())
 
     app.use(
       '/api',

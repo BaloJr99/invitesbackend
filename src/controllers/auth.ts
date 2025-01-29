@@ -46,7 +46,17 @@ export class AuthController {
           .json({ error: req.t('messages.INACTIVE_ACCOUNT') })
       }
 
-      res.json({ token: signInResponse })
+      const tokens = JSON.parse(signInResponse)
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 1000 * 60 * 30,
+        sameSite: 'none'
+      })
+
+      res.json({
+        access_token: tokens.accessToken
+      })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -175,7 +185,11 @@ export class AuthController {
 
       const { user } = req.params
 
-      await this.userService.updateResetPasword(user, result.data.password, false)
+      await this.userService.updateResetPasword(
+        user,
+        result.data.password,
+        false
+      )
       return res.json({ message: req.t('messages.PASSWORD_RESET') })
     } catch (_e) {
       const e: Error = _e as Error
@@ -183,6 +197,43 @@ export class AuthController {
         res,
         req,
         'ERROR_RESET_PASSWORD',
+        e.message,
+        req.userId
+      )
+    }
+  }
+
+  refreshToken = async (req: Request, res: Response) => { 
+    try {
+      const refreshToken = req.cookies['refreshToken']
+
+      if (!refreshToken) {
+        return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
+      }
+
+      const jsonTokens = await this.userService.refreshToken(refreshToken)
+      if (jsonTokens.includes('ERROR')) {
+        return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
+      }
+
+      const tokens = JSON.parse(jsonTokens)
+
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 1000 * 60 * 30,
+        sameSite: 'none'
+      })
+
+      res.json({
+        access_token: tokens.accessToken
+      })
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_REFRESH_TOKEN',
         e.message,
         req.userId
       )

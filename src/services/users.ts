@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken'
 import User from '../models/user.js'
 import { comparePassword, encryptPassword } from '../utils/bcrypt.handle.js'
-import { generatePass } from '../utils/passwordGenerator.hande.js'
+import { generatePass, generateSecret } from '../utils/generators.handle.js'
 import {
   IAuthUser,
   IUpsertUser,
   IUserProfile,
   IUserProfilePhoto
 } from '../interfaces/usersModel.js'
+import { verifyJwtToken } from '../utils/jwt.handle.js'
 
 export class UsersService {
   signin = async (user: IAuthUser): Promise<string> => {
@@ -48,7 +49,7 @@ export class UsersService {
       }
     })
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       {
         id: userFounded._id,
         username: userFounded.username,
@@ -56,13 +57,23 @@ export class UsersService {
         profilePhoto: userFounded.profilePhoto,
         roles: userFounded.roles
       },
-      process.env.SECRET,
+      `${process.env.SECRET}`,
       {
-        expiresIn: 86400
+        expiresIn: 600
       }
     )
 
-    return token
+    const refreshToken = jwt.sign(
+      {
+        id: userFounded._id
+      },
+      `${process.env.SECRET}${userFounded.userSecret}`,
+      {
+        expiresIn: '1d'
+      }
+    )
+
+    return JSON.stringify({ accessToken, refreshToken })
   }
 
   findUser = async (usernameOrEmail: string) => {
@@ -139,7 +150,8 @@ export class UsersService {
       username,
       email,
       roles,
-      password: passHash
+      password: passHash,
+      userSecret: generateSecret()
     })
 
     const savedUser = await newUser.save()
@@ -261,5 +273,48 @@ export class UsersService {
     })
 
     return userFounded ? true : false
+  }
+
+  refreshToken = async (token: string): Promise<string> => {
+    // Check if the refresh token is valid
+    if (!token) return 'ERROR_REFRESH_TOKEN_NOT_FOUND'
+
+    // Verify the refresh token
+    const decoded = verifyJwtToken(token)
+
+    // Get the userId
+    const { id } = decoded
+
+    const userFounded = await User.findById(id).populate('roles')
+
+    if (!userFounded) {
+      return 'ERROR_USER_NOT_FOUND'
+    }
+
+    const accessToken = jwt.sign(
+      {
+        id: userFounded._id,
+        username: userFounded.username,
+        email: userFounded.email,
+        profilePhoto: userFounded.profilePhoto,
+        roles: userFounded.roles
+      },
+      `${process.env.SECRET}`,
+      {
+        expiresIn: 600
+      }
+    )
+
+    const refreshToken = jwt.sign(
+      {
+        id: userFounded._id
+      },
+      `${process.env.SECRET}${userFounded.userSecret}`,
+      {
+        expiresIn: '1d'
+      }
+    )
+
+    return JSON.stringify({ accessToken, refreshToken })
   }
 }

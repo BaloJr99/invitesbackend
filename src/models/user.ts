@@ -44,6 +44,10 @@ const UserSchema = new Schema(
       type: Number,
       default: 0
     },
+    userSecret: {
+      type: String,
+      default: ''
+    },
     roles: [
       {
         ref: 'Role',
