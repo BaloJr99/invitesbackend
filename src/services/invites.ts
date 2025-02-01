@@ -221,7 +221,7 @@ export class InvitesService {
         { family, entriesNumber, phoneNumber, kidsAllowed },
         id
       ])
-      connection.release
+      connection.release()
     } catch (error) {
       console.error(error)
     } finally {

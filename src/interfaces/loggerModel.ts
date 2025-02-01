@@ -1,5 +1,5 @@
 export interface ILogger {
-  dateOfError: Date
+  dateOfError: string
   customError: string
   exceptionMessage: string
   userId: string

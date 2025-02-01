@@ -20,7 +20,7 @@ export const isInvitesAdmin = async (
     }
 
     return res.status(403).json({ error: req.t('messages.SESSION_NOT_ADMIN') })
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: req.t('messages.INVALID_AUTH') })
   }
 }
@@ -43,7 +43,7 @@ export const isAdmin = async (
     }
 
     return res.status(403).json({ error: req.t('messages.SESSION_NOT_ADMIN') })
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: req.t('messages.INVALID_AUTH') })
   }
 }

@@ -12,7 +12,7 @@ export const isDevelopment = async (
     }
 
     return res.status(500).json({ error: req.t('messages.INVALID_ENV') })
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: req.t('messages.INVALID_ENV') })
   }
 }

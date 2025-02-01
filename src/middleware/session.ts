@@ -39,7 +39,7 @@ export const checkJwt = async (
     req.userId = decoded.id
 
     next()
-  } catch (error) {
+  } catch {
     return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
   }
 }

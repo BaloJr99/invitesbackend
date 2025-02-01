@@ -72,10 +72,9 @@ const confirmationSchema = z
         invalid_type_error: 'The date of confirmation must be a string',
         required_error: 'The date of confirmation is required'
       })
-      .datetime({
-        message: 'Invalid date time format'
-      })
-      .transform((value) => value.replace('T', ' ').replace('Z', '')),
+      .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+        message: 'Invalid date format'
+      }),
     isMessageRead: z
       .boolean({
         invalid_type_error: 'The is message read must be a boolean',

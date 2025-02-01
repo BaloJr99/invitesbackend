@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { LoggerService } from '../services/logger.js'
+import { getUTCDate } from './tools.js'
 
 export class ErrorHandler {
   constructor(private loggerService: LoggerService) {
@@ -14,7 +15,7 @@ export class ErrorHandler {
     userId: string
   ) => {
     await this.loggerService.addLog({
-      dateOfError: new Date(),
+      dateOfError: getUTCDate(),
       customError: error,
       exceptionMessage: fullError,
       userId: userId

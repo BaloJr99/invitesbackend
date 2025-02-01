@@ -15,13 +15,17 @@ const eventSchema = z.object({
       required_error: 'The date of the event is required',
       invalid_type_error: 'The date of the event must be a string'
     })
-    .date('Invalid date format'),
+    .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+      message: 'Invalid date format'
+    }),
   maxDateOfConfirmation: z
     .string({
       invalid_type_error: 'The max date of confirmation must be a string',
       required_error: 'The max date of confirmation is required'
     })
-    .date('Invalid date format'),
+    .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+      message: 'Invalid date format'
+    }),
   typeOfEvent: z
     .string({
       invalid_type_error: 'The type of the event must be a string',
