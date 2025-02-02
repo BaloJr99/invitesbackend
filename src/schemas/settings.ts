@@ -90,8 +90,8 @@ const sweetXvSettingsSchema = z
         invalid_type_error: 'The mass time must be a string',
         required_error: 'The mass time is required'
       })
-      .time({
-        message: 'Invalid time format'
+      .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+        message: 'Invalid date format'
       })
       .optional(),
     massAddress: z
@@ -117,8 +117,8 @@ const sweetXvSettingsSchema = z
         invalid_type_error: 'The reception time must be a string',
         required_error: 'The reception time is required'
       })
-      .time({
-        message: 'Invalid time format'
+      .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+        message: 'Invalid date format'
       })
       .optional(),
     receptionPlace: z
@@ -383,8 +383,8 @@ const weddingSettingsSchema = z
         invalid_type_error: 'The mass time must be a string',
         required_error: 'The mass time is required'
       })
-      .time({
-        message: 'Invalid time format'
+      .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+        message: 'Invalid date format'
       })
       .optional(),
     massPlace: z
@@ -410,8 +410,8 @@ const weddingSettingsSchema = z
         invalid_type_error: 'The venue time must be a string',
         required_error: 'The venue time is required'
       })
-      .time({
-        message: 'Invalid time format'
+      .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+        message: 'Invalid date format'
       })
       .optional(),
     venuePlace: z
@@ -437,8 +437,8 @@ const weddingSettingsSchema = z
         invalid_type_error: 'The civil time must be a string',
         required_error: 'The civil time is required'
       })
-      .time({
-        message: 'Invalid time format'
+      .regex(/^\d{4}-\d{2}-\d{2}\s(\d{2}:){2}\d{2}$/, {
+        message: 'Invalid date format'
       })
       .optional(),
     civilPlace: z
