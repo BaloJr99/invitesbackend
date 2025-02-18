@@ -466,7 +466,8 @@ const weddingSettingsSchema = z
       })
       .min(1, {
         message: 'You must provide the card number'
-      }),
+      })
+      .optional(),
     clabeBank: z
       .string({
         invalid_type_error: 'The clabe bank must be a string',
@@ -475,6 +476,7 @@ const weddingSettingsSchema = z
       .min(1, {
         message: 'You must provide the clabe bank'
       })
+      .optional()
   })
   .superRefine((data, ctx) => {
     const sections = data.sections
@@ -492,8 +494,7 @@ const weddingSettingsSchema = z
       (sections.some((s) => s.sectionId === 'dressCodeInfo' && s.selected) &&
         !data.dressCodeColor) ||
       (sections.some((s) => s.sectionId === 'giftsInfo' && s.selected) &&
-        !data.cardNumber) ||
-      !data.clabeBank
+        (!data.cardNumber || !data.clabeBank))
 
     if (sectionHasIssues) {
       ctx.addIssue({
