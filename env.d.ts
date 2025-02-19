@@ -2,6 +2,7 @@ declare namespace NodeJS {
   interface ProcessEnv extends IProcessEnv {
     DATABASE_URL: string
     MONGO_URI: string
+    MONGO_DB: string
     MYSQL_HOST: string
     MYSQL_PORT: string
     MYSQL_USER: string

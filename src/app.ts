@@ -22,6 +22,7 @@ import { fileURLToPath } from 'url'
 import { IUserFromInvite } from './interfaces/usersModel.js'
 import { FilesService } from './services/files.js'
 import { EnvironmentService } from './services/environment.js'
+import { EnvConfig } from './config/config.js'
 
 export class App {
   constructor(
@@ -129,7 +130,7 @@ export class App {
       )
     )
 
-    const PORT = process.env.PORT ?? 3000
+    const PORT = EnvConfig().port ?? 3000
 
     server.listen(PORT, () => console.log(`Server on port ${PORT}`))
   }

@@ -9,13 +9,14 @@ import { LoggerService } from '../services/logger.js'
 import { FilesService } from '../services/files.js'
 import { FileType } from '../interfaces/enum.js'
 import { UploadApiResponse } from 'cloudinary'
+import { EnvConfig } from '../config/config.js'
 
 export class FilesController {
   errorHandler: ErrorHandler
 
   constructor(
     private filesService: FilesService,
-    private loggerService: LoggerService,
+    private loggerService: LoggerService
   ) {
     this.filesService = filesService
     this.errorHandler = new ErrorHandler(this.loggerService)
@@ -31,7 +32,7 @@ export class FilesController {
         }
 
         const folder =
-          process.env.NODE_ENV === 'development' ? 'test/audios' : 'prod/audios'
+          EnvConfig().node_env === 'development' ? 'test/audios' : 'prod/audios'
 
         const cloudResult = (await this.filesService.uploadAsset(
           req.file.buffer,
@@ -57,7 +58,7 @@ export class FilesController {
         }
 
         const folder =
-          process.env.NODE_ENV === 'development'
+          EnvConfig().node_env === 'development'
             ? 'test/invites'
             : 'prod/invites'
 

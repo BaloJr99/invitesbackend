@@ -1,5 +1,4 @@
 import { App } from './app.js'
-import dotenv from 'dotenv'
 import { ConnectionHandler } from './config/mysql/connection.js'
 import dbConnect from './config/mongo/mongo.js'
 import { createRoles } from './utils/createRoles.handle.js'
@@ -15,7 +14,6 @@ import { LoggerService } from './services/logger.js'
 import { cloudinaryConfig } from './config/cloudinary/cloudinary.js'
 import { FilesService } from './services/files.js'
 import { EnvironmentService } from './services/environment.js'
-dotenv.config()
 
 const main = () => {
   const connectionHandler = new ConnectionHandler()

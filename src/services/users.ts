@@ -9,6 +9,7 @@ import {
   IUserProfilePhoto
 } from '../interfaces/usersModel.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
+import { EnvConfig } from '../config/config.js'
 
 export class UsersService {
   signin = async (user: IAuthUser): Promise<string> => {
@@ -57,7 +58,7 @@ export class UsersService {
         profilePhoto: userFounded.profilePhoto,
         roles: userFounded.roles
       },
-      `${process.env.SECRET}`,
+      `${EnvConfig().jwt.secret}`,
       {
         expiresIn: 600
       }
@@ -67,7 +68,7 @@ export class UsersService {
       {
         id: userFounded._id
       },
-      `${process.env.SECRET}${userFounded.userSecret}`,
+      `${EnvConfig().jwt.secret}${userFounded.userSecret}`,
       {
         expiresIn: '1d'
       }
@@ -299,7 +300,7 @@ export class UsersService {
         profilePhoto: userFounded.profilePhoto,
         roles: userFounded.roles
       },
-      `${process.env.SECRET}`,
+      `${EnvConfig().jwt.secret}`,
       {
         expiresIn: 600
       }
@@ -309,7 +310,7 @@ export class UsersService {
       {
         id: userFounded._id
       },
-      `${process.env.SECRET}${userFounded.userSecret}`,
+      `${EnvConfig().jwt.secret}${userFounded.userSecret}`,
       {
         expiresIn: '1d'
       }

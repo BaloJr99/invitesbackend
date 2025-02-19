@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { EnvConfig } from '../config/config.js'
 
 export const isDevelopment = async (
   req: Request,
@@ -6,7 +7,7 @@ export const isDevelopment = async (
   next: NextFunction
 ) => {
   try {
-    if (process.env.NODE_ENV === 'development') {
+    if (EnvConfig().node_env === 'development') {
       next()
       return
     }

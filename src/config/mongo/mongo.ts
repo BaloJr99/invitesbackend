@@ -1,9 +1,9 @@
 import { connect } from 'mongoose'
+import { EnvConfig } from '../config.js'
 
 async function dbConnect(): Promise<void> {
-  const DB_URI = process.env.MONGO_URI
-  await connect(DB_URI, {
-    dbName: process.env.MONGO_DB
+  await connect(EnvConfig().mongo.uri, {
+    dbName: EnvConfig().mongo.db
   })
 }
 

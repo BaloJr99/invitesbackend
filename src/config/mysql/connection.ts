@@ -1,4 +1,5 @@
 import { Pool, createPool } from 'mysql2/promise'
+import { EnvConfig } from '../config.js'
 
 export class ConnectionHandler {
   public connection: Pool
@@ -10,13 +11,13 @@ export class ConnectionHandler {
   establishConnection = () => {
     let connection: Pool
 
-    if (process.env.NODE_ENV === 'development') {
+    if (EnvConfig().node_env === 'development') {
       connection = createPool({
-        host: process.env.MYSQL_HOST,
-        port: parseInt(process.env.MYSQL_PORT),
-        user: process.env.MYSQL_USER,
-        password: process.env.MYSQL_PASSWORD,
-        database: process.env.MYSQL_DATABASE,
+        host: EnvConfig().mysql.host,
+        port: EnvConfig().mysql.port,
+        user: EnvConfig().mysql.user,
+        password: EnvConfig().mysql.password,
+        database: EnvConfig().mysql.database,
         timezone: '+00:00',
         connectionLimit: 100,
         idleTimeout: 60000,
@@ -24,7 +25,7 @@ export class ConnectionHandler {
         enableKeepAlive: true
       })
     } else {
-      connection = createPool(process.env.DATABASE_URL)
+      connection = createPool(EnvConfig().mysql.database_url)
     }
 
     return connection

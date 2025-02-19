@@ -1,11 +1,12 @@
 import { createTransport } from 'nodemailer'
+import { EnvConfig } from '../config.js'
 
 export const mailConnection = () => {
   return createTransport({
-    service: process.env.MAIL_HOST,
+    service: EnvConfig().nodemailer.service,
     auth: {
-      user: process.env.MAIL_USERNAME,
-      pass: process.env.MAIL_PASSWORD
+      user: EnvConfig().nodemailer.user,
+      pass: EnvConfig().nodemailer.pass
     }
   })
 }

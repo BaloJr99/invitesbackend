@@ -1,10 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary'
-import 'dotenv/config'
+import { EnvConfig } from '../config.js'
 
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
+  cloud_name: EnvConfig().cloudinary.cloud_name,
+  api_key: EnvConfig().cloudinary.api_key,
+  api_secret: EnvConfig().cloudinary.api_secret,
   secure: true
 })
 

@@ -12,6 +12,7 @@ import { IUserEventsInfo, IUserInfo } from '../interfaces/usersModel.js'
 import { FilesService } from '../services/files.js'
 import { FileType } from '../interfaces/enum.js'
 import { UploadApiResponse } from 'cloudinary'
+import { EnvConfig } from '../config/config.js'
 
 export class UsersController {
   errorHandler: ErrorHandler
@@ -263,7 +264,7 @@ export class UsersController {
       }
 
       const folder =
-        process.env.NODE_ENV === 'development' ? 'test/users' : 'prod/users'
+        EnvConfig().node_env === 'development' ? 'test/users' : 'prod/users'
 
       const cloudResult = (await this.filesService.uploadAsset(
         result.data.profilePhotoSource,
