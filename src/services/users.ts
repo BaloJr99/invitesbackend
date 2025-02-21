@@ -306,16 +306,6 @@ export class UsersService {
       }
     )
 
-    const refreshToken = jwt.sign(
-      {
-        id: userFounded._id
-      },
-      `${EnvConfig().jwt.secret}${userFounded.userSecret}`,
-      {
-        expiresIn: '1d'
-      }
-    )
-
-    return JSON.stringify({ accessToken, refreshToken })
+    return accessToken;
   }
 }

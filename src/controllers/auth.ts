@@ -50,7 +50,7 @@ export class AuthController {
       res.cookie('refreshToken', tokens.refreshToken, {
         httpOnly: true,
         secure: true,
-        maxAge: 1000 * 60 * 30,
+        maxAge: 1000 * 60 * 60 * 24,
         sameSite: 'none'
       })
 
@@ -203,7 +203,7 @@ export class AuthController {
     }
   }
 
-  refreshToken = async (req: Request, res: Response) => { 
+  refreshToken = async (req: Request, res: Response) => {
     try {
       const refreshToken = req.cookies['refreshToken']
 
@@ -211,22 +211,13 @@ export class AuthController {
         return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
       }
 
-      const jsonTokens = await this.userService.refreshToken(refreshToken)
-      if (jsonTokens.includes('ERROR')) {
+      const access_token = await this.userService.refreshToken(refreshToken)
+      if (access_token.includes('ERROR')) {
         return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
       }
 
-      const tokens = JSON.parse(jsonTokens)
-
-      res.cookie('refreshToken', tokens.refreshToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: 1000 * 60 * 30,
-        sameSite: 'none'
-      })
-
       res.json({
-        access_token: tokens.accessToken
+        access_token
       })
     } catch (_e) {
       const e: Error = _e as Error
