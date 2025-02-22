@@ -1,10 +1,4 @@
-import {
-  FieldPacket,
-  Pool,
-  PoolConnection,
-  QueryResult,
-  RowDataPacket
-} from 'mysql2/promise'
+import { FieldPacket, QueryResult, RowDataPacket } from 'mysql2/promise'
 import {
   IBulkInvite,
   IConfirmation,
@@ -12,24 +6,24 @@ import {
   IInviteEventType,
   ISaveTheDateConfirmation,
   IUpsertInvite,
+  IUserFromInvite,
   IUserInvite
-} from '../interfaces/invitesModels.js'
-import { IUserFromInvite } from '../interfaces/usersModel.js'
+} from '../global/types.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { IInvitesRepository } from '../interfaces/invites-repository.js'
 
-export class InvitesService {
-  constructor(private connection: Pool) {
-    this.connection = connection
+export class InvitesRepository implements IInvitesRepository {
+  constructor(private database: MysqlDatabase) {
+    this.database = database
   }
 
   getAllInvites = async (
     userId: string,
     isAdmin: boolean
   ): Promise<IDashboardInvite[]> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [result] = (await connection.execute(
         'CALL getInvites(CAST(? AS BINARY), ?)',
         [userId, +isAdmin]
@@ -44,11 +38,9 @@ export class InvitesService {
   }
 
   getInvite = async (id: string): Promise<IUserInvite[]> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [result] = (await connection.query(
         'SELECT BIN_TO_UUID(e.id) id, family, entriesNumber, confirmation, kidsAllowed, ev.dateOfEvent, ev.maxDateOfConfirmation, nameOfCelebrated, typeOfEvent, BIN_TO_UUID(eventId) eventId, needsAccomodation FROM invites AS e INNER JOIN events as ev ON e.eventId = ev.id WHERE e.id = UUID_TO_BIN(?)',
         [id]
@@ -63,11 +55,9 @@ export class InvitesService {
   }
 
   markAsViewed = async (id: string): Promise<void> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       await connection.query(
         'UPDATE invites SET inviteViewed = ? WHERE id = UUID_TO_BIN(?)',
         [true, id]
@@ -80,7 +70,7 @@ export class InvitesService {
   }
 
   createInvite = async (invite: IUpsertInvite): Promise<string> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
       const {
@@ -91,8 +81,6 @@ export class InvitesService {
         eventId,
         inviteGroupId
       } = invite
-
-      connection = await this.connection.getConnection()
 
       const [queryResult] = await connection.query('SELECT UUID() uuid')
       const [{ uuid }] = queryResult as { uuid: string }[]
@@ -120,7 +108,7 @@ export class InvitesService {
   createBulkInvite = async (
     invites: IBulkInvite[]
   ): Promise<IUpsertInvite[]> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     const invitesToInsert = invites.map((invite) => ({
       id: crypto.randomUUID().toString(),
@@ -133,8 +121,6 @@ export class InvitesService {
     })) as IUpsertInvite[]
 
     try {
-      connection = await this.connection.getConnection()
-
       // Begin transaction with current connection
       await connection.beginTransaction()
 
@@ -177,11 +163,9 @@ export class InvitesService {
   }
 
   bulkDeleteInvite = async (invites: string[]): Promise<void> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const placeholders = invites.map(() => 'UUID_TO_BIN(?)').join(', ')
       await connection.query(
         `DELETE FROM invites WHERE id IN (${placeholders})`,
@@ -195,11 +179,9 @@ export class InvitesService {
   }
 
   deleteInvite = async (inviteId: string): Promise<void> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       await connection.query('DELETE FROM invites WHERE id = UUID_TO_BIN(?)', [
         inviteId
       ])
@@ -210,18 +192,16 @@ export class InvitesService {
     }
   }
 
-  updateInvite = async (entryModel: IUpsertInvite) => {
-    let connection: PoolConnection | undefined
+  updateInvite = async (entryModel: IUpsertInvite): Promise<void> => {
+    const connection = await this.database.getConnection()
 
     try {
       const { id, family, entriesNumber, phoneNumber, kidsAllowed } = entryModel
-      connection = await this.connection.getConnection()
 
       await connection.query('UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)', [
         { family, entriesNumber, phoneNumber, kidsAllowed },
         id
       ])
-      connection.release()
     } catch (error) {
       console.error(error)
     } finally {
@@ -229,8 +209,10 @@ export class InvitesService {
     }
   }
 
-  updateSweetXvConfirmation = async (confirmations: IConfirmation) => {
-    let connection: PoolConnection | undefined
+  updateSweetXvConfirmation = async (
+    confirmations: IConfirmation
+  ): Promise<void> => {
+    const connection = await this.database.getConnection()
 
     try {
       const {
@@ -240,8 +222,6 @@ export class InvitesService {
         confirmation,
         dateOfConfirmation
       } = confirmations
-
-      connection = await this.connection.getConnection()
 
       await connection.query('UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)', [
         { entriesConfirmed, message, confirmation, dateOfConfirmation },
@@ -256,12 +236,11 @@ export class InvitesService {
 
   updateSaveTheDateConfirmation = async (
     confirmations: ISaveTheDateConfirmation
-  ) => {
-    let connection: PoolConnection | undefined
+  ): Promise<void> => {
+    const connection = await this.database.getConnection()
 
     try {
       const { id, needsAccomodation } = confirmations
-      connection = await this.connection.getConnection()
 
       await connection.query('UPDATE invites SET ? WHERE id = UUID_TO_BIN(?)', [
         { needsAccomodation },
@@ -274,12 +253,10 @@ export class InvitesService {
     }
   }
 
-  readMessage = async (inviteId: string) => {
-    let connection: PoolConnection | undefined
+  readMessage = async (inviteId: string): Promise<void> => {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       await connection.query(
         'UPDATE invites SET isMessageRead = true WHERE id = UUID_TO_BIN(?)',
         [inviteId]
@@ -294,11 +271,9 @@ export class InvitesService {
   getUserFromInviteId = async (
     inviteId: string
   ): Promise<IUserFromInvite[]> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [result] = (await connection.query(
         'SELECT CAST(userId as CHAR) AS id FROM invites AS i INNER JOIN events AS e ON e.id = i.eventId WHERE i.id = UUID_TO_BIN(?)',
         [inviteId]
@@ -313,11 +288,9 @@ export class InvitesService {
   }
 
   getInviteEventType = async (id: string): Promise<IInviteEventType[]> => {
-    let connection: PoolConnection | undefined
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [result] = (await connection.query(
         'SELECT typeOfEvent FROM invites AS i INNER JOIN events as ev ON i.eventId = ev.id WHERE i.id = UUID_TO_BIN(?)',
         [id]

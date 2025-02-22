@@ -1,10 +1,12 @@
 import { Request, Response } from 'express'
-import { LoggerService } from '../services/logger.js'
 import { getUTCDate } from './tools.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { LogsRepository } from '../repositories/logs-repository.js'
 
 export class ErrorHandler {
-  constructor(private loggerService: LoggerService) {
-    this.loggerService = loggerService
+  private logsRepository: LogsRepository
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.logsRepository = new LogsRepository(mysqlDatabase)
   }
 
   handleHttp = async (
@@ -14,7 +16,7 @@ export class ErrorHandler {
     fullError: string,
     userId: string
   ) => {
-    await this.loggerService.addLog({
+    await this.logsRepository.addLog({
       dateOfError: getUTCDate(),
       customError: error,
       exceptionMessage: fullError,

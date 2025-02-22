@@ -1,17 +1,19 @@
 import { Request, Response } from 'express'
-import { LoggerService } from '../services/logger.js'
 import { UsersService } from '../services/users.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { LogsRepository } from '../repositories/logs-repository.js'
 
 export class LoggersController {
-  constructor(
-    private loggerService: LoggerService,
-    private usersService: UsersService
-  ) {
-    this.loggerService = loggerService
+  private logsRepository: LogsRepository
+  private usersService: UsersService
+
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.logsRepository = new LogsRepository(mysqlDatabase)
+    this.usersService = new UsersService()
   }
 
   getLogs = async (req: Request, res: Response) => {
-    const logs = await this.loggerService.getLogs()
+    const logs = await this.logsRepository.getLogs()
 
     let userIds = [...new Set(logs.map((l) => l.userId))]
 

@@ -1,8 +1,5 @@
 import { z } from 'zod'
-import {
-  ISweetXvSettings,
-  IWeddingSetting
-} from '../interfaces/settingsModel.js'
+import { ISweetXvSettings, IWeddingSetting } from '../global/types.js'
 
 const sweetXvSettingsSchema = z
   .object({

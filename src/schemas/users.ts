@@ -5,7 +5,7 @@ import {
   IUpsertUser,
   IUserProfile,
   IUserProfilePhotoSource
-} from '../interfaces/usersModel.js'
+} from '../global/types.js'
 
 const fullUserSchema = z.object({
   username: z

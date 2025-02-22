@@ -1,28 +1,22 @@
 import { Router } from 'express'
 import { AuthController } from '../controllers/auth.js'
-import { UsersService } from '../services/users.js'
-import { MailService } from '../services/mail.js'
-import { LoggerService } from '../services/logger.js'
 import { validateUuid } from '../middleware/validateUuid.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { Transporter } from 'nodemailer'
 
 export const authRouter = Router()
 
 export const createAuthRouter = (
-  userService: UsersService,
-  mailService: MailService,
-  loggerService: LoggerService
+  mysqlDatabase: MysqlDatabase,
+  nodemailerConnection: Transporter
 ) => {
-  const authController = new AuthController(
-    userService,
-    mailService,
-    loggerService
-  )
+  const authController = new AuthController(mysqlDatabase, nodemailerConnection)
 
   authRouter.post('/signin', authController.signIn)
   authRouter.post('/forgotPassword', authController.forgotPassword)
   authRouter.post('/forgotPasswordToUser', authController.forgotPasswordToUser)
   authRouter.get('/refreshToken', authController.refreshToken)
-  
+
   authRouter.get(
     '/forgotPassword/:user',
     [validateUuid],

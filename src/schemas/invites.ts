@@ -4,7 +4,7 @@ import {
   IConfirmation,
   ISaveTheDateConfirmation,
   IUpsertInvite
-} from '../interfaces/invitesModels.js'
+} from '../global/types.js'
 
 const inviteSchema = z.object({
   family: z

@@ -1,16 +1,12 @@
 import { Router } from 'express'
 import { EventsController } from '../controllers/events.js'
-import { EventsService } from '../services/events.js'
 import { validateUuid } from '../middleware/validateUuid.js'
-import { LoggerService } from '../services/logger.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
 export const eventsRouter = Router()
 
-export const createEventsRouter = (
-  eventsService: EventsService,
-  loggerService: LoggerService
-) => {
-  const eventController = new EventsController(eventsService, loggerService)
+export const createEventsRouter = (mysqlDatabase: MysqlDatabase) => {
+  const eventController = new EventsController(mysqlDatabase)
 
   eventsRouter.get('/', eventController.getAllEvents)
   eventsRouter.get('/dropdown', eventController.getDropdownEvents)

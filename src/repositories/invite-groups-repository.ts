@@ -1,26 +1,20 @@
-import {
-  FieldPacket,
-  Pool,
-  PoolConnection,
-  QueryResult,
-  RowDataPacket
-} from 'mysql2/promise'
+import { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
+import { IInviteGroupsRepository } from '../interfaces/invite-groups-repository.js'
 import {
   IInviteGroup,
   IFullInviteGroup,
   IPartialInviteGroup
-} from '../interfaces/inviteGroupsModel.js'
+} from '../global/types.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
-export class InviteGroupsService {
-  constructor(private connection: Pool) {
-    this.connection = connection
+export class InviteGroupsRepository implements IInviteGroupsRepository {
+  constructor(private database: MysqlDatabase) {
+    this.database = database
   }
 
-  getInviteGroups = async (eventId: string): Promise<IInviteGroup[]> => {
-    let connection: PoolConnection | undefined
+  async getInviteGroups(eventId: string): Promise<IInviteGroup[]> {
+    const connection = await this.database.getConnection()
     try {
-      connection = await this.connection.getConnection()
-
       const [result] = (await connection.query(
         'SELECT BIN_TO_UUID(id) id, inviteGroup FROM inviteGroups WHERE eventId = UUID_TO_BIN(?) ORDER BY inviteGroup',
         [eventId]
@@ -33,11 +27,11 @@ export class InviteGroupsService {
     }
   }
 
-  bulkInviteGroup = async (
+  async bulkInviteGroup(
     eventId: string,
     inviteGroups: string[]
-  ): Promise<IFullInviteGroup[]> => {
-    let connection: PoolConnection | undefined
+  ): Promise<IFullInviteGroup[]> {
+    const connection = await this.database.getConnection()
 
     const newInviteGroups = inviteGroups.reduce(
       (result: IInviteGroup[], inviteGroup) => {
@@ -52,8 +46,6 @@ export class InviteGroupsService {
     ) as IFullInviteGroup[]
 
     try {
-      connection = await this.connection.getConnection()
-
       // Begin transaction with current connection
       await connection.beginTransaction()
 
@@ -88,12 +80,10 @@ export class InviteGroupsService {
     }
   }
 
-  createInviteGroup = async (inviteGroups: IInviteGroup): Promise<string> => {
-    let connection: PoolConnection | undefined
+  async createInviteGroup(inviteGroups: IInviteGroup): Promise<string> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const { inviteGroup, eventId } = inviteGroups
 
       const [queryResult] = await connection.query('SELECT UUID() uuid')
@@ -112,14 +102,10 @@ export class InviteGroupsService {
     }
   }
 
-  updateInviteGroup = async (
-    inviteGroups: IPartialInviteGroup
-  ): Promise<void> => {
-    let connection: PoolConnection | undefined
+  async updateInviteGroup(inviteGroups: IPartialInviteGroup): Promise<void> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const { id, inviteGroup } = inviteGroups
 
       await connection.query(
@@ -133,15 +119,13 @@ export class InviteGroupsService {
     }
   }
 
-  checkInviteGroup = async (
+  async checkInviteGroup(
     eventId: string,
     inviteGroup: string
-  ): Promise<boolean> => {
-    let connection: PoolConnection | undefined
+  ): Promise<boolean> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [inviteGroupFounded] = (await connection.query(
         'SELECT * FROM inviteGroups WHERE eventId = UUID_TO_BIN(?) AND inviteGroup = ?',
         [eventId, inviteGroup]

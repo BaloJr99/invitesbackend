@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { IFilesUpload, IImageUsageModel } from '../interfaces/filesModel.js'
+import { IFilesUpload, IImageUsageModel } from '../global/types.js'
 
 const imagesSchema = z.object({
   image: z

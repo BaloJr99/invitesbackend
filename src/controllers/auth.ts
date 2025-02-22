@@ -5,22 +5,21 @@ import {
   validateUserId,
   validateUsernameOrEmail
 } from '../schemas/users.js'
+import { ErrorHandler } from '../utils/error.handle.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 import { UsersService } from '../services/users.js'
 import { MailService } from '../services/mail.js'
-import { ErrorHandler } from '../utils/error.handle.js'
-import { LoggerService } from '../services/logger.js'
+import { Transporter } from 'nodemailer'
 
 export class AuthController {
-  errorHandler: ErrorHandler
+  private errorHandler: ErrorHandler
+  private usersService: UsersService
+  private mailService: MailService
 
-  constructor(
-    private userService: UsersService,
-    private mailService: MailService,
-    private loggerService: LoggerService
-  ) {
-    this.userService = userService
-    this.mailService = mailService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  constructor(myslDatabase: MysqlDatabase, nodemailerConnection: Transporter) {
+    this.errorHandler = new ErrorHandler(myslDatabase)
+    this.mailService = new MailService(nodemailerConnection)
+    this.usersService = new UsersService()
   }
 
   signIn = async (req: Request, res: Response) => {
@@ -31,7 +30,7 @@ export class AuthController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const signInResponse = await this.userService.signin(result.data)
+      const signInResponse = await this.usersService.signin(result.data)
       if (signInResponse.includes('ERROR')) {
         return res
           .status(401)
@@ -76,7 +75,7 @@ export class AuthController {
       return res.status(422).json(JSON.parse(result.error.message))
     }
 
-    const userFounded = await this.userService.findUser(
+    const userFounded = await this.usersService.findUser(
       result.data.usernameOrEmail
     )
 
@@ -96,7 +95,7 @@ export class AuthController {
         subject: 'Password Reset'
       })
 
-      await this.userService.updateResetPasword(
+      await this.usersService.updateResetPasword(
         userFounded._id.toString(),
         '',
         true
@@ -121,7 +120,7 @@ export class AuthController {
       return res.status(422).json(JSON.parse(result.error.message))
     }
 
-    const userFounded = await this.userService.findUserById(result.data.id)
+    const userFounded = await this.usersService.findUserById(result.data.id)
 
     if (!userFounded) {
       return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
@@ -139,7 +138,7 @@ export class AuthController {
         subject: 'Password Reset'
       })
 
-      await this.userService.updateResetPasword(
+      await this.usersService.updateResetPasword(
         userFounded._id.toString(),
         '',
         true
@@ -161,7 +160,7 @@ export class AuthController {
     try {
       const { user } = req.params
 
-      const resetting = await this.userService.isUserResettingPassword(user)
+      const resetting = await this.usersService.isUserResettingPassword(user)
       return res.json(resetting)
     } catch (_e) {
       const e: Error = _e as Error
@@ -185,7 +184,7 @@ export class AuthController {
 
       const { user } = req.params
 
-      await this.userService.updateResetPasword(
+      await this.usersService.updateResetPasword(
         user,
         result.data.password,
         false
@@ -211,7 +210,7 @@ export class AuthController {
         return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
       }
 
-      const access_token = await this.userService.refreshToken(refreshToken)
+      const access_token = await this.usersService.refreshToken(refreshToken)
       if (access_token.includes('ERROR')) {
         return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
       }

@@ -1,28 +1,27 @@
-import { FieldPacket, Pool, PoolConnection, RowDataPacket } from 'mysql2/promise'
+import { FieldPacket, RowDataPacket } from 'mysql2'
+import { FileType } from '../global/enum.js'
+import { IFilesRepository } from '../interfaces/files-repository.js'
 import {
-  IDownloadAudio,
   IDownloadImage,
-  IFilesId,
+  IDownloadAudio,
   IFilesModel,
-  IImageUsageModel
-} from '../interfaces/filesModel.js'
+  IImageUsageModel,
+  IFilesId
+} from '../global/types.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 import { cloudinaryConfig } from '../config/cloudinary/cloudinary.js'
-import { FileType } from '../interfaces/enum.js'
 
-export class FilesService {
-  constructor(
-    private connection: Pool,
-    private cloudinary: typeof cloudinaryConfig
-  ) {
-    this.connection = connection
+export class FilesRepository implements IFilesRepository {
+  private cloudinary = cloudinaryConfig
+
+  constructor(private database: MysqlDatabase) {
+    this.database = database
   }
 
-  getImageByEventId = async (eventId: string): Promise<IDownloadImage[]> => {
-    let connection: PoolConnection | undefined
+  async getImageByEventId(eventId: string): Promise<IDownloadImage[]> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [results] = (await connection.query(
         'SELECT BIN_TO_UUID(id) id, fileUrl, publicId, imageUsage FROM inviteImages WHERE eventId = UUID_TO_BIN(?) ORDER BY imageUsage',
         [eventId]
@@ -36,12 +35,10 @@ export class FilesService {
     }
   }
 
-  getAudioByEventId = async (eventId: string): Promise<IDownloadAudio[]> => {
-    let connection: PoolConnection | undefined
+  async getAudioByEventId(eventId: string): Promise<IDownloadAudio[]> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [results] = (await connection.query(
         'SELECT BIN_TO_UUID(id) id, fileUrl, publicId FROM invitesAudio WHERE eventId = UUID_TO_BIN(?)',
         [eventId]
@@ -55,12 +52,10 @@ export class FilesService {
     }
   }
 
-  createFile = async (image: IFilesModel, fileType: FileType) => {
-    let connection: PoolConnection | undefined
+  async createFile(image: IFilesModel, fileType: FileType): Promise<void> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const { fileUrl, publicId, eventId } = image
 
       const [queryResult] = await connection.query('SELECT UUID() uuid')
@@ -79,12 +74,10 @@ export class FilesService {
     }
   }
 
-  updateImages = async (images: IImageUsageModel[]) => {
-    let connection: PoolConnection | undefined
+  async updateImages(images: IImageUsageModel[]): Promise<void> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       for (const image of images) {
         const { id, imageUsage } = image
         await connection.query(
@@ -99,12 +92,10 @@ export class FilesService {
     }
   }
 
-  deleteFile = async (imageId: string, fileType: FileType) => {
-    let connection: PoolConnection | undefined
+  async deleteFile(imageId: string, fileType: FileType): Promise<void> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       await connection.query(
         `DELETE FROM ${
           fileType === FileType.Video ? 'invitesAudio' : 'inviteImages'
@@ -118,11 +109,11 @@ export class FilesService {
     }
   }
 
-  uploadAsset = async (
+  async uploadAsset(
     file: string | Buffer,
     folder: string,
     fileType: FileType
-  ) => {
+  ): Promise<unknown> {
     if (fileType === FileType.Image) {
       return await this.cloudinary.uploader.upload(file as string, {
         folder,
@@ -145,25 +136,23 @@ export class FilesService {
     }
   }
 
-  deleteAsset = async (imageId: string, fileType: FileType) => {
+  async deleteAsset(imageId: string, fileType: FileType): Promise<void> {
     if (fileType === FileType.Video) {
       await this.cloudinary.uploader.destroy(imageId, {
         resource_type: 'video',
         invalidate: true
       })
     } else {
-      return await this.cloudinary.uploader.destroy(imageId, {
+      await this.cloudinary.uploader.destroy(imageId, {
         resource_type: 'image'
       })
     }
   }
 
-  getAllImages = async (): Promise<IFilesId[]> => {
-    let connection: PoolConnection | undefined
+  async getAllImages(): Promise<IFilesId[]> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [results] = (await connection.query(
         'SELECT publicId FROM inviteImages'
       )) as [RowDataPacket[], FieldPacket[]]
@@ -176,12 +165,10 @@ export class FilesService {
     }
   }
 
-  getAllAudios = async (): Promise<IFilesId[]> => {
-    let connection: PoolConnection | undefined
+  async getAllAudios(): Promise<IFilesId[]> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const [results] = (await connection.query(
         'SELECT publicId FROM invitesAudio'
       )) as [RowDataPacket[], FieldPacket[]]

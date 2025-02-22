@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
-import { AuthModel } from '../interfaces/authModel.js'
 import { EnvConfig } from '../config/config.js'
+import { AuthModel } from '../global/types.js'
 
 const verifyJwtToken = (bearerToken: string): AuthModel => {
   const token = bearerToken.split(' ').pop()

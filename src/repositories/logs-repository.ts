@@ -1,23 +1,22 @@
-import { FieldPacket, Pool, PoolConnection, RowDataPacket } from 'mysql2/promise'
-import { ILogger } from '../interfaces/loggerModel.js'
+import { FieldPacket, RowDataPacket } from 'mysql2'
+import { ILogger } from '../global/types.js'
+import { ILogsRepository } from '../interfaces/logs-repository.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
-export class LoggerService {
-  constructor(private connection: Pool) {
-    this.connection = connection
+export class LogsRepository implements ILogsRepository {
+  constructor(private database: MysqlDatabase) {
+    this.database = database
   }
 
-  addLog = async (logger: ILogger) => {
-    let connection: PoolConnection | undefined
-
+  async addLog(logger: ILogger): Promise<void> {
+    const connection = await this.database.getConnection()
     try {
-      connection = await this.connection.getConnection()
       const { dateOfError, customError, exceptionMessage, userId } = logger
 
       await connection.query(
         `INSERT INTO errorLogs (dateOfError, customError, exceptionMessage, userId) VALUES (?, ?, ?, ?)`,
         [dateOfError, customError, exceptionMessage, userId]
       )
-
     } catch (error) {
       console.log(error)
     } finally {
@@ -25,12 +24,10 @@ export class LoggerService {
     }
   }
 
-  getLogs = async (): Promise<ILogger[]> => {
-    let connection: PoolConnection | undefined
+  async getLogs(): Promise<ILogger[]> {
+    const connection = await this.database.getConnection()
 
     try {
-      connection = await this.connection.getConnection()
-
       const todayMinus31 = new Date()
       todayMinus31.setDate(todayMinus31.getDate() - 31)
 

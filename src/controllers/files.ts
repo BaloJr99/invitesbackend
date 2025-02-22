@@ -5,21 +5,19 @@ import {
 } from '../schemas/images.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
-import { LoggerService } from '../services/logger.js'
-import { FilesService } from '../services/files.js'
-import { FileType } from '../interfaces/enum.js'
+import { FileType } from '../global/enum.js'
 import { UploadApiResponse } from 'cloudinary'
 import { EnvConfig } from '../config/config.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { FilesRepository } from '../repositories/files-repository.js'
 
 export class FilesController {
-  errorHandler: ErrorHandler
+  private errorHandler: ErrorHandler
+  private filesRepository: FilesRepository
 
-  constructor(
-    private filesService: FilesService,
-    private loggerService: LoggerService
-  ) {
-    this.filesService = filesService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
+    this.filesRepository = new FilesRepository(mysqlDatabase)
   }
 
   createFile = async (req: Request, res: Response) => {
@@ -34,7 +32,7 @@ export class FilesController {
         const folder =
           EnvConfig().node_env === 'development' ? 'test/audios' : 'prod/audios'
 
-        const cloudResult = (await this.filesService.uploadAsset(
+        const cloudResult = (await this.filesRepository.uploadAsset(
           req.file.buffer,
           folder,
           FileType.Video
@@ -42,7 +40,7 @@ export class FilesController {
 
         const { eventId } = result.data
 
-        await this.filesService.createFile(
+        await this.filesRepository.createFile(
           {
             fileUrl: cloudResult.secure_url,
             publicId: cloudResult.public_id,
@@ -62,7 +60,7 @@ export class FilesController {
             ? 'test/invites'
             : 'prod/invites'
 
-        const cloudResult = (await this.filesService.uploadAsset(
+        const cloudResult = (await this.filesRepository.uploadAsset(
           result.data.image,
           folder,
           FileType.Image
@@ -70,7 +68,7 @@ export class FilesController {
 
         const { eventId } = result.data
 
-        await this.filesService.createFile(
+        await this.filesRepository.createFile(
           {
             fileUrl: cloudResult.secure_url,
             publicId: cloudResult.public_id,
@@ -101,7 +99,7 @@ export class FilesController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      await this.filesService.updateImages(result.data)
+      await this.filesRepository.updateImages(result.data)
 
       return res.status(201).json({ message: req.t('messages.FILES_UPDATED') })
     } catch (_e) {
@@ -125,9 +123,9 @@ export class FilesController {
           ? FileType.Video
           : FileType.Image
 
-      await this.filesService.deleteAsset(image.publicId, fileType)
+      await this.filesRepository.deleteAsset(image.publicId, fileType)
 
-      await this.filesService.deleteFile(image.id, fileType)
+      await this.filesRepository.deleteFile(image.id, fileType)
 
       return res.json({ message: req.t('messages.FILE_DELETED') })
     } catch (_e) {
@@ -146,8 +144,8 @@ export class FilesController {
     try {
       const { id } = req.params
 
-      const eventImages = await this.filesService.getImageByEventId(id)
-      const eventAudios = await this.filesService.getAudioByEventId(id)
+      const eventImages = await this.filesRepository.getImageByEventId(id)
+      const eventAudios = await this.filesRepository.getAudioByEventId(id)
 
       return res.json({ eventImages, eventAudios })
     } catch (_e) {

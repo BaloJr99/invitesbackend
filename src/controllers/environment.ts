@@ -1,23 +1,25 @@
 import { Request, Response } from 'express'
-import { LoggerService } from '../services/logger.js'
-import { ErrorHandler } from '../utils/error.handle.js'
-import { EnvironmentService } from '../services/environment.js'
-import { FilesService } from '../services/files.js'
-import { FileType } from '../interfaces/enum.js'
+import { FileType } from '../global/enum.js'
 import { UsersService } from '../services/users.js'
 import { RolesService } from '../services/roles.js'
+import { EnvironmentsRepository } from '../repositories/environments-repository.js'
+import { FilesRepository } from '../repositories/files-repository.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { ErrorHandler } from '../utils/error.handle.js'
 
 export class EnvironmentController {
-  errorHandler: ErrorHandler
-  constructor(
-    private environmentService: EnvironmentService,
-    private filesService: FilesService,
-    private loggerService: LoggerService,
-    private rolesService: RolesService,
-    private userService: UsersService
-  ) {
-    this.environmentService = environmentService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  private errorHandler: ErrorHandler
+  private environmentsRepository: EnvironmentsRepository
+  private usersService: UsersService
+  private rolesService: RolesService
+  private filesRepository: FilesRepository
+
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
+    this.environmentsRepository = new EnvironmentsRepository(mysqlDatabase)
+    this.filesRepository = new FilesRepository(mysqlDatabase)
+    this.rolesService = new RolesService()
+    this.usersService = new UsersService()
   }
 
   cleanEnvironment = async (req: Request, res: Response) => {
@@ -25,22 +27,22 @@ export class EnvironmentController {
       console.log('Cleaning environment')
 
       console.log('Getting files')
-      const eventImages = await this.filesService.getAllImages()
+      const eventImages = await this.filesRepository.getAllImages()
       for (const image of eventImages) {
-        await this.filesService.deleteAsset(image.publicId, FileType.Image)
+        await this.filesRepository.deleteAsset(image.publicId, FileType.Image)
       }
       console.log(`Deleted ${eventImages.length} images`)
 
-      const eventAudios = await this.filesService.getAllAudios()
+      const eventAudios = await this.filesRepository.getAllAudios()
       for (const audio of eventAudios) {
-        await this.filesService.deleteAsset(audio.publicId, FileType.Video)
+        await this.filesRepository.deleteAsset(audio.publicId, FileType.Video)
       }
       console.log(`Deleted ${eventAudios.length} audios`)
-      await this.environmentService.cleanEnvironment()
+      await this.environmentsRepository.cleanEnvironment()
 
       // Delete all testing users
       console.log('Deleting testing users')
-      await this.userService.deleteUserTestingData()
+      await this.usersService.deleteUserTestingData()
 
       // Delete all testing roles
       console.log('Deleting testing roles')

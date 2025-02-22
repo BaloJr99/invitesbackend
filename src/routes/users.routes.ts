@@ -1,29 +1,16 @@
 import { Router } from 'express'
 import { UsersController } from '../controllers/users.js'
-import { UsersService } from '../services/users.js'
 import {
   checkDuplicateUsernameOrEmail,
   checkRolesExisted
 } from '../middleware/verifySignup.js'
-import { EventsService } from '../services/events.js'
-import { LoggerService } from '../services/logger.js'
 import { isAdmin, isInvitesAdmin } from '../middleware/auth.js'
-import { FilesService } from '../services/files.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
 export const usersRouter = Router()
 
-export const createUsersRouter = (
-  userService: UsersService,
-  eventsService: EventsService,
-  loggerService: LoggerService,
-  filesService: FilesService
-) => {
-  const userController = new UsersController(
-    userService,
-    eventsService,
-    loggerService,
-    filesService
-  )
+export const createUsersRouter = (mysqlDatabase: MysqlDatabase) => {
+  const userController = new UsersController(mysqlDatabase)
 
   usersRouter.get('/', [isAdmin], userController.getUsers)
   usersRouter.get('/basic', [isInvitesAdmin], userController.getUsersBasicInfo)

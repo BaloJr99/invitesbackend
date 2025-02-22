@@ -1,4 +1,4 @@
-import { IFullRole } from '../interfaces/rolesModel.js'
+import { IFullRole } from '../global/types.js'
 import Role from '../models/role.js'
 
 export class RolesService {

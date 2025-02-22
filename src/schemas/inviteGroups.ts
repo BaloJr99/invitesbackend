@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { IInviteGroup } from '../interfaces/inviteGroupsModel.js'
+import { IInviteGroup } from '../global/types.js'
 
 const inviteGroupSchema = z.object({
   inviteGroup: z

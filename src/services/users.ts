@@ -7,7 +7,7 @@ import {
   IUpsertUser,
   IUserProfile,
   IUserProfilePhoto
-} from '../interfaces/usersModel.js'
+} from '../global/types.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
 import { EnvConfig } from '../config/config.js'
 

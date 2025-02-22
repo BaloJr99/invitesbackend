@@ -1,24 +1,14 @@
 import { Router } from 'express'
-import { InvitesService } from '../services/invites.js'
 import { isInvitesAdmin } from '../middleware/auth.js'
 import { validateUuid } from '../middleware/validateUuid.js'
 import { checkJwt } from '../middleware/session.js'
-import { LoggerService } from '../services/logger.js'
 import { InvitesController } from '../controllers/invites.js'
-import { InviteGroupsService } from '../services/inviteGroups.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
 export const invitesRouter = Router()
 
-export const createInvitesRouter = (
-  invitesService: InvitesService,
-  loggerService: LoggerService,
-  inviteGroupsService: InviteGroupsService
-) => {
-  const invitesController = new InvitesController(
-    invitesService,
-    loggerService,
-    inviteGroupsService
-  )
+export const createInvitesRouter = (mysqlDatabase: MysqlDatabase) => {
+  const invitesController = new InvitesController(mysqlDatabase)
 
   invitesRouter.get(
     '/',

@@ -1,30 +1,28 @@
-import { SettingsService } from '../services/settings.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
-import { LoggerService } from '../services/logger.js'
 import {
   validateSaveTheDateSettings,
   validateSweetXvSettings,
   validateWeddingSettings
 } from '../schemas/settings.js'
-import { EventType } from '../interfaces/enum.js'
+import { EventType } from '../global/enum.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { SettingsRepository } from '../repositories/settings-repository.js'
 
 export class SettingsController {
-  errorHandler: ErrorHandler
+  private errorHandler: ErrorHandler
+  private settingsRepository: SettingsRepository
 
-  constructor(
-    private settingsService: SettingsService,
-    private loggerService: LoggerService
-  ) {
-    this.settingsService = settingsService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
+    this.settingsRepository = new SettingsRepository(mysqlDatabase)
   }
 
   getEventSettingsById = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
 
-      const event = await this.settingsService.getEventSettingsById(id)
+      const event = await this.settingsRepository.getEventSettingsById(id)
       if (event.length > 0)
         return res.json({
           ...event[0]
@@ -63,7 +61,7 @@ export class SettingsController {
 
       const { eventId, ...settings } = result.data
 
-      const settingId = await this.settingsService.createEventSettings({
+      const settingId = await this.settingsRepository.createEventSettings({
         eventId,
         settings: JSON.stringify(settings)
       })
@@ -103,7 +101,7 @@ export class SettingsController {
 
       const { eventId, ...settings } = result.data
 
-      await this.settingsService.updateEventSettings({
+      await this.settingsRepository.updateEventSettings({
         eventId,
         settings: JSON.stringify(settings)
       })

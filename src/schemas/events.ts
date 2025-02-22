@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { EventModel } from '../interfaces/eventsModel.js'
+import { EventModel } from '../global/types.js'
 
 const eventSchema = z.object({
   nameOfEvent: z

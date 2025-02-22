@@ -1,15 +1,13 @@
 import { Router } from 'express'
 import { RolesController } from '../controllers/roles.js'
-import { RolesService } from '../services/roles.js'
-import { LoggerService } from '../services/logger.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
 export const rolesRouter = Router()
 
 export const createRolesRouter = (
-  rolesService: RolesService,
-  loggerService: LoggerService
+  mysqlDatabase: MysqlDatabase
 ) => {
-  const rolesController = new RolesController(rolesService, loggerService)
+  const rolesController = new RolesController(mysqlDatabase)
 
   rolesRouter.get('/', rolesController.getRoles)
 

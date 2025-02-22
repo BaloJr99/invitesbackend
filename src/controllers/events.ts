@@ -1,19 +1,18 @@
 import { validateEvent } from '../schemas/events.js'
-import { EventsService } from '../services/events.js'
 import { Request, Response } from 'express'
-import { IDashboardEvent, IDropdownEvent } from '../interfaces/eventsModel.js'
-import { LoggerService } from '../services/logger.js'
+import { IDashboardEvent, IDropdownEvent } from '../global/types.js'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { EventsRepository } from '../repositories/events-repository.js'
 
 export class EventsController {
-  errorHandler: ErrorHandler
-  constructor(
-    private eventService: EventsService,
-    private loggerService: LoggerService
-  ) {
-    this.eventService = eventService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  private errorHandler: ErrorHandler
+  private eventsRepository: EventsRepository
+
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
+    this.eventsRepository = new EventsRepository(mysqlDatabase)
   }
 
   getAllEvents = async (req: Request, res: Response) => {
@@ -25,9 +24,9 @@ export class EventsController {
 
       let events: IDashboardEvent[]
       if (isAdmin) {
-        events = await this.eventService.getAllEvents()
+        events = await this.eventsRepository.getAllEvents()
       } else {
-        events = await this.eventService.getEventsByUser(req.userId)
+        events = await this.eventsRepository.getEventsByUser(req.userId)
       }
       return res.json(events)
     } catch (_e) {
@@ -51,9 +50,11 @@ export class EventsController {
 
       let events: IDropdownEvent[]
       if (isAdmin) {
-        events = await this.eventService.getDropdownEvents()
+        events = await this.eventsRepository.getDropdownEvents()
       } else {
-        events = await this.eventService.getDropdownEventsByUserId(req.userId)
+        events = await this.eventsRepository.getDropdownEventsByUserId(
+          req.userId
+        )
       }
 
       return res.json(events)
@@ -74,7 +75,7 @@ export class EventsController {
       const { id } = req.params
       const { eventSettings } = req.query
 
-      const eventType = await this.eventService.eventInformation(id)
+      const eventType = await this.eventsRepository.eventInformation(id)
       if (eventType.length > 0) {
         const eventData = eventType[0]
         const filterSettings = eventSettings as string
@@ -114,7 +115,7 @@ export class EventsController {
     try {
       const { id } = req.params
 
-      const events = await this.eventService.getEventInvites(id)
+      const events = await this.eventsRepository.getEventInvites(id)
 
       return res.json(events)
     } catch (_e) {
@@ -133,7 +134,7 @@ export class EventsController {
     try {
       const { id } = req.params
 
-      const deadlineResults = await this.eventService.isDeadlineMet(id)
+      const deadlineResults = await this.eventsRepository.isDeadlineMet(id)
 
       if (deadlineResults.length === 0) {
         return res.json(false)
@@ -156,7 +157,7 @@ export class EventsController {
     try {
       const { id } = req.params
 
-      const event = await this.eventService.getEventById(id)
+      const event = await this.eventsRepository.getEventById(id)
 
       if (event.length > 0) return res.json(event.at(0))
 
@@ -183,7 +184,7 @@ export class EventsController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const eventId = await this.eventService.createEvent(result.data)
+      const eventId = await this.eventsRepository.createEvent(result.data)
 
       return res
         .status(201)
@@ -203,7 +204,7 @@ export class EventsController {
   deleteEvent = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      await this.eventService.deleteEvent(id)
+      await this.eventsRepository.deleteEvent(id)
 
       return res.json({ message: req.t('messages.EVENT_DELETED') })
     } catch (_e) {
@@ -229,7 +230,7 @@ export class EventsController {
 
       const { id } = req.params
 
-      await this.eventService.updateEvent(
+      await this.eventsRepository.updateEvent(
         id,
         result.data,
         JSON.parse(override as string),

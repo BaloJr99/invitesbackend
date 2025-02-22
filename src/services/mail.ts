@@ -1,5 +1,5 @@
 import { Transporter } from 'nodemailer'
-import { MailModel } from '../interfaces/mail.js'
+import { MailModel } from '../global/types.js'
 
 export class MailService {
   constructor(private connection: Transporter) {

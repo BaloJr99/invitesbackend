@@ -1,52 +1,29 @@
 import express, { json } from 'express'
 import path from 'path'
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js'
-import { EventsService } from './services/events.js'
-import { InviteGroupsService } from './services/inviteGroups.js'
-import { UsersService } from './services/users.js'
 import { Server } from 'socket.io'
 import { createServer } from 'http'
 import { createApiRouter } from './routes/api.routes.js'
-import { SettingsService } from './services/settings.js'
-import { RolesService } from './services/roles.js'
-import { MailService } from './services/mail.js'
-import { InvitesService } from './services/invites.js'
-import { LoggerService } from './services/logger.js'
 import { ErrorHandler } from './utils/error.handle.js'
-import { IConfirmation } from './interfaces/invitesModels.js'
 import i18next from 'i18next'
 import Backend from 'i18next-fs-backend'
 import cookieParser from 'cookie-parser'
 import { handle, LanguageDetector } from 'i18next-http-middleware'
 import { fileURLToPath } from 'url'
-import { IUserFromInvite } from './interfaces/usersModel.js'
-import { FilesService } from './services/files.js'
-import { EnvironmentService } from './services/environment.js'
 import { EnvConfig } from './config/config.js'
+import { MysqlDatabase } from './services/mysql-database.js'
+import { Transporter } from 'nodemailer'
+import { InvitesRepository } from './repositories/invites-repository.js'
+import { UsersService } from './services/users.js'
+import { IConfirmation, IUserFromInvite } from './global/types.js'
 
 export class App {
-  constructor(
-    private environmentService: EnvironmentService,
-    private eventsService: EventsService,
-    private inviteGroupsService: InviteGroupsService,
-    private filesService: FilesService,
-    private invitesService: InvitesService,
-    private loggerService: LoggerService,
-    private mailService: MailService,
-    private rolesService: RolesService,
-    private settingsService: SettingsService,
-    private usersService: UsersService
-  ) {
-    this.environmentService = environmentService
-    this.eventsService = eventsService
-    this.inviteGroupsService = inviteGroupsService
-    this.filesService = filesService
-    this.invitesService = invitesService
-    this.loggerService = loggerService
-    this.mailService = mailService
-    this.rolesService = rolesService
-    this.settingsService = settingsService
-    this.usersService = usersService
+  private invitesRepository: InvitesRepository
+  private usersService: UsersService
+
+  constructor(mysqlDatabase: MysqlDatabase, nodemailerConnection: Transporter) {
+    this.invitesRepository = new InvitesRepository(mysqlDatabase)
+    this.usersService = new UsersService()
 
     const __filename = fileURLToPath(import.meta.url)
     const __dirname = path.dirname(__filename)
@@ -65,7 +42,7 @@ export class App {
 
     const server = createServer(app)
 
-    const errorHandler = new ErrorHandler(this.loggerService)
+    const errorHandler = new ErrorHandler(mysqlDatabase)
 
     const io = new Server(server, {
       connectionStateRecovery: {},
@@ -84,9 +61,10 @@ export class App {
 
       socket.on('sendNotification', async (invite: IConfirmation) => {
         try {
-          const result = await this.invitesService.getUserFromInviteId(
+          const result = await this.invitesRepository.getUserFromInviteId(
             invite.id
           )
+
           if (result.length > 0) {
             const user = result.at(0) as IUserFromInvite
 
@@ -114,21 +92,7 @@ export class App {
     app.use(handle(i18next))
     app.use(cookieParser())
 
-    app.use(
-      '/api',
-      createApiRouter(
-        this.environmentService,
-        this.eventsService,
-        this.inviteGroupsService,
-        this.filesService,
-        this.invitesService,
-        this.loggerService,
-        this.mailService,
-        this.rolesService,
-        this.settingsService,
-        this.usersService
-      )
-    )
+    app.use('/api', createApiRouter(mysqlDatabase, nodemailerConnection))
 
     const PORT = EnvConfig().port ?? 3000
 

@@ -1,8 +1,8 @@
 import { Pool, createPool } from 'mysql2/promise'
-import { EnvConfig } from '../config.js'
+import { EnvConfig } from '../config/config.js'
 
-export class ConnectionHandler {
-  public connection: Pool
+export class MysqlDatabase {
+  private connection: Pool
 
   constructor() {
     this.connection = this.establishConnection()
@@ -29,5 +29,9 @@ export class ConnectionHandler {
     }
 
     return connection
+  }
+
+  getConnection = async () => {
+    return this.connection.getConnection()
   }
 }

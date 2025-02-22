@@ -1,18 +1,16 @@
 import { RolesService } from '../services/roles.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
-//import { validateFullRole, validateRole } from '../schemas/roles.js'
-import { LoggerService } from '../services/logger.js'
 import { validateFullRole } from '../schemas/roles.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
 export class RolesController {
-  errorHandler: ErrorHandler
-  constructor(
-    private rolesService: RolesService,
-    private loggerService: LoggerService
-  ) {
-    this.rolesService = rolesService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  private errorHandler: ErrorHandler
+  private rolesService: RolesService
+
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.rolesService = new RolesService()
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
   }
 
   getRoles = async (req: Request, res: Response) => {

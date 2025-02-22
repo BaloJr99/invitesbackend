@@ -6,36 +6,37 @@ import {
   validateUserProfile,
   validateUserProfilePhoto
 } from '../schemas/users.js'
-import { EventsService } from '../services/events.js'
-import { LoggerService } from '../services/logger.js'
-import { IUserEventsInfo, IUserInfo } from '../interfaces/usersModel.js'
-import { FilesService } from '../services/files.js'
-import { FileType } from '../interfaces/enum.js'
+import { IUserEventsInfo, IUserInfo } from '../global/types.js'
+import { FileType } from '../global/enum.js'
 import { UploadApiResponse } from 'cloudinary'
 import { EnvConfig } from '../config/config.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
+import { EventsRepository } from '../repositories/events-repository.js'
+import { FilesRepository } from '../repositories/files-repository.js'
 
 export class UsersController {
-  errorHandler: ErrorHandler
-  constructor(
-    private userService: UsersService,
-    private eventsService: EventsService,
-    private loggerService: LoggerService,
-    private filesService: FilesService
-  ) {
-    this.userService = userService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  private eventsRepository: EventsRepository
+  private errorHandler: ErrorHandler
+  private filesRepository: FilesRepository
+  private usersService: UsersService
+
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.eventsRepository = new EventsRepository(mysqlDatabase)
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
+    this.filesRepository = new FilesRepository(mysqlDatabase)
+    this.usersService = new UsersService()
   }
 
   getUsers = async (req: Request, res: Response) => {
     try {
-      const users = (await this.userService.getUsers()) as IUserInfo[]
+      const users = (await this.usersService.getUsers()) as IUserInfo[]
 
       const usersId = users.map((u) => u._id.toString())
 
       const usersEventInfo: IUserEventsInfo[] = []
 
       for await (const userId of usersId) {
-        const queryResult = await this.eventsService.getEventsInfo(userId)
+        const queryResult = await this.eventsRepository.getEventsInfo(userId)
 
         // Find the user
         const user = users.find((u) => u._id.toString() === userId) as IUserInfo
@@ -77,7 +78,7 @@ export class UsersController {
   getUserById = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      const userFound = await this.userService.getUserById(id)
+      const userFound = await this.usersService.getUserById(id)
 
       return res.json(userFound)
     } catch (_e) {
@@ -94,7 +95,7 @@ export class UsersController {
 
   getUsersBasicInfo = async (req: Request, res: Response) => {
     try {
-      const users = await this.userService.getUsersBasicInfo()
+      const users = await this.usersService.getUsersBasicInfo()
       return res.json(users)
     } catch (_e) {
       const e: Error = _e as Error
@@ -116,7 +117,7 @@ export class UsersController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const userId = await this.userService.createUser({
+      const userId = await this.usersService.createUser({
         ...result.data,
         isActive: true,
         id: ''
@@ -147,7 +148,7 @@ export class UsersController {
 
       const { id } = req.params
 
-      await this.userService.updateUser({
+      await this.usersService.updateUser({
         ...result.data,
         id
       })
@@ -168,7 +169,7 @@ export class UsersController {
   deactivateUser = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      await this.userService.deactivateUser(id)
+      await this.usersService.deactivateUser(id)
 
       return res.json({ message: req.t('messages.USER_DELETED') })
     } catch (_e) {
@@ -186,7 +187,7 @@ export class UsersController {
   getUserProfile = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      const userFound = await this.userService.getUserProfile(id)
+      const userFound = await this.usersService.getUserProfile(id)
 
       return res.json(userFound)
     } catch (_e) {
@@ -209,7 +210,7 @@ export class UsersController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      await this.userService.updateUserProfile(result.data)
+      await this.usersService.updateUserProfile(result.data)
 
       return res
         .status(201)
@@ -229,7 +230,7 @@ export class UsersController {
   checkUsername = async (req: Request, res: Response) => {
     try {
       const { username } = req.params
-      const isDuplicated = await this.userService.checkUsername(username)
+      const isDuplicated = await this.usersService.checkUsername(username)
 
       return res.json(isDuplicated)
     } catch (_e) {
@@ -252,12 +253,12 @@ export class UsersController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const searchLastPhoto = await this.userService.getUserProfile(
+      const searchLastPhoto = await this.usersService.getUserProfile(
         result.data.id
       )
 
       if (searchLastPhoto && searchLastPhoto.profilePhotoPublicId) {
-        await this.filesService.deleteAsset(
+        await this.filesRepository.deleteAsset(
           searchLastPhoto.profilePhotoPublicId,
           FileType.Image
         )
@@ -266,13 +267,13 @@ export class UsersController {
       const folder =
         EnvConfig().node_env === 'development' ? 'test/users' : 'prod/users'
 
-      const cloudResult = (await this.filesService.uploadAsset(
+      const cloudResult = (await this.filesRepository.uploadAsset(
         result.data.profilePhotoSource,
         folder,
         FileType.Image
       )) as UploadApiResponse
 
-      await this.userService.updateUserProfilePhoto({
+      await this.usersService.updateUserProfilePhoto({
         id: result.data.id,
         profilePhoto: cloudResult.secure_url,
         profilePhotoPublicId: cloudResult.public_id

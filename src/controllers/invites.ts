@@ -1,30 +1,28 @@
 import { Request, Response } from 'express'
-import { InvitesService } from '../services/invites.js'
 import {
   validateBulkDeleteInvites,
   validateBulkInvite,
   validateInvite,
   validateConfirmationSchema,
-  validateSaveTheDateConfirmationSchema,
+  validateSaveTheDateConfirmationSchema
 } from '../schemas/invites.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
 import { ErrorHandler } from '../utils/error.handle.js'
-import { LoggerService } from '../services/logger.js'
-import { InviteGroupsService } from '../services/inviteGroups.js'
-import { IFullInviteGroup } from '../interfaces/inviteGroupsModel.js'
-import { IBulkInvite } from '../interfaces/invitesModels.js'
-import { EventType } from '../interfaces/enum.js'
+import { IBulkInvite, IFullInviteGroup } from '../global/types.js'
+import { EventType } from '../global/enum.js'
+import { InviteGroupsRepository } from '../repositories/invite-groups-repository.js'
+import { InvitesRepository } from '../repositories/invites-repository.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
 export class InvitesController {
-  errorHandler: ErrorHandler
+  private errorHandler: ErrorHandler
+  private invitesRepository: InvitesRepository
+  private inviteGroupsRepository: InviteGroupsRepository
 
-  constructor(
-    private invitesService: InvitesService,
-    private loggerService: LoggerService,
-    private inviteGroupsService: InviteGroupsService
-  ) {
-    this.invitesService = invitesService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.inviteGroupsRepository = new InviteGroupsRepository(mysqlDatabase)
+    this.invitesRepository = new InvitesRepository(mysqlDatabase)
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
   }
 
   getInvites = async (req: Request, res: Response) => {
@@ -33,7 +31,7 @@ export class InvitesController {
 
       const decoded = verifyJwtToken(token)
       const isAdmin = decoded.roles.some((r) => r.name == 'admin')
-      const invites = await this.invitesService.getAllInvites(
+      const invites = await this.invitesRepository.getAllInvites(
         decoded.id,
         isAdmin
       )
@@ -55,10 +53,10 @@ export class InvitesController {
     try {
       const { id } = req.params
 
-      const invite = await this.invitesService.getInvite(id)
+      const invite = await this.invitesRepository.getInvite(id)
 
       if (invite.length > 0) {
-        await this.invitesService.markAsViewed(id)
+        await this.invitesRepository.markAsViewed(id)
         return res.json(invite.at(0))
       }
 
@@ -85,7 +83,7 @@ export class InvitesController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const inviteId = await this.invitesService.createInvite({
+      const inviteId = await this.invitesRepository.createInvite({
         ...result.data,
         id: ''
       })
@@ -126,10 +124,11 @@ export class InvitesController {
       let generatedInviteGroups: IFullInviteGroup[] = []
 
       if (bulkInviteGroups) {
-        generatedInviteGroups = await this.inviteGroupsService.bulkInviteGroup(
-          result.data[0].eventId,
-          bulkInviteGroups
-        )
+        generatedInviteGroups =
+          await this.inviteGroupsRepository.bulkInviteGroup(
+            result.data[0].eventId,
+            bulkInviteGroups
+          )
       }
 
       const bulkInvites = result.data.map((bulk) => {
@@ -148,7 +147,7 @@ export class InvitesController {
         } as IBulkInvite
       })
 
-      const generatedInvites = await this.invitesService.createBulkInvite(
+      const generatedInvites = await this.invitesRepository.createBulkInvite(
         bulkInvites
       )
 
@@ -177,7 +176,7 @@ export class InvitesController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      await this.invitesService.bulkDeleteInvite(result.data)
+      await this.invitesRepository.bulkDeleteInvite(result.data)
 
       return res
         .status(201)
@@ -198,7 +197,7 @@ export class InvitesController {
     try {
       const { id } = req.params
 
-      await this.invitesService.deleteInvite(id)
+      await this.invitesRepository.deleteInvite(id)
 
       return res.json({ message: req.t('messages.INVITE_DELETED') })
     } catch (_e) {
@@ -223,7 +222,7 @@ export class InvitesController {
 
       const { id } = req.params
 
-      await this.invitesService.updateInvite({
+      await this.invitesRepository.updateInvite({
         ...result.data,
         id
       })
@@ -253,10 +252,10 @@ export class InvitesController {
         if (!result.success) {
           return res.status(422).json(JSON.parse(result.error.message))
         }
-        
-        await this.invitesService.updateSweetXvConfirmation({
+
+        await this.invitesRepository.updateSweetXvConfirmation({
           ...result.data,
-          id,
+          id
         })
       } else {
         result = validateSaveTheDateConfirmationSchema(req.body)
@@ -264,10 +263,10 @@ export class InvitesController {
         if (!result.success) {
           return res.status(422).json(JSON.parse(result.error.message))
         }
-        
-        await this.invitesService.updateSaveTheDateConfirmation({
+
+        await this.invitesRepository.updateSaveTheDateConfirmation({
           ...result.data,
-          id,
+          id
         })
       }
 
@@ -289,7 +288,7 @@ export class InvitesController {
   readMessage = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      await this.invitesService.readMessage(id)
+      await this.invitesRepository.readMessage(id)
       return res.json({ message: req.t('messages.MESSAGE_READ') })
     } catch (_e) {
       const e: Error = _e as Error
@@ -307,7 +306,7 @@ export class InvitesController {
     try {
       const { id } = req.params
 
-      const invite = await this.invitesService.getInviteEventType(id)
+      const invite = await this.invitesRepository.getInviteEventType(id)
 
       if (invite.length > 0) {
         return res.json(invite[0].typeOfEvent)

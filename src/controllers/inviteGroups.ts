@@ -2,26 +2,25 @@ import {
   validateInviteGroup,
   validateUpdateInviteGroup
 } from '../schemas/inviteGroups.js'
-import { InviteGroupsService } from '../services/inviteGroups.js'
 import { Request, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
-import { LoggerService } from '../services/logger.js'
+import { InviteGroupsRepository } from '../repositories/invite-groups-repository.js'
+import { MysqlDatabase } from '../services/mysql-database.js'
 
 export class InviteGroupsController {
-  errorHandler: ErrorHandler
-  constructor(
-    private inviteGroupService: InviteGroupsService,
-    private loggerService: LoggerService
-  ) {
-    this.inviteGroupService = inviteGroupService
-    this.errorHandler = new ErrorHandler(this.loggerService)
+  private errorHandler: ErrorHandler
+  private inviteGroupsRepository: InviteGroupsRepository
+
+  constructor(mysqlDatabase: MysqlDatabase) {
+    this.inviteGroupsRepository = new InviteGroupsRepository(mysqlDatabase)
+    this.errorHandler = new ErrorHandler(mysqlDatabase)
   }
 
   getInviteGroups = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
 
-      const inviteGroups = await this.inviteGroupService.getInviteGroups(id)
+      const inviteGroups = await this.inviteGroupsRepository.getInviteGroups(id)
 
       return res.json(inviteGroups)
     } catch (_e) {
@@ -44,7 +43,7 @@ export class InviteGroupsController {
         return res.status(422).json(JSON.parse(result.error.message))
       }
 
-      const inviteGroupId = await this.inviteGroupService.createInviteGroup(
+      const inviteGroupId = await this.inviteGroupsRepository.createInviteGroup(
         result.data
       )
 
@@ -73,7 +72,7 @@ export class InviteGroupsController {
 
       const { id } = req.params
 
-      await this.inviteGroupService.updateInviteGroup({
+      await this.inviteGroupsRepository.updateInviteGroup({
         id,
         inviteGroup: result.data.inviteGroup
       })
@@ -94,7 +93,7 @@ export class InviteGroupsController {
   checkInviteGroup = async (req: Request, res: Response) => {
     try {
       const { eventId, inviteGroup } = req.params
-      const isDuplicated = await this.inviteGroupService.checkInviteGroup(
+      const isDuplicated = await this.inviteGroupsRepository.checkInviteGroup(
         eventId,
         inviteGroup
       )
