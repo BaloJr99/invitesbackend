@@ -1,5 +1,5 @@
 import { validateEvent } from '../schemas/events.js'
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { IDashboardEvent, IDropdownEvent } from '../global/types.js'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
@@ -15,7 +15,10 @@ export class EventsController {
     this.eventsRepository = new EventsRepository(mysqlDatabase)
   }
 
-  getAllEvents = async (req: Request, res: Response) => {
+  getAllEvents: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const token = req.headers.authorization || ''
 
@@ -28,7 +31,7 @@ export class EventsController {
       } else {
         events = await this.eventsRepository.getEventsByUser(req.userId)
       }
-      return res.json(events)
+      res.json(events)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -41,7 +44,10 @@ export class EventsController {
     }
   }
 
-  getDropdownEvents = async (req: Request, res: Response) => {
+  getDropdownEvents: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const token = req.headers.authorization || ''
 
@@ -57,7 +63,7 @@ export class EventsController {
         )
       }
 
-      return res.json(events)
+      res.json(events)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -70,7 +76,10 @@ export class EventsController {
     }
   }
 
-  eventInformation = async (req: Request, res: Response) => {
+  eventInformation: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
       const { eventSettings } = req.query
@@ -82,7 +91,7 @@ export class EventsController {
 
         const settings = JSON.parse(eventData.settings)
 
-        return res.json({
+        res.json({
           typeOfEvent: eventData.typeOfEvent,
           settings: settings
             ? JSON.stringify(
@@ -94,11 +103,10 @@ export class EventsController {
               )
             : '{}' // return empty object if no settings
         })
+        return
       }
 
-      return res
-        .status(404)
-        .json({ message: req.t('messages.EVENT_NOT_FOUND') })
+      res.status(404).json({ message: req.t('messages.EVENT_NOT_FOUND') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -111,13 +119,16 @@ export class EventsController {
     }
   }
 
-  getEventInvites = async (req: Request, res: Response) => {
+  getEventInvites: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       const events = await this.eventsRepository.getEventInvites(id)
 
-      return res.json(events)
+      res.json(events)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -130,17 +141,21 @@ export class EventsController {
     }
   }
 
-  isDeadlineMet = async (req: Request, res: Response) => {
+  isDeadlineMet: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       const deadlineResults = await this.eventsRepository.isDeadlineMet(id)
 
       if (deadlineResults.length === 0) {
-        return res.json(false)
+        res.json(false)
+        return
       }
 
-      return res.json(Boolean(deadlineResults[0].isDeadlineMet))
+      res.json(Boolean(deadlineResults[0].isDeadlineMet))
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -153,17 +168,21 @@ export class EventsController {
     }
   }
 
-  getEventById = async (req: Request, res: Response) => {
+  getEventById: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       const event = await this.eventsRepository.getEventById(id)
 
-      if (event.length > 0) return res.json(event.at(0))
+      if (event.length > 0) {
+        res.json(event.at(0))
+        return
+      }
 
-      return res
-        .status(404)
-        .json({ message: req.t('messages.EVENT_NOT_FOUND') })
+      res.status(404).json({ message: req.t('messages.EVENT_NOT_FOUND') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -176,17 +195,21 @@ export class EventsController {
     }
   }
 
-  createEvent = async (req: Request, res: Response) => {
+  createEvent: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateEvent(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const eventId = await this.eventsRepository.createEvent(result.data)
 
-      return res
+      res
         .status(201)
         .json({ id: eventId, message: req.t('messages.EVENT_CREATED') })
     } catch (_e) {
@@ -201,12 +224,15 @@ export class EventsController {
     }
   }
 
-  deleteEvent = async (req: Request, res: Response) => {
+  deleteEvent: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
       await this.eventsRepository.deleteEvent(id)
 
-      return res.json({ message: req.t('messages.EVENT_DELETED') })
+      res.json({ message: req.t('messages.EVENT_DELETED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -219,13 +245,17 @@ export class EventsController {
     }
   }
 
-  updateEvent = async (req: Request, res: Response) => {
+  updateEvent: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateEvent(req.body)
       const { override, overrideViewed } = req.query
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const { id } = req.params
@@ -237,7 +267,7 @@ export class EventsController {
         JSON.parse(overrideViewed as string)
       )
 
-      return res.status(201).json({ message: req.t('messages.EVENT_UPDATED') })
+      res.status(201).json({ message: req.t('messages.EVENT_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

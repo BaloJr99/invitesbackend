@@ -1,5 +1,5 @@
 import { UsersService } from '../services/users.js'
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import {
   validateUser,
@@ -27,7 +27,10 @@ export class UsersController {
     this.usersService = new UsersService()
   }
 
-  getUsers = async (req: Request, res: Response) => {
+  getUsers: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const users = (await this.usersService.getUsers()) as IUserInfo[]
 
@@ -62,7 +65,7 @@ export class UsersController {
         usersEventInfo.push(newUsersEventInfo)
       }
 
-      return res.json(usersEventInfo)
+      res.json(usersEventInfo)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -75,12 +78,15 @@ export class UsersController {
     }
   }
 
-  getUserById = async (req: Request, res: Response) => {
+  getUserById: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
       const userFound = await this.usersService.getUserById(id)
 
-      return res.json(userFound)
+      res.json(userFound)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -93,10 +99,13 @@ export class UsersController {
     }
   }
 
-  getUsersBasicInfo = async (req: Request, res: Response) => {
+  getUsersBasicInfo: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const users = await this.usersService.getUsersBasicInfo()
-      return res.json(users)
+      res.json(users)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -109,12 +118,16 @@ export class UsersController {
     }
   }
 
-  createUser = async (req: Request, res: Response) => {
+  createUser: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateUser(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const userId = await this.usersService.createUser({
@@ -123,7 +136,7 @@ export class UsersController {
         id: ''
       })
 
-      return res
+      res
         .status(201)
         .json({ id: userId, message: req.t('messages.USER_CREATED') })
     } catch (_e) {
@@ -138,12 +151,16 @@ export class UsersController {
     }
   }
 
-  updateUser = async (req: Request, res: Response) => {
+  updateUser: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateUser(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const { id } = req.params
@@ -153,7 +170,7 @@ export class UsersController {
         id
       })
 
-      return res.status(201).json({ message: req.t('messages.USER_UPDATED') })
+      res.status(201).json({ message: req.t('messages.USER_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -166,12 +183,15 @@ export class UsersController {
     }
   }
 
-  deactivateUser = async (req: Request, res: Response) => {
+  deactivateUser: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
       await this.usersService.deactivateUser(id)
 
-      return res.json({ message: req.t('messages.USER_DELETED') })
+      res.json({ message: req.t('messages.USER_DELETED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -184,12 +204,15 @@ export class UsersController {
     }
   }
 
-  getUserProfile = async (req: Request, res: Response) => {
+  getUserProfile: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
       const userFound = await this.usersService.getUserProfile(id)
 
-      return res.json(userFound)
+      res.json(userFound)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -202,19 +225,21 @@ export class UsersController {
     }
   }
 
-  updateUserProfile = async (req: Request, res: Response) => {
+  updateUserProfile: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateUserProfile(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       await this.usersService.updateUserProfile(result.data)
 
-      return res
-        .status(201)
-        .json({ message: req.t('messages.PROFILE_UPDATED') })
+      res.status(201).json({ message: req.t('messages.PROFILE_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -227,12 +252,15 @@ export class UsersController {
     }
   }
 
-  checkUsername = async (req: Request, res: Response) => {
+  checkUsername: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { username } = req.params
       const isDuplicated = await this.usersService.checkUsername(username)
 
-      return res.json(isDuplicated)
+      res.json(isDuplicated)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -245,12 +273,16 @@ export class UsersController {
     }
   }
 
-  uploadProfilePhoto = async (req: Request, res: Response) => {
+  uploadProfilePhoto: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateUserProfilePhoto(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const searchLastPhoto = await this.usersService.getUserProfile(
@@ -279,7 +311,7 @@ export class UsersController {
         profilePhotoPublicId: cloudResult.public_id
       })
 
-      return res.status(201).json({
+      res.status(201).json({
         id: cloudResult.secure_url,
         message: req.t('messages.PROFILE_PHOTO_UPDATED')
       })

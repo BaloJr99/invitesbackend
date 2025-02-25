@@ -3,7 +3,7 @@ import {
   validateFile,
   validateEventId
 } from '../schemas/images.js'
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { FileType } from '../global/enum.js'
 import { UploadApiResponse } from 'cloudinary'
@@ -20,13 +20,17 @@ export class FilesController {
     this.filesRepository = new FilesRepository(mysqlDatabase)
   }
 
-  createFile = async (req: Request, res: Response) => {
+  createFile: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       if (req.file) {
         const result = validateEventId(req.body)
 
         if (!result.success) {
-          return res.status(422).json(JSON.parse(result.error.message))
+          res.status(422).json(JSON.parse(result.error.message))
+          return
         }
 
         const folder =
@@ -52,7 +56,8 @@ export class FilesController {
         const result = validateFile(req.body)
 
         if (!result.success) {
-          return res.status(422).json(JSON.parse(result.error.message))
+          res.status(422).json(JSON.parse(result.error.message))
+          return
         }
 
         const folder =
@@ -78,7 +83,7 @@ export class FilesController {
         )
       }
 
-      return res.status(201).json({ message: req.t('messages.FILES_CREATED') })
+      res.status(201).json({ message: req.t('messages.FILES_CREATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -91,17 +96,21 @@ export class FilesController {
     }
   }
 
-  updateFile = async (req: Request, res: Response) => {
+  updateFile: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateFileUsage(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       await this.filesRepository.updateImages(result.data)
 
-      return res.status(201).json({ message: req.t('messages.FILES_UPDATED') })
+      res.status(201).json({ message: req.t('messages.FILES_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -114,7 +123,10 @@ export class FilesController {
     }
   }
 
-  deleteFile = async (req: Request, res: Response) => {
+  deleteFile: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const image = req.body
 
@@ -127,7 +139,7 @@ export class FilesController {
 
       await this.filesRepository.deleteFile(image.id, fileType)
 
-      return res.json({ message: req.t('messages.FILE_DELETED') })
+      res.json({ message: req.t('messages.FILE_DELETED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -140,14 +152,17 @@ export class FilesController {
     }
   }
 
-  getAllFiles = async (req: Request, res: Response) => {
+  getAllFiles: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       const eventImages = await this.filesRepository.getImageByEventId(id)
       const eventAudios = await this.filesRepository.getAudioByEventId(id)
 
-      return res.json({ eventImages, eventAudios })
+      res.json({ eventImages, eventAudios })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

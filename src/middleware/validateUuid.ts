@@ -1,11 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { z, ZodError } from 'zod'
 
-export const validateUuid = (
+export const validateUuid: RequestHandler = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const pathsWithUUID: string[] = req.route.path
     .split('/')
     .filter((path: string) => path.match(':[a-z].*'))
@@ -30,8 +30,10 @@ export const validateUuid = (
   })
 
   if (errors.length > 0) {
-    return res.status(422).json(JSON.parse(errors[0].message))
+    res.status(422).json(JSON.parse(errors[0].message))
+    return
   }
 
   next()
+  return
 }

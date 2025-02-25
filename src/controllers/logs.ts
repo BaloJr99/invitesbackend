@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { UsersService } from '../services/users.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { LogsRepository } from '../repositories/logs-repository.js'
@@ -12,7 +12,10 @@ export class LoggersController {
     this.usersService = new UsersService()
   }
 
-  getLogs = async (req: Request, res: Response) => {
+  getLogs: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     const logs = await this.logsRepository.getLogs()
 
     let userIds = [...new Set(logs.map((l) => l.userId))]
@@ -29,6 +32,6 @@ export class LoggersController {
       log.userId = usernames.find((u) => u.id === log.userId)?.username ?? ''
     })
 
-    return res.json(logs)
+    res.json(logs)
   }
 }

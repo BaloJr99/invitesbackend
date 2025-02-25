@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import {
   validateBulkDeleteInvites,
   validateBulkInvite,
@@ -25,7 +25,10 @@ export class InvitesController {
     this.errorHandler = new ErrorHandler(mysqlDatabase)
   }
 
-  getInvites = async (req: Request, res: Response) => {
+  getInvites: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const token = req.headers.authorization || ''
 
@@ -36,7 +39,7 @@ export class InvitesController {
         isAdmin
       )
 
-      return res.json(invites)
+      res.json(invites)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -49,7 +52,10 @@ export class InvitesController {
     }
   }
 
-  getInviteForEvent = async (req: Request, res: Response) => {
+  getInviteForEvent: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
@@ -57,12 +63,11 @@ export class InvitesController {
 
       if (invite.length > 0) {
         await this.invitesRepository.markAsViewed(id)
-        return res.json(invite.at(0))
+        res.json(invite.at(0))
+        return
       }
 
-      return res
-        .status(404)
-        .json({ message: req.t('messages.INVITE_NOT_FOUND') })
+      res.status(404).json({ message: req.t('messages.INVITE_NOT_FOUND') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -75,12 +80,16 @@ export class InvitesController {
     }
   }
 
-  createInvite = async (req: Request, res: Response) => {
+  createInvite: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateInvite(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const inviteId = await this.invitesRepository.createInvite({
@@ -88,7 +97,7 @@ export class InvitesController {
         id: ''
       })
 
-      return res
+      res
         .status(201)
         .json({ id: inviteId, message: req.t('messages.INVITE_CREATED') })
     } catch (_e) {
@@ -103,12 +112,16 @@ export class InvitesController {
     }
   }
 
-  bulkInvites = async (req: Request, res: Response) => {
+  bulkInvites: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateBulkInvite(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const bulkInviteGroups = [
@@ -151,7 +164,7 @@ export class InvitesController {
         bulkInvites
       )
 
-      return res.status(201).json({
+      res.status(201).json({
         inviteGroupsGenerated: generatedInviteGroups,
         invitesGenerated: generatedInvites,
         message: req.t('messages.INVITES_CREATED')
@@ -168,19 +181,21 @@ export class InvitesController {
     }
   }
 
-  bulkDeleteInvites = async (req: Request, res: Response) => {
+  bulkDeleteInvites: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateBulkDeleteInvites(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       await this.invitesRepository.bulkDeleteInvite(result.data)
 
-      return res
-        .status(201)
-        .json({ message: req.t('messages.INVITES_BULK_DELETED') })
+      res.status(201).json({ message: req.t('messages.INVITES_BULK_DELETED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -193,13 +208,16 @@ export class InvitesController {
     }
   }
 
-  deleteInvite = async (req: Request, res: Response) => {
+  deleteInvite: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       await this.invitesRepository.deleteInvite(id)
 
-      return res.json({ message: req.t('messages.INVITE_DELETED') })
+      res.json({ message: req.t('messages.INVITE_DELETED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -212,12 +230,16 @@ export class InvitesController {
     }
   }
 
-  updateInvite = async (req: Request, res: Response) => {
+  updateInvite: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateInvite(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const { id } = req.params
@@ -227,7 +249,7 @@ export class InvitesController {
         id
       })
 
-      return res.status(201).json({ message: req.t('messages.INVITE_UPDATED') })
+      res.status(201).json({ message: req.t('messages.INVITE_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -240,7 +262,10 @@ export class InvitesController {
     }
   }
 
-  updateConfirmation = async (req: Request, res: Response) => {
+  updateConfirmation: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       let result
 
@@ -250,7 +275,8 @@ export class InvitesController {
         result = validateConfirmationSchema(req.body)
 
         if (!result.success) {
-          return res.status(422).json(JSON.parse(result.error.message))
+          res.status(422).json(JSON.parse(result.error.message))
+          return
         }
 
         await this.invitesRepository.updateSweetXvConfirmation({
@@ -261,7 +287,8 @@ export class InvitesController {
         result = validateSaveTheDateConfirmationSchema(req.body)
 
         if (!result.success) {
-          return res.status(422).json(JSON.parse(result.error.message))
+          res.status(422).json(JSON.parse(result.error.message))
+          return
         }
 
         await this.invitesRepository.updateSaveTheDateConfirmation({
@@ -270,9 +297,7 @@ export class InvitesController {
         })
       }
 
-      return res
-        .status(201)
-        .json({ message: req.t('messages.CONFIRMATION_SENT') })
+      res.status(201).json({ message: req.t('messages.CONFIRMATION_SENT') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -285,11 +310,14 @@ export class InvitesController {
     }
   }
 
-  readMessage = async (req: Request, res: Response) => {
+  readMessage: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
       await this.invitesRepository.readMessage(id)
-      return res.json({ message: req.t('messages.MESSAGE_READ') })
+      res.json({ message: req.t('messages.MESSAGE_READ') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -302,19 +330,21 @@ export class InvitesController {
     }
   }
 
-  getInviteEventType = async (req: Request, res: Response) => {
+  getInviteEventType: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       const invite = await this.invitesRepository.getInviteEventType(id)
 
       if (invite.length > 0) {
-        return res.json(invite[0].typeOfEvent)
+        res.json(invite[0].typeOfEvent)
+        return
       }
 
-      return res
-        .status(404)
-        .json({ message: req.t('messages.INVITE_NOT_FOUND') })
+      res.status(404).json({ message: req.t('messages.INVITE_NOT_FOUND') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

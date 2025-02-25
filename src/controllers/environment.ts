@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { FileType } from '../global/enum.js'
 import { UsersService } from '../services/users.js'
 import { RolesService } from '../services/roles.js'
@@ -22,7 +22,10 @@ export class EnvironmentController {
     this.usersService = new UsersService()
   }
 
-  cleanEnvironment = async (req: Request, res: Response) => {
+  cleanEnvironment: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       console.log('Cleaning environment')
 
@@ -48,7 +51,7 @@ export class EnvironmentController {
       console.log('Deleting testing roles')
       await this.rolesService.deleteRoleTestingData()
 
-      return res.json({ message: req.t('messages.ENVIRONMENT_CLEANED') })
+      res.json({ message: req.t('messages.ENVIRONMENT_CLEANED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

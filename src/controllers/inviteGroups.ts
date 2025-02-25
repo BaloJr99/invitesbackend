@@ -2,7 +2,7 @@ import {
   validateInviteGroup,
   validateUpdateInviteGroup
 } from '../schemas/inviteGroups.js'
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { InviteGroupsRepository } from '../repositories/invite-groups-repository.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
@@ -16,13 +16,16 @@ export class InviteGroupsController {
     this.errorHandler = new ErrorHandler(mysqlDatabase)
   }
 
-  getInviteGroups = async (req: Request, res: Response) => {
+  getInviteGroups: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       const inviteGroups = await this.inviteGroupsRepository.getInviteGroups(id)
 
-      return res.json(inviteGroups)
+      res.json(inviteGroups)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -35,19 +38,23 @@ export class InviteGroupsController {
     }
   }
 
-  createInviteGroup = async (req: Request, res: Response) => {
+  createInviteGroup: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateInviteGroup(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const inviteGroupId = await this.inviteGroupsRepository.createInviteGroup(
         result.data
       )
 
-      return res
+      res
         .status(201)
         .json({ id: inviteGroupId, message: req.t('messages.GROUP_CREATED') })
     } catch (_e) {
@@ -62,12 +69,16 @@ export class InviteGroupsController {
     }
   }
 
-  updateInviteGroup = async (req: Request, res: Response) => {
+  updateInviteGroup: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateUpdateInviteGroup(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const { id } = req.params
@@ -77,7 +88,7 @@ export class InviteGroupsController {
         inviteGroup: result.data.inviteGroup
       })
 
-      return res.status(201).json({ message: req.t('messages.GROUP_UPDATED') })
+      res.status(201).json({ message: req.t('messages.GROUP_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -90,7 +101,10 @@ export class InviteGroupsController {
     }
   }
 
-  checkInviteGroup = async (req: Request, res: Response) => {
+  checkInviteGroup: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { eventId, inviteGroup } = req.params
       const isDuplicated = await this.inviteGroupsRepository.checkInviteGroup(
@@ -98,7 +112,7 @@ export class InviteGroupsController {
         inviteGroup
       )
 
-      return res.json(isDuplicated)
+      res.json(isDuplicated)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

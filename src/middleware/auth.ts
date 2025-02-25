@@ -1,12 +1,12 @@
 import User from '../models/user.js'
 import Role from '../models/role.js'
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 
-export const isInvitesAdmin = async (
+export const isInvitesAdmin: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const user = await User.findById(req.userId)
 
@@ -19,17 +19,19 @@ export const isInvitesAdmin = async (
       }
     }
 
-    return res.status(403).json({ error: req.t('messages.SESSION_NOT_ADMIN') })
+    res.status(403).json({ error: req.t('messages.SESSION_NOT_ADMIN') })
+    return
   } catch {
-    return res.status(500).json({ error: req.t('messages.INVALID_AUTH') })
+    res.status(500).json({ error: req.t('messages.INVALID_AUTH') })
+    return
   }
 }
 
-export const isAdmin = async (
+export const isAdmin: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const user = await User.findById(req.userId)
 
@@ -42,8 +44,10 @@ export const isAdmin = async (
       }
     }
 
-    return res.status(403).json({ error: req.t('messages.SESSION_NOT_ADMIN') })
+    res.status(403).json({ error: req.t('messages.SESSION_NOT_ADMIN') })
+    return
   } catch {
-    return res.status(500).json({ error: req.t('messages.INVALID_AUTH') })
+    res.status(500).json({ error: req.t('messages.INVALID_AUTH') })
+    return
   }
 }

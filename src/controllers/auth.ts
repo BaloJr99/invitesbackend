@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import {
   validateAuthUser,
   validatePassword,
@@ -22,27 +22,30 @@ export class AuthController {
     this.usersService = new UsersService()
   }
 
-  signIn = async (req: Request, res: Response) => {
+  signIn: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validateAuthUser(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const signInResponse = await this.usersService.signin(result.data)
       if (signInResponse.includes('ERROR')) {
-        return res
-          .status(401)
-          .json({ error: req.t('messages.WRONG_CREDENTIALS') })
+        res.status(401).json({ error: req.t('messages.WRONG_CREDENTIALS') })
+        return
       }
 
       if (signInResponse.includes('BLOCKED')) {
-        return res.status(401).json({ error: req.t('messages.BLOCKED_USER') })
+        res.status(401).json({ error: req.t('messages.BLOCKED_USER') })
+        return
       } else if (signInResponse.includes('INACTIVE')) {
-        return res
-          .status(401)
-          .json({ error: req.t('messages.INACTIVE_ACCOUNT') })
+        res.status(401).json({ error: req.t('messages.INACTIVE_ACCOUNT') })
+        return
       }
 
       const tokens = JSON.parse(signInResponse)
@@ -68,11 +71,15 @@ export class AuthController {
     }
   }
 
-  forgotPassword = async (req: Request, res: Response) => {
+  forgotPassword: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     const result = validateUsernameOrEmail(req.body)
 
     if (!result.success) {
-      return res.status(422).json(JSON.parse(result.error.message))
+      res.status(422).json(JSON.parse(result.error.message))
+      return
     }
 
     const userFounded = await this.usersService.findUser(
@@ -80,7 +87,8 @@ export class AuthController {
     )
 
     if (!userFounded) {
-      return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
+      res.status(404).json({ error: req.t('messages.USER_NOT_FOUND') })
+      return
     }
 
     try {
@@ -113,17 +121,22 @@ export class AuthController {
     }
   }
 
-  forgotPasswordToUser = async (req: Request, res: Response) => {
+  forgotPasswordToUser: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     const result = validateUserId(req.body)
 
     if (!result.success) {
-      return res.status(422).json(JSON.parse(result.error.message))
+      res.status(422).json(JSON.parse(result.error.message))
+      return
     }
 
     const userFounded = await this.usersService.findUserById(result.data.id)
 
     if (!userFounded) {
-      return res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
+      res.status(404).json({ error: req.t('messages.USER_NOT_FOUND') })
+      return
     }
 
     try {
@@ -156,12 +169,15 @@ export class AuthController {
     }
   }
 
-  isUserResettingPassword = async (req: Request, res: Response) => {
+  isUserResettingPassword: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { user } = req.params
 
       const resetting = await this.usersService.isUserResettingPassword(user)
-      return res.json(resetting)
+      res.json(resetting)
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -174,12 +190,16 @@ export class AuthController {
     }
   }
 
-  resetPassword = async (req: Request, res: Response) => {
+  resetPassword: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const result = validatePassword(req.body)
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const { user } = req.params
@@ -189,7 +209,7 @@ export class AuthController {
         result.data.password,
         false
       )
-      return res.json({ message: req.t('messages.PASSWORD_RESET') })
+      res.json({ message: req.t('messages.PASSWORD_RESET') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -202,17 +222,22 @@ export class AuthController {
     }
   }
 
-  refreshToken = async (req: Request, res: Response) => {
+  refreshToken: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const refreshToken = req.cookies['refreshToken']
 
       if (!refreshToken) {
-        return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
+        res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
+        return
       }
 
       const access_token = await this.usersService.refreshToken(refreshToken)
       if (access_token.includes('ERROR')) {
-        return res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
+        res.status(401).json({ error: req.t('messages.INVALID_AUTH') })
+        return
       }
 
       res.json({

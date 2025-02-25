@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import {
   validateSaveTheDateSettings,
@@ -18,19 +18,22 @@ export class SettingsController {
     this.settingsRepository = new SettingsRepository(mysqlDatabase)
   }
 
-  getEventSettingsById = async (req: Request, res: Response) => {
+  getEventSettingsById: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { id } = req.params
 
       const event = await this.settingsRepository.getEventSettingsById(id)
-      if (event.length > 0)
-        return res.json({
+      if (event.length > 0) {
+        res.json({
           ...event[0]
         })
+        return
+      }
 
-      return res
-        .status(404)
-        .json({ message: req.t('messages.SETTINGS_NOT_FOUND') })
+      res.status(404).json({ message: req.t('messages.SETTINGS_NOT_FOUND') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
@@ -43,7 +46,10 @@ export class SettingsController {
     }
   }
 
-  createEventSettings = async (req: Request, res: Response) => {
+  createEventSettings: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { eventType } = req.params
 
@@ -56,7 +62,8 @@ export class SettingsController {
       }
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const { eventId, ...settings } = result.data
@@ -66,7 +73,7 @@ export class SettingsController {
         settings: JSON.stringify(settings)
       })
 
-      return res
+      res
         .status(201)
         .json({ id: settingId, message: req.t('messages.SETTINGS_CREATED') })
     } catch (_e) {
@@ -81,7 +88,10 @@ export class SettingsController {
     }
   }
 
-  updateEventSettings = async (req: Request, res: Response) => {
+  updateEventSettings: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { eventType } = req.params
 
@@ -96,7 +106,8 @@ export class SettingsController {
       }
 
       if (!result.success) {
-        return res.status(422).json(JSON.parse(result.error.message))
+        res.status(422).json(JSON.parse(result.error.message))
+        return
       }
 
       const { eventId, ...settings } = result.data
@@ -106,9 +117,7 @@ export class SettingsController {
         settings: JSON.stringify(settings)
       })
 
-      return res
-        .status(201)
-        .json({ message: req.t('messages.SETTINGS_UPDATED') })
+      res.status(201).json({ message: req.t('messages.SETTINGS_UPDATED') })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(
