@@ -87,7 +87,7 @@ export class AuthController {
     )
 
     if (!userFounded) {
-      res.status(404).json({ error: req.t('messages.USER_NOT_FOUND') })
+      res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
       return
     }
 
@@ -135,7 +135,7 @@ export class AuthController {
     const userFounded = await this.usersService.findUserById(result.data.id)
 
     if (!userFounded) {
-      res.status(404).json({ error: req.t('messages.USER_NOT_FOUND') })
+      res.status(401).json({ error: req.t('messages.USER_NOT_FOUND') })
       return
     }
 

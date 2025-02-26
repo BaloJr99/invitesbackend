@@ -31,7 +31,6 @@
     "ROLE_CREATED": "Rol creado",
     "ROLE_UPDATED": "Rol actualizado",
     "ROLE_DELETED": "Rol desactivado",
-    "SETTINGS_NOT_FOUND": "Configuración de evento no encontrada",
     "SETTINGS_CREATED": "Configuración de evento creada",
     "SETTINGS_UPDATED": "Configuración de evento actualizada",
     "USER_CREATED": "Usuario creado",

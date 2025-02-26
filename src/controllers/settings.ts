@@ -8,14 +8,17 @@ import {
 import { EventType } from '../global/enum.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { SettingsRepository } from '../repositories/settings-repository.js'
+import { EventsRepository } from '../repositories/events-repository.js'
 
 export class SettingsController {
   private errorHandler: ErrorHandler
   private settingsRepository: SettingsRepository
+  private eventsRepository: EventsRepository
 
   constructor(mysqlDatabase: MysqlDatabase) {
     this.errorHandler = new ErrorHandler(mysqlDatabase)
     this.settingsRepository = new SettingsRepository(mysqlDatabase)
+    this.eventsRepository = new EventsRepository(mysqlDatabase)
   }
 
   getEventSettingsById: RequestHandler = async (
@@ -25,15 +28,23 @@ export class SettingsController {
     try {
       const { id } = req.params
 
-      const event = await this.settingsRepository.getEventSettingsById(id)
-      if (event.length > 0) {
-        res.json({
-          ...event[0]
-        })
+      const eventFound = await this.eventsRepository.getEventById(id)
+
+      if (eventFound.length === 0) {
+        res.json({ message: req.t('messages.EVENT_NOT_FOUND') })
         return
       }
 
-      res.status(404).json({ message: req.t('messages.SETTINGS_NOT_FOUND') })
+      const event = await this.settingsRepository.getEventSettingsById(id)
+      if (event.length > 0) {
+        res.json(event[0])
+        return
+      }
+
+      res.json({
+        eventId: id,
+        settings: '{}'
+      })
     } catch (_e) {
       const e: Error = _e as Error
       this.errorHandler.handleHttp(

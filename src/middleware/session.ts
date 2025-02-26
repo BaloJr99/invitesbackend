@@ -37,7 +37,7 @@ export const checkJwt: RequestHandler = async (
     // Check if the user exists
     const user = await User.findById(decoded.id, { password: 0 })
     if (!user) {
-      res.status(404).json({ error: req.t('messages.INVALID_USER') })
+      res.status(401).json({ error: req.t('messages.INVALID_USER') })
       return
     }
 
