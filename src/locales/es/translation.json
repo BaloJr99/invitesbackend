@@ -41,7 +41,10 @@
     "USER_PASSWORD_RESET": "Se ha enviado un correo electrónico al usuario asociado a la cuenta",
     "PASSWORD_RESET": "Se ha actualizado la contraseña",
     "ENVIRONMENT_CLEANED": "Entorno limpiado",
-    "INVALID_ENV": "Entorno inválido"
+    "INVALID_ENV": "Entorno inválido",
+    "ALBUM_CREATED": "Álbum creado",
+    "ALBUM_UPDATED": "Álbum actualizado",
+    "ALBUM_DELETED": "Álbum eliminado"
   },
   "errors": {
     "ERROR_SIGN_IN": "Error al iniciar sesión",
@@ -92,6 +95,12 @@
     "ERROR_CHECK_INVITE_GROUP": "Error al verificar grupo de invitación",
     "ERROR_UPDATE_PROFILE_PHOTO": "Error al actualizar foto de perfil",
     "ERROR_GET_INVITE_EVENT_TYPE": "Error al obtener tipo de evento de la invitación",
-    "ERROR_CLEAN_ENVIRONMENT": "Error al limpiar entorno"
+    "ERROR_CLEAN_ENVIRONMENT": "Error al limpiar entorno",
+    "ERROR_GET_ALBUMS_BY_EVENT_ID": "Error al obtener álbumes por id de evento",
+    "ERROR_GET_ALBUM_IMAGES": "Error al obtener imágenes de álbum",
+    "ERROR_CREATE_ALBUM": "Error al crear álbum",
+    "ERROR_UPDATE_ALBUM": "Error al actualizar álbum",
+    "ERROR_CHECK_ALBUM": "Error al verificar álbum",
+    "ERROR_DELETE_ALBUM": "Error al eliminar álbum"
   }
 }

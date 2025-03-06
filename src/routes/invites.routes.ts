@@ -43,6 +43,8 @@ export const createInvitesRouter = (mysqlDatabase: MysqlDatabase) => {
     invitesController.getInviteForEvent
   )
 
+  invitesRouter.get('/isActive/:id', invitesController.isActive)
+
   invitesRouter.delete(
     '/:id',
     [checkJwt, isInvitesAdmin, validateUuid],

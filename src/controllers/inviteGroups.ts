@@ -6,10 +6,11 @@ import { Request, RequestHandler, Response } from 'express'
 import { ErrorHandler } from '../utils/error.handle.js'
 import { InviteGroupsRepository } from '../repositories/invite-groups-repository.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
+import { IInviteGroupsRepository } from '../interfaces/invite-groups-repository.js'
 
 export class InviteGroupsController {
   private errorHandler: ErrorHandler
-  private inviteGroupsRepository: InviteGroupsRepository
+  private inviteGroupsRepository: IInviteGroupsRepository
 
   constructor(mysqlDatabase: MysqlDatabase) {
     this.inviteGroupsRepository = new InviteGroupsRepository(mysqlDatabase)

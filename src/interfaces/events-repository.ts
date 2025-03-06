@@ -16,6 +16,10 @@ export interface IEventsRepository {
 
   getDropdownEvents(): Promise<IDropdownEvent[]>
 
+  isActive(eventId: string): Promise<boolean>
+
+  getEventId(nameOfEvent: string): Promise<string>
+
   eventInformation(eventId: string): Promise<IEventInformation[]>
 
   getDropdownEventsByUserId(userId: string): Promise<IDropdownEvent[]>

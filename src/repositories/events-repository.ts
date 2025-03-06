@@ -66,6 +66,44 @@ export class EventsRepository implements IEventsRepository {
     }
   }
 
+  async getEventId(nameOfEvent: string): Promise<string> {
+    const connection = await this.database.getConnection()
+
+    try {
+      const [results] = (await connection.query(
+        'SELECT BIN_TO_UUID(id) as eventId FROM events WHERE nameOfEvent = ?',
+        [nameOfEvent]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      if (results.length === 0) return ''
+
+      return results[0].eventId
+    } catch (error) {
+      return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
+    }
+  }
+
+  async isActive(nameOfEvent: string): Promise<boolean> {
+    const connection = await this.database.getConnection()
+
+    try {
+      const [results] = (await connection.query(
+        'SELECT IF(utc_date() >= DATE(dateOfEvent), true, false) AS isActive FROM events WHERE nameOfEvent = ?',
+        [nameOfEvent]
+      )) as [RowDataPacket[], FieldPacket[]]
+
+      if (results.length === 0) return false
+
+      return Boolean(results[0].isActive)
+    } catch (error) {
+      return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
+    }
+  }
+
   async eventInformation(eventId: string): Promise<IEventInformation[]> {
     const connection = await this.database.getConnection()
 

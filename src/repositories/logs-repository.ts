@@ -18,7 +18,7 @@ export class LogsRepository implements ILogsRepository {
         [dateOfError, customError, exceptionMessage, userId]
       )
     } catch (error) {
-      console.log(error)
+      return Promise.reject(error)
     } finally {
       if (connection) connection.release()
     }

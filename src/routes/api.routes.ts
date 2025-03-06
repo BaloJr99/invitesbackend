@@ -14,6 +14,7 @@ import { isDevelopment } from '../middleware/isDevelopment.js'
 import { createEnvironmentRouter } from './environment.routes.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { Transporter } from 'nodemailer'
+import { createGalleryRouter } from './gallery.routes.js'
 
 export const apiRouter = Router()
 
@@ -37,6 +38,8 @@ export const createApiRouter = (
 
   apiRouter.use('/files', createFilesRouter(mysqlDatabase))
 
+  apiRouter.use('/gallery', createGalleryRouter(mysqlDatabase))
+
   apiRouter.use('/invites', createInvitesRouter(mysqlDatabase))
 
   apiRouter.use(
@@ -53,11 +56,7 @@ export const createApiRouter = (
 
   apiRouter.use('/settings', createSettingsRouter(mysqlDatabase))
 
-  apiRouter.use(
-    '/users',
-    [checkJwt],
-    createUsersRouter(mysqlDatabase)
-  )
+  apiRouter.use('/users', [checkJwt], createUsersRouter(mysqlDatabase))
 
   apiRouter.use(
     '/environment',

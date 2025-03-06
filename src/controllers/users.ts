@@ -13,11 +13,13 @@ import { EnvConfig } from '../config/config.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { EventsRepository } from '../repositories/events-repository.js'
 import { FilesRepository } from '../repositories/files-repository.js'
+import { IFilesRepository } from '../interfaces/files-repository.js'
+import { IEventsRepository } from '../interfaces/events-repository.js'
 
 export class UsersController {
-  private eventsRepository: EventsRepository
+  private eventsRepository: IEventsRepository
   private errorHandler: ErrorHandler
-  private filesRepository: FilesRepository
+  private filesRepository: IFilesRepository
   private usersService: UsersService
 
   constructor(mysqlDatabase: MysqlDatabase) {

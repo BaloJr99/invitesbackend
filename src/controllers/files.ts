@@ -10,10 +10,11 @@ import { UploadApiResponse } from 'cloudinary'
 import { EnvConfig } from '../config/config.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { FilesRepository } from '../repositories/files-repository.js'
+import { IFilesRepository } from '../interfaces/files-repository.js'
 
 export class FilesController {
   private errorHandler: ErrorHandler
-  private filesRepository: FilesRepository
+  private filesRepository: IFilesRepository
 
   constructor(mysqlDatabase: MysqlDatabase) {
     this.errorHandler = new ErrorHandler(mysqlDatabase)

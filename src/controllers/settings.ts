@@ -9,11 +9,13 @@ import { EventType } from '../global/enum.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { SettingsRepository } from '../repositories/settings-repository.js'
 import { EventsRepository } from '../repositories/events-repository.js'
+import { ISettingsRepository } from '../interfaces/settings-repository.js'
+import { IEventsRepository } from '../interfaces/events-repository.js'
 
 export class SettingsController {
   private errorHandler: ErrorHandler
-  private settingsRepository: SettingsRepository
-  private eventsRepository: EventsRepository
+  private settingsRepository: ISettingsRepository
+  private eventsRepository: IEventsRepository
 
   constructor(mysqlDatabase: MysqlDatabase) {
     this.errorHandler = new ErrorHandler(mysqlDatabase)

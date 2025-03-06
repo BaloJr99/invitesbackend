@@ -2,9 +2,10 @@ import { Request, RequestHandler, Response } from 'express'
 import { UsersService } from '../services/users.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { LogsRepository } from '../repositories/logs-repository.js'
+import { ILogsRepository } from '../interfaces/logs-repository.js'
 
 export class LoggersController {
-  private logsRepository: LogsRepository
+  private logsRepository: ILogsRepository
   private usersService: UsersService
 
   constructor(mysqlDatabase: MysqlDatabase) {

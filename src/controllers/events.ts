@@ -5,10 +5,11 @@ import { ErrorHandler } from '../utils/error.handle.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { EventsRepository } from '../repositories/events-repository.js'
+import { IEventsRepository } from '../interfaces/events-repository.js'
 
 export class EventsController {
   private errorHandler: ErrorHandler
-  private eventsRepository: EventsRepository
+  private eventsRepository: IEventsRepository
 
   constructor(mysqlDatabase: MysqlDatabase) {
     this.errorHandler = new ErrorHandler(mysqlDatabase)

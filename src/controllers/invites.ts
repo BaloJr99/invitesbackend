@@ -13,16 +13,22 @@ import { EventType } from '../global/enum.js'
 import { InviteGroupsRepository } from '../repositories/invite-groups-repository.js'
 import { InvitesRepository } from '../repositories/invites-repository.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
+import { IInviteGroupsRepository } from '../interfaces/invite-groups-repository.js'
+import { IInvitesRepository } from '../interfaces/invites-repository.js'
+import { IEventsRepository } from '../interfaces/events-repository.js'
+import { EventsRepository } from '../repositories/events-repository.js'
 
 export class InvitesController {
   private errorHandler: ErrorHandler
-  private invitesRepository: InvitesRepository
-  private inviteGroupsRepository: InviteGroupsRepository
+  private invitesRepository: IInvitesRepository
+  private inviteGroupsRepository: IInviteGroupsRepository
+  private eventsRepository: IEventsRepository
 
   constructor(mysqlDatabase: MysqlDatabase) {
     this.inviteGroupsRepository = new InviteGroupsRepository(mysqlDatabase)
     this.invitesRepository = new InvitesRepository(mysqlDatabase)
     this.errorHandler = new ErrorHandler(mysqlDatabase)
+    this.eventsRepository = new EventsRepository(mysqlDatabase)
   }
 
   getInvites: RequestHandler = async (
@@ -351,6 +357,39 @@ export class InvitesController {
         res,
         req,
         'ERROR_GET_INVITE_EVENT_TYPE',
+        e.message,
+        req.userId
+      )
+    }
+  }
+
+  isActive: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const { id } = req.params
+
+      const eventId = await this.eventsRepository.getEventId(id)
+
+      if (eventId === '') {
+        res.status(404).json({ message: req.t('messages.EVENT_NOT_FOUND') })
+        return
+      }
+
+      const isActive = await this.eventsRepository.isActive(id)
+
+      res.json({
+        isActive,
+        eventId
+      })
+      return
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_IS_ACTIVE',
         e.message,
         req.userId
       )

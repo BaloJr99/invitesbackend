@@ -6,13 +6,15 @@ import { EnvironmentsRepository } from '../repositories/environments-repository.
 import { FilesRepository } from '../repositories/files-repository.js'
 import { MysqlDatabase } from '../services/mysql-database.js'
 import { ErrorHandler } from '../utils/error.handle.js'
+import { IEnvironmentsRepository } from '../interfaces/environments-repository.js'
+import { IFilesRepository } from '../interfaces/files-repository.js'
 
 export class EnvironmentController {
   private errorHandler: ErrorHandler
-  private environmentsRepository: EnvironmentsRepository
+  private environmentsRepository: IEnvironmentsRepository
   private usersService: UsersService
   private rolesService: RolesService
-  private filesRepository: FilesRepository
+  private filesRepository: IFilesRepository
 
   constructor(mysqlDatabase: MysqlDatabase) {
     this.errorHandler = new ErrorHandler(mysqlDatabase)
