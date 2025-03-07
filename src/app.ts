@@ -1,4 +1,4 @@
-import express, { json } from 'express'
+import express from 'express'
 import path from 'path'
 import { ACCEPTED_ORIGINS, corsMiddleware } from './middleware/cors.js'
 import { Server } from 'socket.io'
@@ -87,7 +87,6 @@ export class App {
       })
     })
 
-    app.use(json({ limit: '3mb' }))
     app.use(corsMiddleware())
     app.use(handle(i18next))
     app.use(cookieParser())

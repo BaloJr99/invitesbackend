@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { json, Router } from 'express'
 import { createEventsRouter } from './events.routes.js'
 import { createInviteGroupsRouter } from './inviteGroups.routes.js'
 import { createAuthRouter } from './auth.routes.js'
@@ -22,45 +22,57 @@ export const createApiRouter = (
   mysqlDatabase: MysqlDatabase,
   nodemailerConnection: Transporter
 ) => {
-  apiRouter.use('/auth', createAuthRouter(mysqlDatabase, nodemailerConnection))
+  apiRouter.use(
+    '/auth',
+    json(),
+    createAuthRouter(mysqlDatabase, nodemailerConnection)
+  )
 
   apiRouter.use(
     '/events',
-    [checkJwt, isInvitesAdmin],
+    [json(), checkJwt, isInvitesAdmin],
     createEventsRouter(mysqlDatabase)
   )
 
   apiRouter.use(
     '/inviteGroups',
-    [checkJwt, isInvitesAdmin],
+    [json(), checkJwt, isInvitesAdmin],
     createInviteGroupsRouter(mysqlDatabase)
   )
 
-  apiRouter.use('/files', createFilesRouter(mysqlDatabase))
+  apiRouter.use(
+    '/files',
+    [json({ limit: '3mb' })],
+    createFilesRouter(mysqlDatabase)
+  )
 
-  apiRouter.use('/gallery', createGalleryRouter(mysqlDatabase))
+  apiRouter.use(
+    '/gallery',
+    [json({ limit: '10mb' })],
+    createGalleryRouter(mysqlDatabase)
+  )
 
-  apiRouter.use('/invites', createInvitesRouter(mysqlDatabase))
+  apiRouter.use('/invites', json(), createInvitesRouter(mysqlDatabase))
 
   apiRouter.use(
     '/logs',
-    [checkJwt, isAdmin],
+    [json(), checkJwt, isAdmin],
     createLoggersRouter(mysqlDatabase)
   )
 
   apiRouter.use(
     '/roles',
-    [checkJwt, isInvitesAdmin],
+    [json(), checkJwt, isInvitesAdmin],
     createRolesRouter(mysqlDatabase)
   )
 
-  apiRouter.use('/settings', createSettingsRouter(mysqlDatabase))
+  apiRouter.use('/settings', json(), createSettingsRouter(mysqlDatabase))
 
-  apiRouter.use('/users', [checkJwt], createUsersRouter(mysqlDatabase))
+  apiRouter.use('/users', [json(), checkJwt], createUsersRouter(mysqlDatabase))
 
   apiRouter.use(
     '/environment',
-    [checkJwt, isAdmin, isDevelopment],
+    [json(), checkJwt, isAdmin, isDevelopment],
     createEnvironmentRouter(mysqlDatabase)
   )
 
