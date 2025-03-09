@@ -318,3 +318,5 @@ export type IAlbumImage = Omit<IFullAlbumImage, 'image'>
 export type IAlbumImageModel = Pick<IFullAlbumImage, 'fileUrl' | 'publicId' | 'albumId'>
 
 export type IImageUpload = Pick<IFullAlbumImage, 'image' | 'albumId'>
+
+export type IOverwriteConfirmation = Pick<IConfirmation, 'entriesConfirmed' | 'confirmation'>

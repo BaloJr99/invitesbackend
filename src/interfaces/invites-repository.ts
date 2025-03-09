@@ -3,6 +3,7 @@ import {
   IConfirmation,
   IDashboardInvite,
   IInviteEventType,
+  IOverwriteConfirmation,
   ISaveTheDateConfirmation,
   IUpsertInvite,
   IUserFromInvite,
@@ -37,4 +38,11 @@ export interface IInvitesRepository {
   getUserFromInviteId(inviteId: string): Promise<IUserFromInvite[]>
 
   getInviteEventType(id: string): Promise<IInviteEventType[]>
+
+  cancelInvites(eventId: string): Promise<void>
+
+  overwriteConfirmation(
+    overwriteConfirmation: IOverwriteConfirmation,
+    inviteId: string
+  ): Promise<void>
 }

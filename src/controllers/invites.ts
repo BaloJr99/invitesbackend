@@ -4,7 +4,8 @@ import {
   validateBulkInvite,
   validateInvite,
   validateConfirmationSchema,
-  validateSaveTheDateConfirmationSchema
+  validateSaveTheDateConfirmationSchema,
+  validateOverwriteConfirmationSchema
 } from '../schemas/invites.js'
 import { verifyJwtToken } from '../utils/jwt.handle.js'
 import { ErrorHandler } from '../utils/error.handle.js'
@@ -390,6 +391,58 @@ export class InvitesController {
         res,
         req,
         'ERROR_IS_ACTIVE',
+        e.message,
+        req.userId
+      )
+    }
+  }
+
+  cancelInvites: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const { id } = req.params
+
+      await this.invitesRepository.cancelInvites(id)
+
+      res.json({ message: req.t('messages.INVITES_CANCELED') })
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_CANCEL_INVITES',
+        e.message,
+        req.userId
+      )
+    }
+  }
+
+  overwriteConfirmation: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    let result
+    try {
+      const { id } = req.params
+
+      result = validateOverwriteConfirmationSchema(req.body)
+
+      if (!result.success) {
+        res.status(422).json(JSON.parse(result.error.message))
+        return
+      }
+
+      await this.invitesRepository.overwriteConfirmation(result.data, id)
+
+      res.json({ message: req.t('messages.CONFIRMATION_OVERWRITE') })
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_OVERWRITE_CONFIRMATION',
         e.message,
         req.userId
       )

@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   IBulkInvite,
   IConfirmation,
+  IOverwriteConfirmation,
   ISaveTheDateConfirmation,
   IUpsertInvite
 } from '../global/types.js'
@@ -81,6 +82,29 @@ const confirmationSchema = z
         required_error: 'The is message read is required'
       })
       .default(false)
+  })
+  .superRefine(({ confirmation, entriesConfirmed }, refinementContext) => {
+    if (
+      confirmation === true &&
+      (entriesConfirmed === undefined || entriesConfirmed === null)
+    ) {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'The entries are required if you assist',
+        path: ['entriesConfirmed']
+      })
+    }
+  })
+
+const overwriteConfirmationSchema = z
+  .object({
+    entriesConfirmed: z.number({
+      required_error: 'The number of entries are required'
+    }),
+    confirmation: z.boolean({
+      invalid_type_error: 'The confirmation must be a boolean',
+      required_error: 'The confirmation is required'
+    })
   })
   .superRefine(({ confirmation, entriesConfirmed }, refinementContext) => {
     if (
@@ -188,4 +212,10 @@ export function validateBulkDeleteInvites(invitesIds: string[]) {
       message: 'The invites ids are required'
     })
     .safeParse(invitesIds)
+}
+
+export function validateOverwriteConfirmationSchema(
+  overwriteConfirmation: IOverwriteConfirmation
+) {
+  return overwriteConfirmationSchema.safeParse(overwriteConfirmation)
 }

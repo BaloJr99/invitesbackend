@@ -15,16 +15,19 @@ export const createInvitesRouter = (mysqlDatabase: MysqlDatabase) => {
     [checkJwt, isInvitesAdmin],
     invitesController.getInvites
   )
+
   invitesRouter.post(
     '/',
     [checkJwt, isInvitesAdmin],
     invitesController.createInvite
   )
+
   invitesRouter.post(
     '/bulkInvites',
     [checkJwt, isInvitesAdmin],
     invitesController.bulkInvites
   )
+
   invitesRouter.delete(
     '/bulkInvites',
     [checkJwt, isInvitesAdmin],
@@ -61,6 +64,18 @@ export const createInvitesRouter = (mysqlDatabase: MysqlDatabase) => {
     '/messages/:id',
     [checkJwt, isInvitesAdmin, validateUuid],
     invitesController.readMessage
+  )
+
+  invitesRouter.patch(
+    '/cancel/:id',
+    [checkJwt, validateUuid, isInvitesAdmin],
+    invitesController.cancelInvites
+  )
+
+  invitesRouter.patch(
+    '/overwrite/:id',
+    [checkJwt, validateUuid, isInvitesAdmin],
+    invitesController.overwriteConfirmation
   )
 
   invitesRouter.patch(

@@ -90,7 +90,7 @@ export class EventsRepository implements IEventsRepository {
 
     try {
       const [results] = (await connection.query(
-        'SELECT IF(utc_date() >= DATE(dateOfEvent), true, false) AS isActive FROM events WHERE nameOfEvent = ?',
+        'SELECT IF(utc_date() >= DATE(dateOfEvent), true, false) AS isActive FROM events WHERE nameOfEvent = ? HAVING isActive = true',
         [nameOfEvent]
       )) as [RowDataPacket[], FieldPacket[]]
 

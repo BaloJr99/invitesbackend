@@ -44,7 +44,9 @@
     "INVALID_ENV": "Invalid environment",
     "ALBUM_CREATED": "Album created",
     "ALBUM_UPDATED": "Album updated",
-    "ALBUM_DELETED": "Album deleted"
+    "ALBUM_DELETED": "Album deleted",
+    "INVITES_CANCELED": "Invites canceled",
+    "CONFIRMATION_OVERWRITE": "Confirmation updated"
   },
   "errors": {
     "ERROR_SIGN_IN": "Error signing in",
@@ -100,6 +102,9 @@
     "ERROR_CREATE_ALBUM": "Error creating album",
     "ERROR_UPDATE_ALBUM": "Error updating album",
     "ERROR_CHECK_ALBUM": "Error checking album",
-    "ERROR_DELETE_ALBUM": "Error deleting album"
+    "ERROR_DELETE_ALBUM": "Error deleting album",
+    "ERROR_IS_ACTIVE": "Error getting active event",
+    "ERROR_CANCEL_INVITES": "Error canceling invites",
+    "ERROR_OVERWRITE_CONFIRMATION": "Error overwritting confirmation"
   }
 }

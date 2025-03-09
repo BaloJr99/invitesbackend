@@ -4,6 +4,7 @@ import {
   IConfirmation,
   IDashboardInvite,
   IInviteEventType,
+  IOverwriteConfirmation,
   ISaveTheDateConfirmation,
   IUpsertInvite,
   IUserFromInvite,
@@ -299,6 +300,40 @@ export class InvitesRepository implements IInvitesRepository {
       return result as IInviteEventType[]
     } catch (error) {
       return Promise.reject(error)
+    } finally {
+      if (connection) connection.release()
+    }
+  }
+
+  cancelInvites = async (eventId: string): Promise<void> => {
+    const connection = await this.database.getConnection()
+
+    try {
+      await connection.query(
+        'UPDATE invites SET confirmation = false, message = "", entriesConfirmed = 0, dateOfConfirmation = UTC_TIMESTAMP() WHERE eventId = UUID_TO_BIN(?) AND confirmation IS NULL',
+        [eventId]
+      )
+    } catch (error) {
+      console.error(error)
+    } finally {
+      if (connection) connection.release()
+    }
+  }
+
+  overwriteConfirmation = async (
+    overwriteConfirmation: IOverwriteConfirmation,
+    inviteId: string
+  ): Promise<void> => {
+    const connection = await this.database.getConnection()
+
+    try {
+      const { confirmation, entriesConfirmed } = overwriteConfirmation
+      await connection.query(
+        'UPDATE invites SET confirmation = ?, entriesConfirmed = ?, message = "", dateOfConfirmation = UTC_TIMESTAMP() WHERE id = UUID_TO_BIN(?)',
+        [confirmation, entriesConfirmed, inviteId]
+      )
+    } catch (error) {
+      console.error(error)
     } finally {
       if (connection) connection.release()
     }
