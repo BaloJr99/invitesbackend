@@ -280,4 +280,38 @@ export class EventsController {
       )
     }
   }
+
+  isActive: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    console.log(req.headers['user-agent'])
+    try {
+      const { id } = req.params
+
+      const eventId = await this.eventsRepository.getEventId(id)
+
+      if (eventId === '') {
+        res.status(404).json({ message: req.t('messages.EVENT_NOT_FOUND') })
+        return
+      }
+
+      const isActive = await this.eventsRepository.isActive(id)
+
+      res.json({
+        isActive,
+        eventId
+      })
+      return
+    } catch (_e) {
+      const e: Error = _e as Error
+      this.errorHandler.handleHttp(
+        res,
+        req,
+        'ERROR_IS_ACTIVE',
+        e.message,
+        req.userId
+      )
+    }
+  }
 }

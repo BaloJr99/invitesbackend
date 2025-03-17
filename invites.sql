@@ -16,6 +16,7 @@ CREATE TABLE invites (
   eventId BINARY(16) NOT NULL,
   inviteGroupId BINARY(16) NOT NULL,
   inviteViewed BOOLEAN DEFAULT 0,
+  lastViewedDate DATETIME NULL,
   needsAccomodation BOOLEAN NULL,
 );
 

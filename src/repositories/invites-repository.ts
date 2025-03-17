@@ -60,7 +60,7 @@ export class InvitesRepository implements IInvitesRepository {
 
     try {
       await connection.query(
-        'UPDATE invites SET inviteViewed = ? WHERE id = UUID_TO_BIN(?)',
+        'UPDATE invites SET inviteViewed = ?, lastViewedDate = UTC_TIMESTAMP() WHERE id = UUID_TO_BIN(?)',
         [true, id]
       )
     } catch (error) {

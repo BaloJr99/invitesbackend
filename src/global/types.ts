@@ -96,6 +96,7 @@ export interface IFullInvite {
   inviteGroupId: string
   inviteViewed: string
   needsAccomodation: boolean | null
+  lastViewedDate: string | null
 }
 
 export type IUpsertInvite = Omit<
@@ -107,6 +108,7 @@ export type IUpsertInvite = Omit<
   | 'isMessageRead'
   | 'inviteViewed'
   | 'needsAccomodation'
+  | 'lastViewedDate'
 >
 
 export type IBulkInvite = Pick<

@@ -28,11 +28,7 @@ export const createApiRouter = (
     createAuthRouter(mysqlDatabase, nodemailerConnection)
   )
 
-  apiRouter.use(
-    '/events',
-    [json(), checkJwt, isInvitesAdmin],
-    createEventsRouter(mysqlDatabase)
-  )
+  apiRouter.use('/events', json(), createEventsRouter(mysqlDatabase))
 
   apiRouter.use(
     '/inviteGroups',
